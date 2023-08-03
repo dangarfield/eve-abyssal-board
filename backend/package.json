@@ -1,0 +1,32 @@
+{
+  "name": "eve-abyssal-board-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon app.js"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "backend/raw-data",
+      "raw-data",
+      "data",
+      "client-src",
+      "_static",
+      "_docs",
+      "*.json"
+    ]
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "eve-esi-swaggerts": "^1.11.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.1"
+  }
+}

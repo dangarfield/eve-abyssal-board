@@ -1,0 +1,31 @@
+{
+  "name": "eve-abyssal-board",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "run-p dev:*",
+    "dev:backend": "npm run dev -w backend",
+    "dev:frontend": "npm run dev -w frontend",
+    "build:frontend": "npm run build -w frontend",
+    "deploy": "push-dir --dir=frontend/_static --branch=gh-pages"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "adm-zip": "^0.5.10",
+    "js-yaml": "^4.1.0",
+    "push-dir": "^0.4.1"
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "devDependencies": {
+    "axios": "^1.4.0",
+    "npm-run-all": "^4.1.5",
+    "standard": "^17.1.0",
+    "unzipper": "^0.10.14"
+  }
+}

@@ -1,3 +1,4 @@
+import { getAppraisalForItemId } from './appraisal'
 import { doesCurrentCharacterHaveSellerScope, getCurrentUserDetails, triggerLoginFlow } from './auth'
 import { getCurrentUserListedItems } from './board-api'
 import { getCurrentUserModInventory } from './esi-api'
@@ -161,6 +162,7 @@ const renderInventoryPlaceholder = (userDetails) => {
                 </div>
                 <p>EVE Online servers cache this data and it is made available to us up to 60 minutes after requesting.</p>
                 <p class="refresh-time">This text will update with the next refresh time.</p>
+                <p>Select the mods that you wish to sell and </p>
             </div>
         </div>
         <div class="inner-content">
@@ -276,6 +278,13 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
                     <p><img src="https://images.evetech.net/types/${item.sourceTypeId}/icon?size=32">${item.sourceTypeName}</p>
                     <hr/>
                     ${dogmaHtml}
+                    <div class="appraisal" data-item-id="${item.item_id}">
+                      <div class="col placeholder-glow">
+                          <span class="col-3">Value:</span>
+                          <span class="placeholder col-6"></span>
+                          <span class="placeholder col-2"></span>
+                      </div>
+                    </div>
                 </div>
             </div>
         </div>`
@@ -310,6 +319,17 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
   const refreshTimeInterval = setInterval(refreshTime, 1000)
   refreshTime()
 }
+const updateAppraisals = async () => {
+  console.log('start')
+  await Promise.all([...document.querySelectorAll('.appraisal')].map(async appraisalEle => {
+    const itemId = appraisalEle.getAttribute('data-item-id')
+    const appraisal = await getAppraisalForItemId(itemId)
+    console.log('appraisalEle', appraisalEle, itemId, appraisal)
+    appraisalEle.innerHTML = `<p>Value: ${appraisal.value} <i>(Confidence: ${appraisal.confidence})</></p>`
+    return appraisalEle
+  }))
+  console.log('end')
+}
 export const initSellFlow = async () => {
   if (doesCurrentCharacterHaveSellerScope()) {
     const userDetails = getCurrentUserDetails()
@@ -331,6 +351,7 @@ export const initListModInventory = async () => {
     console.log('Seller logged in, show available mods')
     const { inventory, cacheExpires, lastModified } = await getCurrentUserModInventory()
     renderAvailableInventory(inventory, cacheExpires, lastModified)
+    await updateAppraisals()
   } else {
     window.location.hash = '#/sell'
   }

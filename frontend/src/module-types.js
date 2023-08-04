@@ -2,6 +2,7 @@ export const getAbyssModuleTypesFlatIds = () => {
   const types = getAbyssModuleTypes()
   return types.flatMap((item) => item.categories.map((category) => category.typeId))
 }
+// TODO - Can all be replaced with dynamicattributes.json
 const RELEVANT_ATTRIBUTES = {
   microwarpdrive: [6, 147, 20, 30, 554, 50],
   afterburner: [6, 20, 30, 50],
@@ -92,7 +93,66 @@ const RELEVANT_VALUE_GROUP_MAPPING = {
   56312: RELEVANT_ATTRIBUTES.energy_neutralizer,
   56313: RELEVANT_ATTRIBUTES.abyssal_siege_module
 }
-
+const UNIT_STR = {
+  1: 'm',
+  2: 'kg',
+  3: 'sec',
+  4: 'A',
+  5: 'K',
+  6: 'mol',
+  7: 'cd',
+  8: 'm2',
+  9: 'm3',
+  10: 'm/sec',
+  11: 'm/sec',
+  12: 'm-1',
+  13: 'kg/m3',
+  14: 'm3/kg',
+  15: 'A/m2',
+  16: 'A/m',
+  17: 'mol/m3',
+  18: 'cd/m2',
+  19: 'kg/kg = 1',
+  101: 's',
+  102: 'mm',
+  103: 'None',
+  104: 'x',
+  105: '%',
+  106: 'tf',
+  107: 'MW',
+  108: '%',
+  109: '%',
+  111: '%',
+  112: 'rad/sec',
+  113: 'HP',
+  114: 'GJ',
+  115: 'groupID',
+  116: 'typeID',
+  118: 'Ore units',
+  119: 'attributeID',
+  120: 'points',
+  121: '%',
+  122: 'None',
+  123: 'sec',
+  124: '%',
+  125: 'N',
+  126: 'ly',
+  127: '%',
+  128: 'Mbit/sec',
+  129: 'None',
+  133: 'ISK',
+  134: 'm3/hour',
+  135: 'AU',
+  136: 'Slot',
+  138: 'units',
+  139: '+',
+  140: 'Level',
+  141: 'hardpoints',
+  143: 'None'
+}
+export const getUnitStringForUnitId = (unitId) => {
+  return UNIT_STR[unitId]
+}
 export const getRelevantDogmaAttributesForTypeId = (typeId) => {
   const mapping = RELEVANT_VALUE_GROUP_MAPPING[typeId]
   if (mapping === undefined) return RELEVANT_ATTRIBUTES.afterburner

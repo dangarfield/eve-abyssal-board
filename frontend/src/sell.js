@@ -214,6 +214,20 @@ const renderInventoryPlaceholder = (userDetails) => {
     `
   document.querySelector('.content').innerHTML = html
 }
+const formatForUnit = (value, unit, addSign) => {
+  let outputValue = ''
+  switch (unit) {
+    case 'GJ': outputValue = value.toFixed(1); break
+    case 's': outputValue = (value / 1000).toFixed(2); break
+    case 'x': outputValue = value.toFixed(3); break
+    case 'm': outputValue = Math.floor(value).toFixed(0); break
+    // case '%': outputValue = (100 * (1 - value)).toFixed(2); break
+    default: outputValue = value.toFixed(2); break
+  }
+  const signValue = addSign && value > 0 ? '+' : ''
+  outputValue = outputValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  return `${signValue}${outputValue} ${unit}`
+}
 const renderAvailableInventory = (availableInventory, cacheExpires, lastModified) => {
   let html = ''
 
@@ -244,7 +258,13 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
     html += '<div class="row">'
     for (const item of availableInventory) {
       const dogmaHtml = item.relevantDogmaAttributes.map(dogma => {
-        return `<p><img src="icons/${dogma.iconID}.png" width="32" height="32">${dogma.name} - ${dogma.value}</p>`
+        return `<p><img src="icons/${dogma.iconID}.png" width="32" height="32">
+            ${dogma.name} |
+            ${formatForUnit(dogma.value, dogma.unit)} |
+            ${formatForUnit(dogma.diff, dogma.unit, true)} |
+            ${dogma.isGood ? 'GOOD' : 'BAD'} |
+            ${formatForUnit(dogma.min, dogma.unit)} - ${formatForUnit(dogma.max, dogma.unit)}
+            </p>`
       }).join('')
       html += `
         <div class="col-3 mt-4">

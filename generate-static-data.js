@@ -10,9 +10,18 @@ import { getAllRelevantDogmaAttributes } from './frontend/src/module-types.js'
 const SDE_URL = 'https://eve-static-data-export.s3-eu-west-1.amazonaws.com/tranquility/sde.zip'
 const SDE_ICONS_URL = 'https://web.ccpgamescdn.com/aws/developers/Uprising_V21.03_Icons.zip'
 const SDE_TYPES_URL = 'https://web.ccpgamescdn.com/aws/developers/Uprising_V21.03_Types.zip'
+const DYN_ATTRS_URL = 'https://sde.hoboleaks.space/tq/dynamicitemattributes.json'
 
 const yamlToJson = (filePath) => {
   return yaml.load(fs.readFileSync(filePath, 'utf-8'))
+}
+const downloadJson = async (url, folder) => {
+  const fileName = path.basename(url)
+  const filePath = path.join(folder, fileName)
+  if (fs.existsSync(filePath)) return
+  const data = (await axios.get(url)).data
+  console.log('downloadJson', fileName, url, filePath)
+  fs.writeFileSync(filePath, JSON.stringify(data))
 }
 const downloadAndUnzip = async (url, unzipPath, folderName) => {
   try {
@@ -124,18 +133,36 @@ const populateRequiredData = async () => {
   }
 
   // Item Names
-  const itemNames = Object.keys(types)
+  const typeDogmas = yamlToJson('./_data/sde/fsd/typeDogma.yaml')
+  const relevantAttributes = getAllRelevantDogmaAttributes()
+  const itemData = Object.keys(types)
     .map((key) => {
       const type = types[key]
       type.typeID = key
+      const group = groups[type.groupID]
+      type.categoryID = group.categoryID
       return type
     })
-    .filter((item) => item.published) // Filter items by metaGroupID
+    .filter((item) => item.published && (item.categoryID === 7 || item.categoryID === 17))// Only get modules, do mutaplasmids count as modules?
     .reduce((acc, item) => {
-      acc[item.typeID] = item.name.en
+      acc[item.typeID] = {
+        name: item.name.en
+      }
+      if (typeDogmas[item.typeID]) {
+        acc[item.typeID].dogmaAttributes = typeDogmas[item.typeID].dogmaAttributes
+          .filter(a => relevantAttributes.includes(a.attributeID))
+          .reduce((obj, item) => {
+            obj[item.attributeID] = item.value
+            return obj
+          }, {})
+      }
       return acc
     }, {})
-  return { abyssalTypes, dogmaAttributes, dogmaEffects, itemNames }
+
+  const mutatorAttributes = JSON.parse(fs.readFileSync('./_data/dynamicitemattributes.json', 'utf8'))
+  // https://sde.hoboleaks.space/tq/dynamicitemattributes.json
+  // https://github.com/stephenswat/eve-abyssal-market/blob/0ef588480f7a4fbe70c4fa1c68a0e8c5d9c99700/abyssal_modules/management/commands/get_abyssal_types.py
+  return { abyssalTypes, dogmaAttributes, dogmaEffects, itemData, mutatorAttributes }
 }
 const copyDogmaAttributeImages = async () => {
   const dogmaAttributes = yamlToJson('./_data/sde/fsd/dogmaAttributes.yaml')
@@ -148,12 +175,13 @@ const copyDogmaAttributeImages = async () => {
   for (const dogmaAttributeImage of dogmaAttributeImages) {
     fs.copyFileSync(dogmaAttributeImage.from, dogmaAttributeImage.to)
   }
-  console.log('copyDogmaAttributeImages', dogmaAttributeImages)
+//   console.log('copyDogmaAttributeImages', dogmaAttributeImages)
 }
 const init = async () => {
   await downloadAndUnzip(SDE_URL, './_data', 'sde')
   await downloadAndUnzip(SDE_ICONS_URL, './_data', 'Icons')
   await downloadAndUnzip(SDE_TYPES_URL, './_data', 'Types')
+  await downloadJson(DYN_ATTRS_URL, './_data')
   const data = await populateRequiredData()
   await saveRequiredData(data)
   await copyDogmaAttributeImages()

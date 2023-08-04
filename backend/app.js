@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import { getSellerListings } from './listings.js'
+import { getAppConfig } from './config.js'
 
 const app = express()
 const PORT = 3001
@@ -42,6 +43,10 @@ app.get('/api/inventory/:characterId', verifyToken, async function (req, res) {
   const characterId = req.params.characterId
   console.log('/api/inventory/:characterId', characterId, 'auth', req.auth.characterId, req.auth.characterName)
   res.json((await getSellerListings(characterId)))
+})
+app.get('/api/app-config', async function (req, res) {
+  console.log('/api/app-config')
+  res.json((await getAppConfig()))
 })
 
 app.listen(PORT, function (err) {

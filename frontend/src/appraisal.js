@@ -12,7 +12,7 @@ const getValueAndConfidenceFromHtml = (text) => {
   let match
   while ((match = regex.exec(appraisalText)) !== null) {
     matches.push(match[1].replace('(nan)', '').trim())
-    console.log('match', match[1].trim())
+    // console.log('match', match[1].trim())
   }
   return { value: matches[0], confidence: matches[1] }
 }
@@ -22,7 +22,7 @@ export const getAppraisalForItemId = async (itemId) => {
     const req = await fetch(`https://thingproxy.freeboard.io/fetch/https://mutaplasmid.space/module/${itemId}/`)
     const text = await req.text()
     const appraisal = getValueAndConfidenceFromHtml(text)
-    console.log('appraisal', appraisal)
+    // console.log('appraisal', appraisal)
     return appraisal
   } catch (error) {
     return { value: 'Unavailable', confidence: 'Unavailable' }

@@ -1,6 +1,6 @@
 import { getAppraisalForItemId } from './appraisal'
 import { doesCurrentCharacterHaveSellerScope, getCurrentUserDetails, triggerLoginFlow } from './auth'
-import { getCurrentUserListedItems } from './board-api'
+import { getAppConfig, getCurrentUserListedItems } from './board-api'
 import { getCurrentUserModInventory } from './esi-api'
 
 const askForSellerScopePermission = () => {
@@ -162,7 +162,7 @@ const renderInventoryPlaceholder = (userDetails) => {
                 </div>
                 <p>EVE Online servers cache this data and it is made available to us up to 60 minutes after requesting.</p>
                 <p class="refresh-time">This text will update with the next refresh time.</p>
-                <p>Select the mods that you wish to sell and </p>
+                <p>Select the mods that you wish to sell</p>
             </div>
         </div>
         <div class="inner-content">
@@ -213,6 +213,33 @@ const renderInventoryPlaceholder = (userDetails) => {
             </div>
         </div>
     </div>
+    <div class="selected-inventory-holder">
+      <nav class="fixed-bottom bg-secondary pb-0 pt-2">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-10">
+              <ul class="row my-0 px-0 gx-2 selected-inventory-item-holder">
+              </ul>
+            </div>
+            <div class="col-2">
+              <ul class="navbar-nav ms-auto h-100 pb-2">
+                <button class="btn btn-primary w-100 h-100 confirm-inventory" type="submit">
+                  <div class="d-flex flex-row justify-content-center">
+                    <i class="bi bi-plus-circle-fill"></i>
+                    <span class="text-start ps-3">
+                      List <span class="count">0</span> mods<br/>
+                      <i class="price">0 ISK</i>
+                    </span>
+                  </div>
+                </button>
+              </ul>
+            </div>
+          </div>
+          
+        </div>
+      </nav>
+
+    </div>
     `
   document.querySelector('.content').innerHTML = html
 }
@@ -230,6 +257,19 @@ const formatForUnit = (value, unit, addSign) => {
   outputValue = outputValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
   return `${signValue}${outputValue} ${unit}`
 }
+const formatToISKString = (number) => {
+  const suffixes = ['', 'k', 'm', 'b', 't']
+  let absNumber = Math.abs(number)
+  let suffixIndex = 0
+  while (absNumber >= 1000 && suffixIndex < suffixes.length - 1) {
+    absNumber /= 1000
+    suffixIndex++
+  }
+  const formattedNumber = Number.isInteger(absNumber) ? absNumber : absNumber.toFixed(1)
+  const suffix = suffixes[suffixIndex]
+  return number >= 0 ? formattedNumber + suffix + ' ISK' : '-' + formattedNumber + suffix + ' ISK'
+}
+
 const renderAvailableInventory = (availableInventory, cacheExpires, lastModified) => {
   let html = ''
 
@@ -244,19 +284,19 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
         </div>
         `
   } else {
-    const filterHtml = `
-    <div class="row mt-4">
-        <div class="col">
-            <div class="hstack gap-3">
-                <input class="form-control me-auto" type="text" placeholder="TODO - Filter your items somehow">
-                <button type="button" class="btn btn-secondary">Submit</button>
-                <div class="vr"></div>
-                <button type="button" class="btn btn-outline-danger">Reset</button>
-            </div>
-        </div>
-    </div>
-    `
-    html += filterHtml
+    // const filterHtml = `
+    // <div class="row mt-4">
+    //     <div class="col">
+    //         <div class="hstack gap-3">
+    //             <input class="form-control me-auto" type="text" placeholder="TODO - Filter your items somehow">
+    //             <button type="button" class="btn btn-secondary">Submit</button>
+    //             <div class="vr"></div>
+    //             <button type="button" class="btn btn-outline-danger">Reset</button>
+    //         </div>
+    //     </div>
+    // </div>
+    // `
+    // html += filterHtml
     html += '<div class="row">'
     for (const item of availableInventory) {
       const dogmaHtml = item.relevantDogmaAttributes.map(dogma => {
@@ -270,7 +310,8 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
       }).join('')
       html += `
         <div class="col-3 mt-4">
-            <div class="card" aria-hidden="true">
+          <div class="card-container inventory-item" data-item-id="${item.item_id}">
+            <div class="card ">
                 <div class="card-body">
                     <h5 class="card-title"><img src="https://images.evetech.net/types/${item.type_id}/icon?size=32">${item.typeName}</h5>
                     <hr/>
@@ -287,6 +328,12 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
                     </div>
                 </div>
             </div>
+            <span class="interaction-button">
+              <button class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-circle-fill"></i>
+              </button>
+            </span>
+          </div>
         </div>`
     }
     html += '</div>'
@@ -318,17 +365,88 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
   }
   const refreshTimeInterval = setInterval(refreshTime, 1000)
   refreshTime()
+
+  // Bind add and remove inventory
+  for (const inventoryItemEle of [...document.querySelectorAll('.inventory-item')]) {
+    inventoryItemEle.addEventListener('click', async () => {
+      const itemId = parseInt(inventoryItemEle.getAttribute('data-item-id'))
+      const item = availableInventory.find(i => i.item_id === itemId)
+      console.log('inventoryItemEle', inventoryItemEle, itemId, item)
+      const isListed = inventoryItemEle.classList.contains('listed')
+      if (isListed) {
+        console.log('Item already listed')
+        return
+      }
+      const isSelected = inventoryItemEle.classList.contains('selected')
+      if (isSelected) {
+        console.log('Item already selected, remove from list')
+        inventoryItemEle.classList.remove('selected')
+        inventoryItemEle.querySelector('.interaction-button').innerHTML = '<button class="btn btn-primary btn-sm"><i class="bi bi-plus-circle-fill"></i></button>'
+        const selectedItemEle = document.querySelector(`.selected-inventory-item-holder [data-item-id="${itemId}"]`)
+        selectedItemEle.remove()
+      } else {
+        console.log('Item not selected, add to list')
+        inventoryItemEle.classList.add('selected')
+        inventoryItemEle.querySelector('.interaction-button').innerHTML = '<button class="btn btn-danger btn-sm"><i class="bi bi-x-circle-fill"></i></button>'
+
+        let html = ''
+        html += `
+        <div class="col-2" data-item-id="${itemId}">
+          <span class="selected-inventory-item">
+            <button class="btn btn-success btn-sm w-100 mb-2" type="submit">
+              <img src="https://images.evetech.net/types/${item.type_id}/icon?size=32">
+              <span class="title">${item.typeName}</span>
+            </button>
+            <span class="interaction-button">
+              <button class="btn btn-danger btn-sm">
+                <i class="bi bi-x-circle-fill"></i>
+              </button>
+            </span>
+          </span>
+        </div>`
+        document.querySelector('.selected-inventory-item-holder').insertAdjacentHTML('beforeend', html)
+
+        const selectedInventoryItems = document.querySelectorAll('.selected-inventory-item-holder [data-item-id]')
+        if (selectedInventoryItems.length > 0) {
+          const lastSelectedInventoryItem = selectedInventoryItems[selectedInventoryItems.length - 1]
+          lastSelectedInventoryItem.addEventListener('click', () => {
+            document.querySelector(`.inventory-item[data-item-id="${itemId}"]`).click()
+          })
+        }
+      }
+      const selectedCount = document.querySelectorAll('.inventory-item.selected').length
+      const listingPrice = (await getAppConfig()).listingPrice * selectedCount
+      console.log('listingPrice', selectedCount, listingPrice)
+      document.querySelector('.confirm-inventory .count').textContent = selectedCount
+      document.querySelector('.confirm-inventory .price').textContent = formatToISKString(listingPrice)
+
+      const selectedInventoryHolderEle = document.querySelector('.selected-inventory-holder')
+      if (selectedCount > 0) {
+        selectedInventoryHolderEle.style.opacity = '1'
+      } else {
+        selectedInventoryHolderEle.style.opacity = '0'
+      }
+    })
+  }
+
+  document.querySelector('.confirm-inventory').addEventListener('click', () => {
+    const selectedInventoryToList = [...document.querySelectorAll('.selected-inventory-item-holder [data-item-id]')].map(a => {
+      return availableInventory.find(i => i.item_id === parseInt(a.getAttribute('data-item-id')))
+    })
+    console.log('selectedInventoryToList', selectedInventoryToList)
+    window.alert(`Selected Inventory To List: ${selectedInventoryToList.map(a => a.typeName).join(', ')}`)
+  })
 }
 const updateAppraisals = async () => {
-  console.log('start')
+  // console.log('start')
   await Promise.all([...document.querySelectorAll('.appraisal')].map(async appraisalEle => {
     const itemId = appraisalEle.getAttribute('data-item-id')
     const appraisal = await getAppraisalForItemId(itemId)
-    console.log('appraisalEle', appraisalEle, itemId, appraisal)
+    // console.log('appraisalEle', appraisalEle, itemId, appraisal)
     appraisalEle.innerHTML = `<p>Value: ${appraisal.value} <i>(Confidence: ${appraisal.confidence})</></p>`
     return appraisalEle
   }))
-  console.log('end')
+  // console.log('end')
 }
 export const initSellFlow = async () => {
   if (doesCurrentCharacterHaveSellerScope()) {

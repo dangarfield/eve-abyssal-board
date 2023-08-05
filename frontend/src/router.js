@@ -1,4 +1,5 @@
-import { triggerLoginFlow, triggerLoginReturnFlow } from './auth'
+import { initAdmin } from './admin'
+import { triggerLoginFlow, triggerLoginReturnFlow, triggerAdminLoginFlow, triggerAdminLoginReturnFlow } from './auth'
 import { initSellFlow, initListModInventory } from './sell'
 
 const tempRender = (text) => { document.querySelector('.content').innerHTML = text }
@@ -57,6 +58,16 @@ const updateContent = (route) => {
       break
     case '/error':
       renderError()
+      break
+
+    case '/admin':
+      initAdmin()
+      break
+    case '/admin/login':
+      triggerAdminLoginFlow()
+      break
+    case '/admin/return': case '/admin/return/':
+      triggerAdminLoginReturnFlow()
       break
 
     default:

@@ -1,4 +1,5 @@
 import { getCurrentUserAccessToken, fetchWithRetry } from './auth'
+import { loadData } from './utils'
 
 const API_ROOT = 'http://localhost:3001'
 let appConfig
@@ -7,25 +8,37 @@ export const getCurrentUserListedItems = async () => {
   const { characterId, accessToken } = getCurrentUserAccessToken()
   const url = `${API_ROOT}/api/seller/${characterId}/items`
 
-  const fetchOptions = {
+  const res = await fetchWithRetry(url, {
     method: 'GET',
     headers: {
       Accept: 'application/json, text/plain, */*',
       'Content-Type': 'application/json',
       Authorization: `Bearer ${accessToken}`
     }
-  }
-
-  const res = await fetchWithRetry(url, fetchOptions)
+  })
   console.log('getCurrentUserListedItems', characterId, accessToken, res)
   return res
 }
 
-export const getAppConfig = async () => {
-  if (appConfig !== undefined) return appConfig
+export const getAppConfig = async (forceRefresh) => {
+  if (appConfig !== undefined && !forceRefresh) return appConfig
   const req = await window.fetch(`${API_ROOT}/api/app-config`)
   const res = await req.json()
   appConfig = res
   console.log('appConfig', appConfig)
   return appConfig
+}
+export const getCorpCharacterConfig = async () => {
+  const data = loadData()
+  const req = await window.fetch(`${API_ROOT}/api/corp-char-config`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `${data['admin-password']}`
+    }
+  })
+  const corpCharacterConfig = await req.json()
+  console.log('getCorpCharacterConfig', corpCharacterConfig)
+  return corpCharacterConfig
 }

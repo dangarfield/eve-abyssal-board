@@ -1,7 +1,10 @@
 export const loadData = () => {
   const dataString = window.localStorage.getItem('abyssal-board')
   if (dataString) {
-    return JSON.parse(dataString)
+    const data = JSON.parse(dataString)
+    // delete data['admin-token']
+    // clearData('admin-token')
+    return data
   }
   return {}
 }

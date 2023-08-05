@@ -2,6 +2,7 @@ import { loadData, saveData, clearData } from './utils'
 import { createSSO } from 'eve-sso-pkce'
 
 const SELLER_SCOPES = 'publicData esi-assets.read_assets.v1'.split(' ')
+const ADMIN_SCOPES = 'esi-mail.organize_mail.v1 esi-mail.read_mail.v1 esi-mail.send_mail.v1 esi-wallet.read_character_wallet.v1 esi-contracts.read_character_contracts.v1 esi-wallet.read_corporation_wallets.v1 esi-contracts.read_corporation_contracts.v1'.split(' ')
 
 const ssoConfig = window.location.href.includes('localhost')
   ? {
@@ -12,8 +13,20 @@ const ssoConfig = window.location.href.includes('localhost')
       clientId: 'dc6490d2eafc421a8cc35cf0394d60d1',
       redirectUri: 'https://dangarfield.github.io/eve-remap/'
     }
+
+const ssoConfigAdmin = window.location.href.includes('localhost')
+  ? {
+      clientId: 'e754a650bfb24eda938734b8ddd38679',
+      redirectUri: 'http://localhost:3000/#/admin/return/'
+    }
+  : {
+      clientId: 'dc6490d2eafc421a8cc35cf0394d60d1',
+      redirectUri: 'https://dangarfield.github.io/eve-remap/'
+    }
+
 // console.log('ssoConfig', ssoConfig)
 const sso = createSSO(ssoConfig)
+const ssoAdmin = createSSO(ssoConfigAdmin)
 
 export const triggerLoginFlow = async (useScopes) => {
   console.log('triggerLoginFlow useScopes', useScopes)
@@ -44,6 +57,39 @@ export const triggerLoginReturnFlow = async () => {
     console.log('token', token)
     saveData('selectedCharacter', token.character_id)
     saveData(`token-${token.character_id}`, token)
+    clearData('codeVerifier')
+    clearData('returnUrl')
+    window.location.assign(data.returnUrl)
+  } else {
+    // TODO - More robust version of handling failures
+    clearData('codeVerifier')
+    clearData('returnUrl')
+    window.alert('login failed')
+  }
+}
+export const triggerAdminLoginFlow = async () => {
+  console.log('triggerAdminLoginFlow useScopes')
+  saveData('returnUrl', window.location.href)
+  clearData('codeVerifier')
+  const ssoUri = await ssoAdmin.getUri(ADMIN_SCOPES)
+  saveData('codeVerifier', ssoUri.codeVerifier)
+  console.log('ssoUri', ssoUri)
+  window.location.assign(ssoUri.uri)
+}
+export const triggerAdminLoginReturnFlow = async () => {
+  const urlParams = new URLSearchParams(window.location.search)
+  const code = urlParams.get('code')
+  const state = urlParams.get('state')
+
+  console.log('triggerAdminLoginReturnFlow', code, state)
+  if (code && state) {
+    const data = loadData()
+    console.log('code', code, 'state', state, 'codeVerifier', data.codeVerifier)
+    const token = await ssoAdmin.getAccessToken(code, data.codeVerifier)
+    token.character_id = token.payload.sub.replace('CHARACTER:EVE:', '')
+    console.log('token', token)
+    saveData('selectedCharacter', token.character_id)
+    saveData('admin-token', token)
     clearData('codeVerifier')
     clearData('returnUrl')
     window.location.assign(data.returnUrl)
@@ -107,6 +153,11 @@ export const doesCurrentCharacterHaveSellerScope = () => {
   } else {
     return false
   }
+}
+export const isLoginPasswordSet = () => {
+  // clearData('admin-token')
+  const data = loadData()
+  return data['admin-password'] !== undefined
 }
 export const fetchWithRetry = async (url, fetchOptions, maxRetries = 3) => {
   let retries = 0

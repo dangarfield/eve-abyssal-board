@@ -162,7 +162,7 @@ const renderInventoryPlaceholder = (userDetails) => {
                 </div>
                 <p>EVE Online servers cache this data and it is made available to us up to 60 minutes after requesting.</p>
                 <p class="refresh-time">This text will update with the next refresh time.</p>
-                <p>Select the mods that you wish to sell</p>
+                <p>Select the mods that you wish to sell and add your listing price. You can update the listing price at any time after it is listed.</p>
             </div>
         </div>
         <div class="inner-content">
@@ -326,6 +326,13 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
                           <span class="placeholder col-2"></span>
                       </div>
                     </div>
+                    <div class="mt-2 listing-price-holder" style="display:none;">
+                      <div class="input-group mb-3">
+                        <input type="text" class="form-control listing-price no-click-close text-end" placeholder="Add listing price">
+                        <span class="input-group-text no-click-close">eg, 13m 1.9b</span>
+                      </div>
+
+                    </div>
                 </div>
             </div>
             <span class="interaction-button">
@@ -368,7 +375,8 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
 
   // Bind add and remove inventory
   for (const inventoryItemEle of [...document.querySelectorAll('.inventory-item')]) {
-    inventoryItemEle.addEventListener('click', async () => {
+    inventoryItemEle.addEventListener('click', async function (event) {
+      if (event.target.classList.contains('no-click-close')) return
       const itemId = parseInt(inventoryItemEle.getAttribute('data-item-id'))
       const item = availableInventory.find(i => i.item_id === itemId)
       console.log('inventoryItemEle', inventoryItemEle, itemId, item)
@@ -384,6 +392,8 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
         inventoryItemEle.querySelector('.interaction-button').innerHTML = '<button class="btn btn-primary btn-sm"><i class="bi bi-plus-circle-fill"></i></button>'
         const selectedItemEle = document.querySelector(`.selected-inventory-item-holder [data-item-id="${itemId}"]`)
         selectedItemEle.remove()
+        inventoryItemEle.querySelector('.listing-price-holder').style.display = 'none'
+        inventoryItemEle.querySelector('.listing-price-holder .listing-price').focus()
       } else {
         console.log('Item not selected, add to list')
         inventoryItemEle.classList.add('selected')
@@ -405,6 +415,7 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
           </span>
         </div>`
         document.querySelector('.selected-inventory-item-holder').insertAdjacentHTML('beforeend', html)
+        inventoryItemEle.querySelector('.listing-price-holder').style.display = 'block'
 
         const selectedInventoryItems = document.querySelectorAll('.selected-inventory-item-holder [data-item-id]')
         if (selectedInventoryItems.length > 0) {
@@ -428,14 +439,32 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
       }
     })
   }
-
+  for (const listingPriceEle of [...document.querySelectorAll('.listing-price')]) {
+    listingPriceEle.addEventListener('blur', () => {
+      listingPriceEle.value = validateListingPrice(listingPriceEle.value)
+    })
+  }
   document.querySelector('.confirm-inventory').addEventListener('click', () => {
-    const selectedInventoryToList = [...document.querySelectorAll('.selected-inventory-item-holder [data-item-id]')].map(a => {
-      return availableInventory.find(i => i.item_id === parseInt(a.getAttribute('data-item-id')))
+    const selectedInventoryToList = [...document.querySelectorAll('.inventory-item.selected[data-item-id]')].map(a => {
+      const inventory = availableInventory.find(i => i.item_id === parseInt(a.getAttribute('data-item-id')))
+      inventory.listingPrice = a.querySelector('.listing-price').value
+      return inventory
     })
     console.log('selectedInventoryToList', selectedInventoryToList)
-    window.alert(`Selected Inventory To List: ${selectedInventoryToList.map(a => a.typeName).join(', ')}`)
+    window.alert(`Selected Inventory To List: ${selectedInventoryToList.map(a => a.typeName + ' ' + a.listingPrice).join(', ')}`)
   })
+}
+const validateListingPrice = (inputValue) => {
+  const digitsString = inputValue.match(/[\d.]+/g)
+  const value = parseFloat(digitsString ? digitsString.join('') : '')
+
+  const inputValueLower = inputValue.toLowerCase().replace('isk', '')
+  let unit = ''
+  if (inputValueLower.includes('k') || inputValueLower.includes('thou')) unit = 'k'
+  else if (inputValueLower.includes('m') || inputValueLower.includes('mil')) unit = 'm'
+  else if (inputValueLower.includes('b') || inputValueLower.includes('bil')) unit = 'b'
+  else if (inputValueLower.includes('t') || inputValueLower.includes('tril')) unit = 't'
+  return value + unit
 }
 const updateAppraisals = async () => {
   // console.log('start')
@@ -444,6 +473,7 @@ const updateAppraisals = async () => {
     const appraisal = await getAppraisalForItemId(itemId)
     // console.log('appraisalEle', appraisalEle, itemId, appraisal)
     appraisalEle.innerHTML = `<p>Value: ${appraisal.value} <i>(Confidence: ${appraisal.confidence})</></p>`
+    appraisalEle.parentNode.querySelector('.listing-price').value = validateListingPrice(appraisal.value)
     return appraisalEle
   }))
   // console.log('end')

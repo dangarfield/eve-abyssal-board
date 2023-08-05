@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import { getSellerListings } from './listings.js'
-import { getAppConfig, getCorpCharacterConfig } from './config.js'
+import { getAppConfig, getCorpCharacterConfig, setAppConfig, setCorpCharacterConfig } from './config.js'
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -59,12 +59,20 @@ app.get('/api/inventory/:characterId', verifyToken, async function (req, res) {
   res.json((await getSellerListings(characterId)))
 })
 app.get('/api/app-config', async function (req, res) {
-  console.log('/api/app-config')
+  console.log('GET /api/app-config')
   res.json((await getAppConfig()))
 })
+app.post('/api/app-config', verifyAdmin, async function (req, res) {
+  console.log('POST /api/app-config', req.body)
+  res.json((await setAppConfig(req.body)))
+})
 app.get('/api/corp-char-config', verifyAdmin, async function (req, res) {
-  console.log('/api/corp-char-config', req.body)
+  console.log('GET /api/corp-char-config', req.body)
   res.json((await getCorpCharacterConfig()))
+})
+app.post('/api/corp-char-config', verifyAdmin, async function (req, res) {
+  console.log('POST /api/corp-char-config', req.body)
+  res.json((await setCorpCharacterConfig(req.body)))
 })
 
 app.listen(PORT, function (err) {

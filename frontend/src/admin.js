@@ -1,5 +1,5 @@
 import { isLoginPasswordSet, triggerAdminLoginFlow } from './auth'
-import { getAppConfig, getCorpCharacterConfig } from './board-api'
+import { getAppConfig, getCorpCharacterConfig, setAppConfig, setCorpCharacterConfig } from './board-api'
 import { saveData, clearData, loadData } from './utils'
 
 const renderAdminLogin = () => {
@@ -78,12 +78,26 @@ const renderAdminDetails = (corpCharacterConfig, appConfig, adminToken) => {
                             <div class="col-sm-4">
                                 <input type="text" class="form-control" id="corpId" value="${corpCharacterConfig.corpId}">
                             </div>
+                            ${adminToken
+? `
+                            <div class="col-sm-4 offset-sm-2">
+                                <input type="text" class="form-control" id="corpId-sso" value="${adminToken.corpId}" disabled>
+                            </div>
+                            `
+: ''}
                         </div>
                         <div class="row mb-3">
                             <label for="corpName" class="col-sm-2 col-form-label">Corp Name</label>
                             <div class="col-sm-4">
                                 <input type="text" class="form-control" id="corpName" value="${corpCharacterConfig.corpName}">
                             </div>
+                            ${adminToken
+? `
+                            <div class="col-sm-4 offset-sm-2">
+                                <input type="text" class="form-control" id="corpName-sso" value="${adminToken.corpName}" disabled>
+                            </div>
+                            `
+: ''}
                         </div>
                         <div class="row mb-3">
                             <label for="corpDivision" class="col-sm-2 col-form-label">Corp Wallet Division</label>
@@ -138,9 +152,24 @@ const renderAdminDetails = (corpCharacterConfig, appConfig, adminToken) => {
             </div>
         </div>`
   document.querySelector('.content').innerHTML = html
-  document.querySelector('.admin-form').addEventListener('submit', function (event) {
+  document.querySelector('.admin-form').addEventListener('submit', async function (event) {
     event.preventDefault()
-    console.log('sadsa')
+
+    const newAppConfig = {
+      listingPrice: parseInt(document.querySelector('#listingPrice').value)
+    }
+    await setAppConfig(newAppConfig)
+
+    const corpCharacterConfig = {
+      characterId: parseInt(document.querySelector('#characterId').value),
+      characterName: document.querySelector('#characterName').value,
+      corpId: parseInt(document.querySelector('#corpId').value),
+      corpName: document.querySelector('#corpName').value,
+      corpDivision: parseInt(document.querySelector('#corpDivision').value),
+      accessToken: document.querySelector('#accessToken').value,
+      refreshToken: document.querySelector('#refreshToken').value
+    }
+    await setCorpCharacterConfig(corpCharacterConfig)
   })
   document.querySelector('.admin-form .clear-sso').addEventListener('click', function (event) {
     console.log('clear-sso')
@@ -157,6 +186,8 @@ const renderAdminDetails = (corpCharacterConfig, appConfig, adminToken) => {
       console.log('transferSsoEle')
       document.querySelector('#characterId').value = document.querySelector('#characterId-sso').value
       document.querySelector('#characterName').value = document.querySelector('#characterName-sso').value
+      document.querySelector('#corpId').value = document.querySelector('#corpId-sso').value
+      document.querySelector('#corpName').value = document.querySelector('#corpName-sso').value
       document.querySelector('#accessToken').value = document.querySelector('#accessToken-sso').value
       document.querySelector('#refreshToken').value = document.querySelector('#refreshToken-sso').value
     })

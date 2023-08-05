@@ -28,6 +28,20 @@ export const getAppConfig = async (forceRefresh) => {
   console.log('appConfig', appConfig)
   return appConfig
 }
+export const setAppConfig = async (newAppConfig) => {
+  const data = loadData()
+  console.log('setAppConfig', newAppConfig)
+  const req = await window.fetch(`${API_ROOT}/api/app-config`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `${data['admin-password']}`
+    },
+    body: JSON.stringify(newAppConfig)
+  })
+  appConfig = await req.json()
+}
 export const getCorpCharacterConfig = async () => {
   const data = loadData()
   const req = await window.fetch(`${API_ROOT}/api/corp-char-config`, {
@@ -41,4 +55,18 @@ export const getCorpCharacterConfig = async () => {
   const corpCharacterConfig = await req.json()
   console.log('getCorpCharacterConfig', corpCharacterConfig)
   return corpCharacterConfig
+}
+
+export const setCorpCharacterConfig = async (corpCharacterConfig) => {
+  const data = loadData()
+  console.log('setCorpCharacterConfig', corpCharacterConfig)
+  await window.fetch(`${API_ROOT}/api/corp-char-config`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `${data['admin-password']}`
+    },
+    body: JSON.stringify(corpCharacterConfig)
+  })
 }

@@ -136,6 +136,11 @@ export const getCurrentUserModInventory = async () => {
   // TODO - Highligh already listed items
   return { inventory, cacheExpires, lastModified }
 }
-
+export const getCorpForChar = async (characterId, accessToken) => {
+  const corpId = (await esi.characters.postCharactersAffiliation([characterId])).data[0].corporation_id
+  const corpName = (await esi.corporations.getCorporationsCorporationId(corpId)).data.name
+  // console.log('corpId', corpId, corpName)
+  return { corpId, corpName }
+}
 // List of modules
 // https://github.com/stephenswat/eve-abyssal-market/blob/master/abyssal_modules/models/modules.py

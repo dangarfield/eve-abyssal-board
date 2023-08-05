@@ -1,3 +1,4 @@
+import { getCorpForChar } from './esi-api'
 import { loadData, saveData, clearData } from './utils'
 import { createSSO } from 'eve-sso-pkce'
 
@@ -87,7 +88,11 @@ export const triggerAdminLoginReturnFlow = async () => {
     console.log('code', code, 'state', state, 'codeVerifier', data.codeVerifier)
     const token = await ssoAdmin.getAccessToken(code, data.codeVerifier)
     token.character_id = token.payload.sub.replace('CHARACTER:EVE:', '')
-    console.log('token', token)
+    const corp = await getCorpForChar(token.character_id)
+    token.corpId = corp.corpId
+    token.corpName = corp.corpName
+    // console.log('token', token)
+    // console.log('corp', corp)
     saveData('selectedCharacter', token.character_id)
     saveData('admin-token', token)
     clearData('codeVerifier')

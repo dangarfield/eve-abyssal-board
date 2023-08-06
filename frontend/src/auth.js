@@ -11,8 +11,8 @@ const ssoConfig = window.location.href.includes('localhost')
       redirectUri: 'http://localhost:8888/#/login/return/'
     }
   : {
-      clientId: 'dc6490d2eafc421a8cc35cf0394d60d1',
-      redirectUri: 'https://dangarfield.github.io/eve-remap/'
+      clientId: '63adc68f3b214e63a79b2b612e4c4a10',
+      redirectUri: 'https://abyssalboard.netlify.app/#/login/return/'
     }
 
 const ssoConfigAdmin = window.location.href.includes('localhost')
@@ -21,8 +21,8 @@ const ssoConfigAdmin = window.location.href.includes('localhost')
       redirectUri: 'http://localhost:8888/#/admin/return/'
     }
   : {
-      clientId: 'dc6490d2eafc421a8cc35cf0394d60d1',
-      redirectUri: 'https://dangarfield.github.io/eve-remap/'
+      clientId: '85729707fd0a4e94aec5703b7180e5c7',
+      redirectUri: 'https://abyssalboard.netlify.app/#/admin/return/'
     }
 
 // console.log('ssoConfig', ssoConfig)

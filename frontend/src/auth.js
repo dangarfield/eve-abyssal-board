@@ -8,7 +8,7 @@ const ADMIN_SCOPES = 'esi-mail.organize_mail.v1 esi-mail.read_mail.v1 esi-mail.s
 const ssoConfig = window.location.href.includes('localhost')
   ? {
       clientId: 'dc6490d2eafc421a8cc35cf0394d60d1',
-      redirectUri: 'http://localhost:3000/#/login/return/'
+      redirectUri: 'http://localhost:8888/#/login/return/'
     }
   : {
       clientId: 'dc6490d2eafc421a8cc35cf0394d60d1',
@@ -18,7 +18,7 @@ const ssoConfig = window.location.href.includes('localhost')
 const ssoConfigAdmin = window.location.href.includes('localhost')
   ? {
       clientId: 'e754a650bfb24eda938734b8ddd38679',
-      redirectUri: 'http://localhost:3000/#/admin/return/'
+      redirectUri: 'http://localhost:8888/#/admin/return/'
     }
   : {
       clientId: 'dc6490d2eafc421a8cc35cf0394d60d1',

@@ -1,7 +1,7 @@
 import { getCurrentUserAccessToken, fetchWithRetry } from './auth'
 import { loadData } from './utils'
 
-const API_ROOT = 'http://localhost:3001'
+const API_ROOT = ''// 'http://localhost:3001'
 let appConfig
 // Example usage:
 export const getCurrentUserListedItems = async () => {

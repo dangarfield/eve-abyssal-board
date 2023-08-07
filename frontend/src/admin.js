@@ -1,5 +1,5 @@
-import { isLoginPasswordSet, triggerAdminLoginFlow } from './auth'
-import { getAppConfig, getCorpCharacterConfig, setAppConfig, setCorpCharacterConfig } from './board-api'
+import { isLoginPasswordSet } from './auth'
+import { getAppConfigAdmin, getAppAuth, getSSOAdminLoginUrl, setAppConfig } from './board-api'
 import { saveData, clearData, loadData } from './utils'
 
 const renderAdminLogin = () => {
@@ -30,7 +30,7 @@ const renderAdminLogin = () => {
     initAdmin()
   })
 }
-const renderAdminDetails = (corpCharacterConfig, appConfig, adminToken) => {
+const renderAdminDetails = (appAuth, appConfig, adminToken) => {
   let html = ''
   html += `
         <div class="container">
@@ -40,97 +40,49 @@ const renderAdminDetails = (corpCharacterConfig, appConfig, adminToken) => {
                     <form class="admin-form">
                         <div class="row">
                             <div class="col">
-                                <h5>Corp Character Config</h5>
+                                <h5>App Auth</h5>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <label for="characterId" class="col-sm-2 col-form-label">Character Id</label>
                             <div class="col-sm-4">
-                            <input type="text" class="form-control" id="characterId" value="${corpCharacterConfig.characterId}">
-                            </div>
-                            ${adminToken
-? `
-                            <div class="col-sm-2">
-                                <button type="button" class="btn btn-primary w-100 transfer-sso"><i class="bi bi-arrow-left"></i> Transfer <i class="bi bi-arrow-left"></i></button>
+                              <input type="text" class="form-control" id="characterId" value="${appAuth.characterId}" disabled>
                             </div>
                             <div class="col-sm-4">
-                                <input type="text" class="form-control" id="characterId-sso" value="${adminToken.character_id}" disabled>
+                              <button type="button" class="btn btn-primary login-sso">Update with Admin SSO</button>
                             </div>
-                            `
-: ''}
                         </div>
                         <div class="row mb-3">
                             <label for="characterName" class="col-sm-2 col-form-label">Character Name</label>
                             <div class="col-sm-4">
-                                <input type="text" class="form-control" id="characterName" value="${corpCharacterConfig.characterName}">
+                                <input type="text" class="form-control" id="characterName" value="${appAuth.characterName}" disabled>
                             </div>
-                            ${adminToken
-? `
-                            <div class="col-sm-4 offset-sm-2">
-                                <input type="text" class="form-control" id="characterName-sso" value="${adminToken.payload.name}" disabled>
-                            </div>
-                            `
-: ''}
                         </div>
 
                         <div class="row mb-3">
                             <label for="corpId" class="col-sm-2 col-form-label">Corp Id</label>
                             <div class="col-sm-4">
-                                <input type="text" class="form-control" id="corpId" value="${corpCharacterConfig.corpId}">
+                                <input type="text" class="form-control" id="corpId" value="${appAuth.corpId}" disabled>
                             </div>
-                            ${adminToken
-? `
-                            <div class="col-sm-4 offset-sm-2">
-                                <input type="text" class="form-control" id="corpId-sso" value="${adminToken.corpId}" disabled>
-                            </div>
-                            `
-: ''}
                         </div>
                         <div class="row mb-3">
                             <label for="corpName" class="col-sm-2 col-form-label">Corp Name</label>
                             <div class="col-sm-4">
-                                <input type="text" class="form-control" id="corpName" value="${corpCharacterConfig.corpName}">
-                            </div>
-                            ${adminToken
-? `
-                            <div class="col-sm-4 offset-sm-2">
-                                <input type="text" class="form-control" id="corpName-sso" value="${adminToken.corpName}" disabled>
-                            </div>
-                            `
-: ''}
-                        </div>
-                        <div class="row mb-3">
-                            <label for="corpDivision" class="col-sm-2 col-form-label">Corp Wallet Division</label>
-                            <div class="col-sm-4">
-                                <input type="text" class="form-control" id="corpDivision" value="${corpCharacterConfig.corpDivision}">
+                                <input type="text" class="form-control" id="corpName" value="${appAuth.corpName}" disabled>
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <label for="accessToken" class="col-sm-2 col-form-label">Access Token</label>
                             <div class="col-sm-4">
-                                <input type="text" class="form-control" id="accessToken" value="${corpCharacterConfig.accessToken}">
+                                <input type="text" class="form-control" id="accessToken" value="${appAuth.accessToken}" disabled>
                             </div>
-                            ${adminToken
-? `
-                            <div class="col-sm-4 offset-sm-2">
-                                <input type="text" class="form-control" id="accessToken-sso" value="${adminToken.access_token}" disabled>
-                            </div>
-                            `
-: ''}
                         </div>
                         <div class="row mb-3">
                             <label for="refreshToken" class="col-sm-2 col-form-label">Refresh Token</label>
                             <div class="col-sm-4">
-                                <input type="text" class="form-control" id="refreshToken" value="${corpCharacterConfig.refreshToken}">
+                                <input type="text" class="form-control" id="refreshToken" value="${appAuth.refreshToken}" disabled>
                             </div>
-                            ${adminToken
-? `
-                            <div class="col-sm-4 offset-sm-2">
-                                <input type="text" class="form-control" id="refreshToken-sso" value="${adminToken.refresh_token}" disabled>
-                            </div>
-                            `
-: ''}
                         </div>
 
                         <div class="row">
@@ -141,12 +93,32 @@ const renderAdminDetails = (corpCharacterConfig, appConfig, adminToken) => {
                         <div class="row mb-3">
                             <label for="listingPrice" class="col-sm-2 col-form-label">Listing Price</label>
                             <div class="col-sm-4">
-                            <input type="text" class="form-control" id="listingPrice" value="${appConfig.listingPrice}">
+                              <input type="text" class="form-control" id="listingPrice" value="${appConfig.listingPrice}">
                             </div>
                         </div>
-                        <button type="button" class="btn btn-primary login-sso">Login Admin SSO</button>
-                        <button type="button" class="btn btn-primary clear-sso">Clear Admin SSO</button>
-                        <button type="submit" class="btn btn-primary save">Save</button>
+                        <div class="row mb-3">
+                            <label for="corpDivision" class="col-sm-2 col-form-label">Corp Wallet Division ID</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" id="corpDivisionId" value="${appConfig.corpDivisionId}">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="corpDivision" class="col-sm-2 col-form-label">Corp Wallet Division Name</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" id="corpDivisionName" value="${appConfig.corpDivisionName}">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="corpDivision" class="col-sm-2 col-form-label">Discord URL</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" id="discordUrl" value="${appConfig.discordUrl}">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                          <div class="col-sm-6">
+                            <button type="submit" class="btn btn-primary save float-end">Save</button>
+                          </div>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -156,29 +128,20 @@ const renderAdminDetails = (corpCharacterConfig, appConfig, adminToken) => {
     event.preventDefault()
 
     const newAppConfig = {
-      listingPrice: parseInt(document.querySelector('#listingPrice').value)
+      listingPrice: parseInt(document.querySelector('#listingPrice').value),
+      corpDivisionId: parseInt(document.querySelector('#corpDivisionId').value),
+      corpDivisionName: document.querySelector('#corpDivisionName').value,
+      discordUrl: document.querySelector('#discordUrl').value
     }
     await setAppConfig(newAppConfig)
+  })
 
-    const corpCharacterConfig = {
-      characterId: parseInt(document.querySelector('#characterId').value),
-      characterName: document.querySelector('#characterName').value,
-      corpId: parseInt(document.querySelector('#corpId').value),
-      corpName: document.querySelector('#corpName').value,
-      corpDivision: parseInt(document.querySelector('#corpDivision').value),
-      accessToken: document.querySelector('#accessToken').value,
-      refreshToken: document.querySelector('#refreshToken').value
-    }
-    await setCorpCharacterConfig(corpCharacterConfig)
-  })
-  document.querySelector('.admin-form .clear-sso').addEventListener('click', function (event) {
-    console.log('clear-sso')
-    clearData('admin-token')
-    initAdmin()
-  })
-  document.querySelector('.admin-form .login-sso').addEventListener('click', function (event) {
+  document.querySelector('.admin-form .login-sso').addEventListener('click', async function (event) {
     console.log('login-sso')
-    triggerAdminLoginFlow()
+
+    const loginUrl = await getSSOAdminLoginUrl()
+    console.log('loginUrl', loginUrl)
+    window.location.assign(loginUrl)
   })
   const transferSsoEle = document.querySelector('.admin-form .transfer-sso')
   if (transferSsoEle) {
@@ -198,17 +161,17 @@ export const initAdmin = async () => {
   //   clearData('admin-password')
   if (isLoginPasswordSet()) {
     console.log('initAdmin - LOGGED IN')
-    const corpCharacterConfig = await getCorpCharacterConfig()
-    console.log('corpCharacterConfig', corpCharacterConfig)
-    if (corpCharacterConfig.error) {
-      console.log('BAD LOGIN', corpCharacterConfig)
+    const appAuth = await getAppAuth()
+    console.log('appAuth', appAuth)
+    if (appAuth.error) {
+      console.log('BAD LOGIN', appAuth)
       clearData('admin-password')
       initAdmin()
     } else {
-      const appConfig = await getAppConfig()
-      console.log('LOGGED IN!!! DATA', corpCharacterConfig, appConfig)
+      const appConfig = await getAppConfigAdmin()
+      console.log('LOGGED IN!!! DATA', appAuth, appConfig)
       const data = loadData()
-      renderAdminDetails(corpCharacterConfig, appConfig, data['admin-token'])
+      renderAdminDetails(appAuth, appConfig, data['admin-token'])
     }
     // TODO is null, password is bad, clear password and reload page
   } else {

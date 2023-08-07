@@ -1,6 +1,6 @@
 import { getAppraisalForItemId } from './appraisal'
 import { doesCurrentCharacterHaveSellerScope, getCurrentUserDetails, triggerLoginFlow } from './auth'
-import { getAppConfig, getCurrentUserListedItems } from './board-api'
+import { getAppConfig, getCurrentUserInventory, initiateListingFlow } from './board-api'
 import { getCurrentUserModInventory } from './esi-api'
 
 const askForSellerScopePermission = () => {
@@ -142,7 +142,7 @@ const renderSellerListing = (listedItems) => {
                 </svg>
                 <div class="card-body">
                     <h5 class="card-title">
-                        TODO - ${listedItem.title}
+                        TODO - ${listedItem.typeName} - ${listedItem.status}
                     </h5>
                 </div>
             </div>
@@ -310,10 +310,16 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
       }).join('')
       html += `
         <div class="col-3 mt-4">
-          <div class="card-container inventory-item" data-item-id="${item.item_id}">
+          <div class="card-container inventory-item${item.status ? ' listed' : ''}" data-item-id="${item.item_id}">
             <div class="card ">
                 <div class="card-body">
-                    <h5 class="card-title"><img src="https://images.evetech.net/types/${item.type_id}/icon?size=32">${item.typeName}</h5>
+                    <h5 class="card-title"><img src="https://images.evetech.net/types/${item.type_id}/icon?size=32">
+                      ${item.typeName}
+                      ${item.status ? `<span class="badge bg-primary">${item.status}</span>` : ''}
+                    </h5>
+                    
+                    <span class="badge bg-secondary">${item.abyssalModuleGroup}</span>
+                    <span class="badge bg-secondary">${item.abyssalModuleCategory}</span>
                     <hr/>
                     <p><img src="https://images.evetech.net/types/${item.mutatorTypeId}/icon?size=32">${item.mutatorTypeName}</p>
                     <p><img src="https://images.evetech.net/types/${item.sourceTypeId}/icon?size=32">${item.sourceTypeName}</p>
@@ -444,19 +450,66 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
       listingPriceEle.value = validateListingPrice(listingPriceEle.value)
     })
   }
-  document.querySelector('.confirm-inventory').addEventListener('click', () => {
+  document.querySelector('.confirm-inventory').addEventListener('click', async () => {
     const selectedInventoryToList = [...document.querySelectorAll('.inventory-item.selected[data-item-id]')].map(a => {
       const inventory = availableInventory.find(i => i.item_id === parseInt(a.getAttribute('data-item-id')))
-      inventory.listingPrice = a.querySelector('.listing-price').value
+      inventory.listingPriceString = a.querySelector('.listing-price').value
+      inventory.listingPrice = listingPriceStringToInt(a.querySelector('.listing-price').value)
+      inventory.appraisalValue = a.querySelector('.appraisal p').textContent.replace('Value: ', '')
       return inventory
     })
-    console.log('selectedInventoryToList', selectedInventoryToList)
-    window.alert(`Selected Inventory To List: ${selectedInventoryToList.map(a => a.typeName + ' ' + a.listingPrice).join(', ')}`)
+    const selectedInventoryToListShort = selectedInventoryToList.map(a => {
+      return {
+        itemId: a.item_id,
+        typeId: a.type_id,
+        typeName: a.typeName,
+        sourceTypeId: a.sourceTypeId,
+        sourceTypeName: a.sourceTypeName,
+        mutatorTypeId: a.mutatorTypeId,
+        mutatorTypeName: a.mutatorTypeName,
+        abyssalModuleGroup: a.abyssalModuleGroup,
+        abyssalModuleCategory: a.abyssalModuleCategory,
+        appraisal: {
+          type: 'AUTO',
+          value: a.appraisalValue
+        },
+        listingPrice: a.listingPrice,
+        attributes: a.relevantDogmaAttributes.map(d => {
+          return {
+            attributeId: d.dogmaAttribute.attributeID,
+            attributeName: d.name,
+            iconID: d.iconID,
+
+            value: d.value,
+            sourceValue: d.sourceValue,
+            diff: d.diff,
+            highIsGood: d.highIsGood,
+            isGood: d.isGood,
+            min: d.min,
+            minPercent: d.minPercent,
+            max: d.max,
+            maxPercent: d.maxPercent
+          }
+        })
+      }
+    })
+
+    for (const item of selectedInventoryToList) {
+      if (item.listingPrice === 0) {
+        window.alert('Please ensure the listing prices are above zero')
+        return
+      }
+    }
+    console.log('selectedInventoryToList', selectedInventoryToList, selectedInventoryToListShort)
+    // window.alert(`Selected Inventory To List: ${selectedInventoryToList.map(a => a.typeName + ' ' + a.listingPrice).join(', ')}`)
+    await initiateListingFlow(selectedInventoryToListShort)
   })
 }
 const validateListingPrice = (inputValue) => {
   const digitsString = inputValue.match(/[\d.]+/g)
   const value = parseFloat(digitsString ? digitsString.join('') : '')
+  console.log('validateListingPrice', inputValue, value)
+  if (isNaN(value)) return 0
 
   const inputValueLower = inputValue.toLowerCase().replace('isk', '')
   let unit = ''
@@ -465,6 +518,18 @@ const validateListingPrice = (inputValue) => {
   else if (inputValueLower.includes('b') || inputValueLower.includes('bil')) unit = 'b'
   else if (inputValueLower.includes('t') || inputValueLower.includes('tril')) unit = 't'
   return value + unit
+}
+const listingPriceStringToInt = (inputValue) => {
+  const digitsString = inputValue.match(/[\d.]+/g)
+  let value = parseFloat(digitsString ? digitsString.join('') : '')
+
+  const inputValueLower = inputValue.toLowerCase()
+  if (inputValueLower.includes('k')) value = value * 1000
+  if (inputValueLower.includes('m')) value = value * 1000000
+  if (inputValueLower.includes('b')) value = value * 1000000000
+  if (inputValueLower.includes('t')) value = value * 1000000000000
+  console.log('listingPriceStringToInt', inputValue, value)
+  return value
 }
 const updateAppraisals = async () => {
   // console.log('start')
@@ -483,7 +548,7 @@ export const initSellFlow = async () => {
     const userDetails = getCurrentUserDetails()
     renderSellerPlaceholder(userDetails)
     console.log('Seller logged in, show sell page')
-    const listedItems = await getCurrentUserListedItems()
+    const listedItems = await getCurrentUserInventory()
     console.log('listedItems', listedItems)
     renderSellerListing(listedItems)
   } else {

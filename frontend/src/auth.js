@@ -68,43 +68,7 @@ export const triggerLoginReturnFlow = async () => {
     window.alert('login failed')
   }
 }
-export const triggerAdminLoginFlow = async () => {
-  console.log('triggerAdminLoginFlow useScopes')
-  saveData('returnUrl', window.location.href)
-  clearData('codeVerifier')
-  const ssoUri = await ssoAdmin.getUri(ADMIN_SCOPES)
-  saveData('codeVerifier', ssoUri.codeVerifier)
-  console.log('ssoUri', ssoUri)
-  window.location.assign(ssoUri.uri)
-}
-export const triggerAdminLoginReturnFlow = async () => {
-  const urlParams = new URLSearchParams(window.location.search)
-  const code = urlParams.get('code')
-  const state = urlParams.get('state')
 
-  console.log('triggerAdminLoginReturnFlow', code, state)
-  if (code && state) {
-    const data = loadData()
-    console.log('code', code, 'state', state, 'codeVerifier', data.codeVerifier)
-    const token = await ssoAdmin.getAccessToken(code, data.codeVerifier)
-    token.character_id = token.payload.sub.replace('CHARACTER:EVE:', '')
-    const corp = await getCorpForChar(token.character_id)
-    token.corpId = corp.corpId
-    token.corpName = corp.corpName
-    // console.log('token', token)
-    // console.log('corp', corp)
-    saveData('selectedCharacter', token.character_id)
-    saveData('admin-token', token)
-    clearData('codeVerifier')
-    clearData('returnUrl')
-    window.location.assign(data.returnUrl)
-  } else {
-    // TODO - More robust version of handling failures
-    clearData('codeVerifier')
-    clearData('returnUrl')
-    window.alert('login failed')
-  }
-}
 export const getCurrentUserDetails = () => {
   const data = loadData()
   //   console.log('data', data)
@@ -178,6 +142,9 @@ export const fetchWithRetry = async (url, fetchOptions, maxRetries = 3) => {
       } else if (response.expired) {
         console.log('Token expired')
         await refreshTokenAndGetNewUserAccessToken()
+        // TODO - load token
+        const { accessToken } = getCurrentUserAccessToken()
+        fetchOptions.headers.Authorization = `Bearer ${accessToken}`
       } else {
         return response
       }

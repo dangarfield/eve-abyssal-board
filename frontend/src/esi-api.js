@@ -1,7 +1,8 @@
 import { Api } from 'eve-esi-swaggerts'
 import { getCurrentUserAccessToken, refreshTokenAndGetNewUserAccessToken } from './auth'
-import { getAbyssModuleTypesFlatIds, getRelevantDogmaAttributesForTypeId, getUnitStringForUnitId } from './module-types'
+import { getAbyssModuleTypes, getAbyssModuleTypesFlatIds, getRelevantDogmaAttributesForTypeId, getUnitStringForUnitId } from './module-types'
 import sde from './generated-data/sde.json'
+import { getCurrentUserInventory } from './board-api'
 
 const esi = new Api()
 
@@ -39,10 +40,10 @@ export const getCurrentUserModInventory = async () => {
     }
   } while (pagesFetched < maxPage)
 
-  const abyssTypes = getAbyssModuleTypesFlatIds()
-  console.log('abyssTypes', abyssTypes)
-
-  inventory = inventory.filter(i => abyssTypes.includes(i.type_id) && i.location_flag === 'Hangar')
+  const abyssTypesFlat = getAbyssModuleTypesFlatIds()
+  console.log('abyssTypesFlat', abyssTypesFlat)
+  const abyssModuleTypes = getAbyssModuleTypes()
+  inventory = inventory.filter(i => abyssTypesFlat.includes(i.type_id) && i.location_flag === 'Hangar')
 
   console.log('sde', sde)
   inventory = await Promise.all(inventory.map(async (i) => {
@@ -65,6 +66,15 @@ export const getCurrentUserModInventory = async () => {
     const source = sde.itemData[i.dogma.source_type_id]
     if (i.item_id === 1042529492556) {
       console.log('item', i.type_id, i.typeName, '-', i.mutatorTypeId, i.mutatorTypeName, mutator, '-', i.sourceTypeId, i.sourceTypeName, source)
+    }
+
+    for (const abyssModuleGroup of abyssModuleTypes) {
+      for (const abyssModuleCategory of abyssModuleGroup.categories) {
+        if (i.type_id === abyssModuleCategory.typeId) {
+          i.abyssalModuleGroup = abyssModuleGroup.group
+          i.abyssalModuleCategory = abyssModuleCategory.categoryName
+        }
+      }
     }
 
     i.relevantDogmaAttributes = getRelevantDogmaAttributesForTypeId(i.type_id + '').map(dogmaAttributeId => {
@@ -134,6 +144,17 @@ export const getCurrentUserModInventory = async () => {
   // TODO - Add full data
   // TODO - Render properly
   // TODO - Highligh already listed items
+
+  const currentInventory = await getCurrentUserInventory()
+  for (const inventoryItem of inventory) {
+    for (const currentInventoryItem of currentInventory) {
+      if (inventoryItem.item_id === currentInventoryItem.itemId) {
+        inventoryItem.status = currentInventoryItem.status
+        console.log('currentInventoryItem', inventoryItem)
+      }
+    }
+  }
+
   return { inventory, cacheExpires, lastModified }
 }
 export const getCorpForChar = async (characterId, accessToken) => {

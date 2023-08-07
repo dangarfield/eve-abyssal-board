@@ -14,7 +14,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "lambda-api": "^1.0.3"
+    "eve-esi-swaggerts": "^1.11.1",
+    "jsonwebtoken": "^9.0.1",
+    "lambda-api": "^1.0.3",
+    "mongodb": "^5.7.0",
+    "nanoid": "^4.0.2",
+    "saslprep": "^1.0.3"
   },
   "workspaces": [
     "frontend",
@@ -29,11 +34,18 @@
   },
   "devDependencies": {
     "adm-zip": "^0.5.10",
-    "js-yaml": "^4.1.0",
-    "push-dir": "^0.4.1",
     "axios": "^1.4.0",
+    "js-yaml": "^4.1.0",
     "npm-run-all": "^4.1.5",
+    "push-dir": "^0.4.1",
     "standard": "^17.1.0",
     "unzipper": "^0.10.14"
+  },
+  "standard": {
+    "ignore": [
+      ".env",
+      ".env.local",
+      ".env.local.example"
+    ]
   }
 }

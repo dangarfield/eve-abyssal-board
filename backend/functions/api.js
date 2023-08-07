@@ -1,31 +1,40 @@
 import API from 'lambda-api'
-import { getAppConfig, setAppConfig, getCorpCharacterConfig, setCorpCharacterConfig } from '../utils/config'
-import { verifyAdmin, verifyToken } from '../utils/auth'
-import { getSellerListings } from '../utils/listings'
+import { getAppAuth, getAppConfig, setAppConfig } from '../app/config'
+import { verifyAdmin, verifyToken } from '../app/auth'
+import { getSellerInventory } from '../app/inventory'
+import { initiateListingFlow } from '../app/listing-flow'
+import { ssoAdminLoginStart, ssoAdminReturn } from '../app/sso'
 const app = API()
 
-app.get('/api/seller/:characterId/items', verifyToken, async function (req, res) {
-  const characterId = req.params.characterId
-  console.log('/api/seller/:characterId/items', characterId, 'auth', req.auth.characterId, req.auth.characterName)
-  res.json((await getSellerListings(characterId)))
-})
 app.get('/api/inventory/:characterId', verifyToken, async function (req, res) {
-  const characterId = req.params.characterId
-  console.log('/api/inventory/:characterId', characterId, 'auth', req.auth.characterId, req.auth.characterName)
-  res.json((await getSellerListings(characterId)))
+  console.log('/api/inventory/:characterId', req.params.characterId, 'auth', req.auth.characterId, req.auth.characterName)
+  res.json((await getSellerInventory(parseInt(req.auth.characterId), parseInt(req.params.characterId))))
 })
 
 app.get('/api/app-config', async (req, res) => {
   return await getAppConfig()
 })
-app.post('/api/app-config', async (req, res) => {
+app.get('/api/app-config/admin', verifyAdmin, async (req, res) => {
+  return await getAppConfig(true)
+})
+app.post('/api/app-config', verifyAdmin, async (req, res) => {
   return await setAppConfig(req.body)
 })
-app.get('/api/corp-char-config', verifyAdmin, async function (req, res) {
-  res.json((await getCorpCharacterConfig()))
+app.get('/api/app-auth', verifyAdmin, async (req, res) => {
+  return await getAppAuth()
 })
-app.post('/api/corp-char-config', verifyAdmin, async function (req, res) {
-  res.json((await setCorpCharacterConfig(req.body)))
+
+app.post('/api/listing', verifyToken, async function (req, res) {
+  res.json((await initiateListingFlow(req.auth, req.body)))
+})
+
+app.get('/api/sso/login', verifyAdmin, async function (req, res) {
+  const loginUrl = await ssoAdminLoginStart()
+  res.json({ loginUrl })
+})
+app.get('/api/sso/return', async function (req, res) {
+  await ssoAdminReturn(req.query.code, req.query.state)
+  res.redirect('/#/admin')
 })
 
 export async function handler (event, context) {

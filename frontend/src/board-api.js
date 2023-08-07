@@ -4,9 +4,13 @@ import { loadData } from './utils'
 const API_ROOT = ''// 'http://localhost:3001'
 let appConfig
 // Example usage:
-export const getCurrentUserListedItems = async () => {
-  const { characterId, accessToken } = getCurrentUserAccessToken()
-  const url = `${API_ROOT}/api/seller/${characterId}/items`
+export const getCurrentUserInventory = async () => {
+  const { characterId } = getCurrentUserAccessToken()
+  return getUserInventory(characterId)
+}
+export const getUserInventory = async (characterId) => {
+  const { accessToken } = getCurrentUserAccessToken()
+  const url = `${API_ROOT}/api/inventory/${characterId}`
 
   const res = await fetchWithRetry(url, {
     method: 'GET',
@@ -16,7 +20,7 @@ export const getCurrentUserListedItems = async () => {
       Authorization: `Bearer ${accessToken}`
     }
   })
-  console.log('getCurrentUserListedItems', characterId, accessToken, res)
+  console.log('getUserInventory', characterId, accessToken, res)
   return res
 }
 
@@ -27,6 +31,19 @@ export const getAppConfig = async (forceRefresh) => {
   appConfig = res
   console.log('appConfig', appConfig)
   return appConfig
+}
+export const getAppConfigAdmin = async () => {
+  const data = loadData()
+  const req = await window.fetch(`${API_ROOT}/api/app-config/admin`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `${data['admin-password']}`
+    }
+  })
+  const res = await req.json()
+  return res
 }
 export const setAppConfig = async (newAppConfig) => {
   const data = loadData()
@@ -42,9 +59,9 @@ export const setAppConfig = async (newAppConfig) => {
   })
   appConfig = await req.json()
 }
-export const getCorpCharacterConfig = async () => {
+export const getAppAuth = async () => {
   const data = loadData()
-  const req = await window.fetch(`${API_ROOT}/api/corp-char-config`, {
+  const req = await window.fetch(`${API_ROOT}/api/app-auth`, {
     method: 'GET',
     headers: {
       Accept: 'application/json, text/plain, */*',
@@ -52,21 +69,37 @@ export const getCorpCharacterConfig = async () => {
       Authorization: `${data['admin-password']}`
     }
   })
-  const corpCharacterConfig = await req.json()
-  console.log('getCorpCharacterConfig', corpCharacterConfig)
-  return corpCharacterConfig
+  const appAuth = await req.json()
+  console.log('getAppAuth', appAuth)
+  return appAuth
 }
 
-export const setCorpCharacterConfig = async (corpCharacterConfig) => {
-  const data = loadData()
-  console.log('setCorpCharacterConfig', corpCharacterConfig)
-  await window.fetch(`${API_ROOT}/api/corp-char-config`, {
+export const initiateListingFlow = async (inventoryItems) => {
+  const { accessToken } = getCurrentUserAccessToken()
+  const url = `${API_ROOT}/api/listing`
+
+  const res = await window.fetch(url, {
     method: 'POST',
     headers: {
       Accept: 'application/json, text/plain, */*',
       'Content-Type': 'application/json',
-      Authorization: `${data['admin-password']}`
+      Authorization: `Bearer ${accessToken}`
     },
-    body: JSON.stringify(corpCharacterConfig)
+    body: JSON.stringify(inventoryItems)
   })
+  console.log('initialListing res', res)
+}
+export const getSSOAdminLoginUrl = async () => {
+  const data = loadData()
+  const req = await window.fetch(`${API_ROOT}/api/sso/login`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `${data['admin-password']}`
+    }
+  })
+  const res = await req.json()
+  console.log('getSSOAdminLoginUrl', res)
+  return res.loginUrl
 }

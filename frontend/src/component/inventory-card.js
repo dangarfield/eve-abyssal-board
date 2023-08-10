@@ -59,7 +59,7 @@ export const renderInventoryCard = (item) => {
                     <div class="d-flex flex-row gap-2 align-items-center px-1">
                         <div class="p-0"><img src="https://images.evetech.net/types/${item.typeId}/icon?size=32"></div>
                         <div class="p-0">
-                            <p class="lead mb-0"><b>${item.typeName}</b></p>
+                            <p class="lead mb-0 type-name"><b>${item.typeName}</b></p>
                             <span class="badge bg-secondary">${item.abyssalModuleGroup}</span>
                             <span class="badge bg-secondary">${item.abyssalModuleCategory}</span>
                             ${item.status ? `<span class="badge bg-primary">${item.status}</span>` : ''}

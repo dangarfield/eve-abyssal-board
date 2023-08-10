@@ -1,9 +1,7 @@
-import { getCorpForChar } from './esi-api'
 import { loadData, saveData, clearData } from './utils'
 import { createSSO } from 'eve-sso-pkce'
 
 const SELLER_SCOPES = 'publicData esi-assets.read_assets.v1'.split(' ')
-const ADMIN_SCOPES = 'esi-mail.organize_mail.v1 esi-mail.read_mail.v1 esi-mail.send_mail.v1 esi-wallet.read_character_wallet.v1 esi-contracts.read_character_contracts.v1 esi-wallet.read_corporation_wallets.v1 esi-contracts.read_corporation_contracts.v1'.split(' ')
 
 const ssoConfig = window.location.href.includes('localhost')
   ? {
@@ -15,19 +13,8 @@ const ssoConfig = window.location.href.includes('localhost')
       redirectUri: 'https://abyssalboard.netlify.app/#/login/return/'
     }
 
-const ssoConfigAdmin = window.location.href.includes('localhost')
-  ? {
-      clientId: 'e754a650bfb24eda938734b8ddd38679',
-      redirectUri: 'http://localhost:8888/#/admin/return/'
-    }
-  : {
-      clientId: '85729707fd0a4e94aec5703b7180e5c7',
-      redirectUri: 'https://abyssalboard.netlify.app/#/admin/return/'
-    }
-
 // console.log('ssoConfig', ssoConfig)
 const sso = createSSO(ssoConfig)
-const ssoAdmin = createSSO(ssoConfigAdmin)
 
 export const triggerLoginFlow = async (useScopes) => {
   console.log('triggerLoginFlow useScopes', useScopes)
@@ -83,7 +70,7 @@ export const getCurrentUserAccessToken = () => {
   const characterId = data.selectedCharacter
   const accessToken = data[`token-${characterId}`].access_token
   const jwt = data[`token-${characterId}`].payload
-  console.log('getCurrentUserAccessToken', characterId)
+  // console.log('getCurrentUserAccessToken', characterId)
   return { characterId, accessToken, jwt }
 }
 export const refreshTokenAndGetNewUserAccessToken = async () => {

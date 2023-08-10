@@ -4,11 +4,17 @@ import { verifyAdmin, verifyToken } from '../app/auth'
 import { getSellerInventory } from '../app/inventory'
 import { initiateListingFlow } from '../app/listing-flow'
 import { ssoAdminLoginStart, ssoAdminReturn } from '../app/sso'
+import { getSellerPayments } from '../app/payments'
+
 const app = API()
 
-app.get('/api/inventory/:characterId', verifyToken, async function (req, res) {
-  console.log('/api/inventory/:characterId', req.params.characterId, 'auth', req.auth.characterId, req.auth.characterName)
-  res.json((await getSellerInventory(parseInt(req.auth.characterId), parseInt(req.params.characterId))))
+app.get('/api/seller/:characterId/inventory', verifyToken, async function (req, res) {
+  console.log('/api/seller/:characterId/inventory', req.params.characterId, 'auth', req.auth.characterId, req.auth.characterName)
+  res.json(await getSellerInventory(parseInt(req.auth.characterId), parseInt(req.params.characterId)))
+})
+app.get('/api/seller/@me/payments', verifyToken, async function (req, res) {
+  console.log('/api/seller/@me/payments', req.params.characterId, 'auth', req.auth.characterId, req.auth.characterName)
+  res.json(await getSellerPayments(parseInt(req.auth.characterId)))
 })
 
 app.get('/api/app-config', async (req, res) => {

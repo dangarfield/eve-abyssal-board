@@ -10,11 +10,11 @@ const renderInventoryPlaceholder = (userDetails) => {
       <div class="container">
           <div class="row">
               <div class="col">
-                  <div class="d-grid gap-2 d-md-flex justify-content-between">
+                  <div class="d-grid gap-2 d-md-flex justify-content-between my-2">
                       <h1>Mods are in your hangers - Available to be listed</h1>
                   </div>
                   <p>EVE Online servers cache this data and it is made available to us up to 60 minutes after requesting.</p>
-                  <p class="refresh-time">This text will update with the next refresh time.</p>
+                  <p class="refresh-time-inventory">This text will update with the next refresh time.</p>
                   <p>Select the mods that you wish to sell and add your listing price. You can update the listing price at any time after it is listed.</p>
               </div>
           </div>
@@ -110,15 +110,19 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
           </div>
           `
   } else {
-    html += `<div class="row>
-        <div class="col">
-            <ul class="nav nav-pills justify-content-end">
-                <li class="nav-item">
-                    <div class="nav-link active toggle-show-all" role="button" data-show-all="true">Hide already on sale</div>
-                </li>
-            </ul>
+    html += `
+    <div class="row row-cols-lg-auto g-3 align-items-center flex-row-reverse px-2">
+      <div class="col-12">
+        <input class="form-control ms-2 data-search" type="search" placeholder="Search" aria-label="Search">
+      </div>
+      <div class="col-12">
+        <div class="form-check form-switch">
+          <input class="form-check-input toggle-show-all" type="checkbox" role="switch" id="toggle-show-all" checked>
+          <label class="form-check-label" for="toggle-show-all">Show already on sale</label>
         </div>
-    </div>`
+      </div>
+    </div>
+`
     html += '<div class="row">'
     for (const item of availableInventory) {
       html += '<div class="col-3 mt-4">'
@@ -129,8 +133,23 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
   }
   document.querySelector('.inner-content').innerHTML = html
 }
+
+const filterCards = () => {
+  const searchQuery = document.querySelector('.data-search').value.toLowerCase()
+  const hideListed = !document.querySelector('.toggle-show-all').checked
+
+  document.querySelectorAll('.inventory-item').forEach((element) => {
+    const text = element.querySelector('.type-name').textContent.toLowerCase()
+    const isListed = element.classList.contains('listed')
+
+    // Filter based on search query and hide/show based on hideListed
+    const shouldHide = (searchQuery && !text.includes(searchQuery)) || (hideListed && isListed)
+    // element.style.display = shouldHide ? 'none' : 'block'
+    element.parentElement.style.display = shouldHide ? 'none' : 'block'
+  })
+}
 const bindInventoryActions = (availableInventory, cacheExpires, lastModified) => {
-  triggerRefreshTime('.refresh-time', 'Inventory data', cacheExpires, lastModified)
+  triggerRefreshTime('.refresh-time-inventory', 'Inventory data', cacheExpires, lastModified)
 
   document.querySelector('.toggle-show-all').addEventListener('click', function () {
     const showAll = this.getAttribute('data-show-all') === 'true'
@@ -141,11 +160,12 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
       this.setAttribute('data-show-all', true)
       this.textContent = 'Hide already on sale'
     }
-    for (const listedEle of [...document.querySelectorAll('.inventory-item.listed')]) {
-      const parent = listedEle.parentNode
-      console.log('listedEle', listedEle, parent)
-      parent.style.display = showAll ? 'none' : 'block'
-    }
+    filterCards()
+  })
+  document.querySelector('.data-search').addEventListener('input', function () {
+    const value = this.value
+    console.log('value', value)
+    filterCards()
   })
   // Bind add and remove inventory
   for (const inventoryItemEle of [...document.querySelectorAll('.inventory-item')]) {

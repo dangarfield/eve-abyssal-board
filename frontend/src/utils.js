@@ -72,8 +72,8 @@ export const formatMilliseconds = (milliseconds) => {
 }
 export const triggerRefreshTime = (elementSelector, typeMessage, expireTime, lastModified) => {
   const refreshTime = () => {
-    const ele = document.querySelector(elementSelector)
     const timeDiff = expireTime - new Date()
+    const ele = document.querySelector(elementSelector)
     // console.log('timeDiff', timeDiff)
     if (ele === undefined) {
       clearInterval(refreshTimeInterval)
@@ -81,7 +81,11 @@ export const triggerRefreshTime = (elementSelector, typeMessage, expireTime, las
       ele.innerHTML = '<span class="text-primary">New data available on EVE API - Refresh the page to load it</span>'
       clearInterval(refreshTimeInterval)
     } else {
-      ele.innerHTML = `${typeMessage} correct and cached by EVE API as of ${lastModified.toLocaleTimeString()}. Next update available in <span class="text-primary">${(formatMilliseconds(timeDiff))}</span>`
+      try {
+        ele.innerHTML = `${typeMessage} correct and cached by EVE API as of ${lastModified.toLocaleTimeString()}. Next update available in <span class="text-primary">${(formatMilliseconds(timeDiff))}</span>`
+      } catch (error) {
+        // It's gone, oh well...
+      }
     }
   }
   const refreshTimeInterval = setInterval(refreshTime, 1000)

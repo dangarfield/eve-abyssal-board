@@ -1,12 +1,13 @@
 import { doesCurrentCharacterHaveSellerScope, getCurrentUserDetails, triggerLoginFlow } from './auth'
-import { getCurrentUserInventory } from './board-api'
+import { getAppConfig, getCurrentSellerInventory, getCurrentSellerPayments } from './board-api'
 import { renderInventoryCard } from './component/inventory-card'
+import { formatToISKString } from './utils'
 
 const askForSellerScopePermission = () => {
   const html = `
     <div class="container">
         <div class="row">
-            <div class="col text-center">
+            <div class="col text-center my-2">
                 <h1>Abyssal Board</h1>
             </div>
         </div>
@@ -45,15 +46,17 @@ const renderSellerPlaceholder = (userDetails) => {
     <div class="container">
         <div class="row">
             <div class="col">
-                <div class="d-grid gap-2 d-md-flex justify-content-between">
+                <div class="d-grid gap-2 d-md-flex justify-content-between my-2">
                     <h1>Hi ${userDetails.characterName}! Here are your mod listings!</h1>
                     <a href="#/sell/inventory" class="btn btn-primary align-self-center" type="button"><i class="bi bi-plus-lg"></i> Add new mod listings</a>
                 </div>
-                <p>EVE Online servers cache this data and it is made available to us up to 60 minutes after requesting.</p>
-                <p class="refresh-time">This text will update with the next refresh time.</p>
             </div>
         </div>
-        <div class="inner-content">
+        <div class="payment-content">
+        </div>
+        <div class="inventory-content">
+        </div>
+        <div class="placeholder-content">
 
             <div class="row mt-4">
                 <div class="col placeholder-glow">
@@ -107,7 +110,6 @@ const renderSellerPlaceholder = (userDetails) => {
 
 const renderSellerListing = (listedItems) => {
   let html = ''
-
   if (listedItems.length === 0) {
     html = `
         <div class="row mt-4">
@@ -119,19 +121,25 @@ const renderSellerListing = (listedItems) => {
         </div>
         `
   } else {
-    const filterHtml = `
-    <div class="row mt-4">
-        <div class="col">
-            <div class="hstack gap-3">
-                <input class="form-control me-auto" type="text" placeholder="TODO - Filter your items somehow">
-                <button type="button" class="btn btn-secondary">Submit</button>
-                <div class="vr"></div>
-                <button type="button" class="btn btn-outline-danger">Reset</button>
-            </div>
-        </div>
+    // html += `
+    // <div class="row mt-4">
+    //     <div class="col">
+    //         <div class="hstack gap-3">
+    //             <input class="form-control me-auto" type="text" placeholder="TODO - Filter your items somehow">
+    //             <button type="button" class="btn btn-secondary">Submit</button>
+    //             <div class="vr"></div>
+    //             <button type="button" class="btn btn-outline-danger">Reset</button>
+    //         </div>
+    //     </div>
+    // </div>
+    // `
+    html += `
+    <div class="row row-cols-lg-auto g-3 align-items-center flex-row-reverse px-2">
+      <div class="col-12">
+        <input class="form-control ms-2 data-search" type="search" placeholder="Search">
+      </div>
     </div>
-    `
-    html += filterHtml
+`
     html += '<div class="row">'
     for (const listedItem of listedItems) {
       html += `
@@ -141,17 +149,126 @@ const renderSellerListing = (listedItems) => {
     }
     html += '</div>'
   }
-  document.querySelector('.inner-content').innerHTML = html
+  document.querySelector('.inventory-content').innerHTML = html
+  document.querySelector('.placeholder-content').remove()
+  document.querySelector('.data-search').addEventListener('input', function () {
+    const value = this.value
+    console.log('value', value)
+    filterCards()
+  })
 }
+const renderPaymentsListing = (payments, appConfig) => {
+  let html = ''
+  if (payments.length === 0) {
+    html = `
+          <div class="row mt-4">
+              <div class="col">
+                  <div class="alert alert-info" role="alert">
+                      <p class="m-0">No payments required</p>
+                  </div>
+              </div>
+          </div>
+          `
+  } else {
+    html += `<div class="row">
+        <div class="col-12">
+            <h4>Outstanding Payments</h4>
+            <p>Payments should be made in game to <code>${appConfig.corpName}</code>. Right click, give ISK. Always pay into the <code>${appConfig.corpDivisionName}</code> account with the reason shown below.</p>
+            <p>Any issues? Contact us on discord. <i><b>Note:</b> Payments take up to 1 hour to be registered</i></p>
+        </div>`
 
+    for (const payment of payments) {
+      html += `
+          <div class="col-3">
+              
+              <div class="card border-danger h-100 payment" role="button"${payment.inventory ? ` data-inventory="${payment.inventory.join(',')}"` : ''}>
+                <div class="card-body">
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <h5 class="">Amount: </h5>
+                        </div>
+                        <div class="text-end">
+                            <h5 class="">${formatToISKString(payment.amount)}</h5>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <h6 class="">Reason / Ref: </h6>
+                        </div>
+                        <div class="text-end">
+                            <code class="fs-6">${payment.id}</code>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <div class="flex-grow-1">
+                            <h6 class="">Type: </h6>
+                        </div>
+                        <div class="text-end">
+                            <span class="">${payment.type} of ${payment.inventory.length} mod${payment.inventory.length > 1 ? 's' : ''}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+          </div>`
+    }
+    html += '</div>'
+  }
+  document.querySelector('.payment-content').innerHTML = html
+
+  for (const paymentEle of [...document.querySelectorAll('.payment')]) {
+    paymentEle.addEventListener('mouseenter', () => {
+      const inventory = paymentEle.getAttribute('data-inventory')
+      if (inventory === undefined) {
+        return
+      }
+      const inventories = inventory.split(',')
+      console.log('mouseenter', inventories)
+
+      document.querySelectorAll('.inventory-item').forEach((element) => {
+        const itemId = element.getAttribute('data-item-id')
+        const shouldHide = !inventories.includes(itemId)
+        console.log('element', element, itemId, shouldHide)
+        element.parentElement.style.display = shouldHide ? 'none' : 'block'
+      })
+    })
+    paymentEle.addEventListener('mouseleave', () => {
+      //
+      console.log('mouseleave')
+      filterCards()
+    })
+  }
+}
+const filterCards = () => {
+  const searchQuery = document.querySelector('.data-search').value.toLowerCase()
+  //   const hideListed = !document.querySelector('.toggle-show-all').checked
+  document.querySelectorAll('.inventory-item').forEach((element) => {
+    // TODO - Update
+    const text = element.querySelector('.type-name').textContent.toLowerCase()
+    // const isListed = element.classList.contains('listed')
+    const shouldHide = (searchQuery && !text.includes(searchQuery))// || (hideListed && isListed)
+    element.parentElement.style.display = shouldHide ? 'none' : 'block'
+  })
+  console.log('filterCards')
+}
+const displayPayments = async () => {
+  const appConfig = await getAppConfig()
+
+  const payments = await getCurrentSellerPayments()
+  console.log('payments', payments)
+  renderPaymentsListing(payments, appConfig)
+}
+const displayInventory = async () => {
+  const listedItems = await getCurrentSellerInventory()
+  console.log('listedItems', listedItems)
+  renderSellerListing(listedItems)
+}
 export const initSellFlow = async () => {
   if (doesCurrentCharacterHaveSellerScope()) {
     const userDetails = getCurrentUserDetails()
     renderSellerPlaceholder(userDetails)
     console.log('Seller logged in, show sell page')
-    const listedItems = await getCurrentUserInventory()
-    console.log('listedItems', listedItems)
-    renderSellerListing(listedItems)
+    await Promise.all([displayPayments(), displayInventory()])
   } else {
     console.log('No seller scope')
     askForSellerScopePermission()

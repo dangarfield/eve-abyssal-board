@@ -2,7 +2,7 @@ import { Api } from 'eve-esi-swaggerts'
 import { getCurrentUserAccessToken, refreshTokenAndGetNewUserAccessToken } from './auth'
 import { getAbyssModuleTypes, getAbyssModuleTypesFlatIds, getRelevantDogmaAttributesForTypeId, getUnitStringForUnitId } from './module-types'
 import sde from './generated-data/sde.json'
-import { getCurrentUserInventory } from './board-api'
+import { getCurrentSellerInventory } from './board-api'
 
 const esi = new Api()
 
@@ -143,14 +143,14 @@ export const getCurrentUserModInventory = async () => {
   }))
   console.log('inventory', inventory)
 
-  const currentInventory = await getCurrentUserInventory()
+  const currentInventory = await getCurrentSellerInventory()
   for (const inventoryItem of inventory) {
     for (const currentInventoryItem of currentInventory) {
       if (inventoryItem.itemId === currentInventoryItem.itemId) {
         inventoryItem.status = currentInventoryItem.status
         inventoryItem.appraisal = currentInventoryItem.appraisal
         inventoryItem.listingPrice = currentInventoryItem.listingPrice
-        console.log('currentInventoryItem', inventoryItem, currentInventoryItem)
+        // console.log('currentInventoryItem', inventoryItem, currentInventoryItem)
       }
     }
   }

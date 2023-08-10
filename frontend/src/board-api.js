@@ -4,13 +4,13 @@ import { loadData } from './utils'
 const API_ROOT = ''// 'http://localhost:3001'
 let appConfig
 // Example usage:
-export const getCurrentUserInventory = async () => {
+export const getCurrentSellerInventory = async () => {
   const { characterId } = getCurrentUserAccessToken()
-  return getUserInventory(characterId)
+  return getSellerInventory(characterId)
 }
-export const getUserInventory = async (characterId) => {
+export const getSellerInventory = async (characterId) => {
   const { accessToken } = getCurrentUserAccessToken()
-  const url = `${API_ROOT}/api/inventory/${characterId}`
+  const url = `${API_ROOT}/api/seller/${characterId}/inventory`
 
   const res = await fetchWithRetry(url, {
     method: 'GET',
@@ -20,7 +20,22 @@ export const getUserInventory = async (characterId) => {
       Authorization: `Bearer ${accessToken}`
     }
   })
-  console.log('getUserInventory', characterId, accessToken, res)
+  // console.log('getSellerInventory', characterId, accessToken, res)
+  return res
+}
+export const getCurrentSellerPayments = async () => {
+  const { accessToken } = getCurrentUserAccessToken()
+  const url = `${API_ROOT}/api/seller/@me/payments`
+
+  const res = await fetchWithRetry(url, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+  // console.log('getSellerPayments', characterId, res)
   return res
 }
 

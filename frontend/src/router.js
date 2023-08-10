@@ -3,15 +3,28 @@ import { triggerLoginFlow, triggerLoginReturnFlow } from './auth'
 import { initSellFlow } from './sell'
 import { initListModInventory } from './sell-inventory'
 
-const tempRender = (text) => { document.querySelector('.content').innerHTML = text }
-
+const tempRender = (text) => {
+  let html = ''
+  html += `
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="alert alert-info my-5" role="alert">
+                    <h3>${text} - This page is still under construction</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    `
+  document.querySelector('.content').innerHTML = html
+}
 const renderError = () => {
   let html = ''
   html += `
     <div class="container">
         <div class="row">
             <div class="col">
-                <div class="alert alert-danger" role="alert">
+                <div class="alert alert-danger my-5" role="alert">
                     <h3>Error!</h3>
                     <p>Something went wrong! Please contact us and let us know!</p>
                 </div>
@@ -27,7 +40,7 @@ const render404 = () => {
     <div class="container">
         <div class="row">
             <div class="col">
-                <div class="alert alert-danger" role="alert">
+                <div class="alert alert-danger my-5" role="alert">
                     <h3>404 - Page not found!</h3>
                     <p>We don't think anything should be here, if you do, please contact us and let us know!</p>
                 </div>

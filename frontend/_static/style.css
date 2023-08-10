@@ -1,3 +1,7 @@
+
+.content {
+    min-height: calc(100vh - 120px);
+}
 .selected-inventory-holder {
     opacity: 0;
 }
@@ -11,20 +15,19 @@
 .inventory-item {
     box-shadow: 0 6px 10px rgba(0,0,0,.08), 0 0 6px rgba(0,0,0,.05);
     transition: .3s transform cubic-bezier(.155,1.105,.295,1.12),.3s box-shadow,.3s -webkit-transform cubic-bezier(.155,1.105,.295,1.12);
-    cursor: pointer;
 }
 .inventory-item:hover:not(.listed) {
     transform: scale(1.02);
     box-shadow: 0 10px 20px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.06);
 }
 .inventory-item .card:hover {
-    background-color: lightblue;
+    background-color: aliceblue;
 }
 .inventory-item.selected .card {
-    background-color: lightskyblue;
+    background-color: lightblue;
 }
 .inventory-item.listed .card {
-    background-color: lightgreen;
+    background-color: lightgray;
 }
 .selected-inventory-item {
     position: relative;
@@ -44,4 +47,9 @@
 .inventory-item:hover:not(.listed) .interaction-button,
 .selected-inventory-item:hover:not(.listed) .interaction-button {
   visibility: visible;
+}
+.inventory-item .progress,
+.inventory-item .progress-stacked {
+    border-radius: 0;
+    height: 10px;
 }

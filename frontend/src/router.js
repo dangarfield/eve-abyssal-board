@@ -1,6 +1,7 @@
 import { initAdmin } from './admin'
 import { triggerLoginFlow, triggerLoginReturnFlow } from './auth'
-import { initSellFlow, initListModInventory } from './sell'
+import { initSellFlow } from './sell'
+import { initListModInventory } from './sell-inventory'
 
 const tempRender = (text) => { document.querySelector('.content').innerHTML = text }
 

@@ -29,12 +29,11 @@ export const initiateListingFlow = async (auth, inventoryItems) => {
   const appConfig = await getAppConfig(true)
   const appAuth = await getAppAuth()
   const paymentItem = {
-    _id: new ObjectId().toString(),
+    _id: nanoid(10),
     characterId: auth.characterId,
     characterName: auth.characterName,
     amount: appConfig.listingPrice * inventoryItems.length,
-    inventory: inventoryItems.map(i => i._id),
-    ref: nanoid(10)
+    inventory: inventoryItems.map(i => i._id)
   }
   console.log('paymentItem', paymentItem)
   try {
@@ -53,15 +52,17 @@ Right click on this </font><font size="14" color="#ffd98d00"><a href="showinfo:2
 Fill in the details as follows:<br><br>
 <b>Account</b>: ${appConfig.corpDivisionName}<br>
 <b>Amount</b>: ${paymentItem.amount}<br>
-<b>Reason</b>: ${paymentItem.ref}<br><br><br>
+<b>Reason</b>: ${paymentItem._id}<br><br><br>
 Please be careful to fill this information in carefully.<br>
 It may take up to 1 hour for the transation to be registered and your items listed.<br><br>
 For any specific questions, contact us on </font><font size="14" color="#ffffe400"><loc><a href="${appConfig.discordUrl}">discord</a></loc></font><font size="14" color="#bfffffff">.<br><br>
 Thanks</font>`.replace(/\n/g, '')
   await sendMail(auth.characterId, 'Abyss Board Listing Fee', body)
 
-  for (const inventoryItem of inventoryItems) {
-    delete inventoryItem._id
+  return {
+    corpName: appAuth.corpName,
+    account: appConfig.corpDivisionName,
+    amount: paymentItem.amount,
+    reason: paymentItem._id
   }
-  return { inventoryItems }
 }

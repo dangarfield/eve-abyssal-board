@@ -78,7 +78,7 @@ export const initiateListingFlow = async (inventoryItems) => {
   const { accessToken } = getCurrentUserAccessToken()
   const url = `${API_ROOT}/api/listing`
 
-  const res = await window.fetch(url, {
+  const req = await window.fetch(url, {
     method: 'POST',
     headers: {
       Accept: 'application/json, text/plain, */*',
@@ -87,7 +87,9 @@ export const initiateListingFlow = async (inventoryItems) => {
     },
     body: JSON.stringify(inventoryItems)
   })
-  console.log('initialListing res', res)
+  const res = await req.json()
+  console.log('initialListing res', req)
+  return res
 }
 export const getSSOAdminLoginUrl = async () => {
   const data = loadData()

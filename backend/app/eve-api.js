@@ -1,5 +1,5 @@
 import { Api } from 'eve-esi-swaggerts'
-import { getAppAuth } from './config'
+import { getAppAuth, getAppConfig } from './config'
 import { updateAndPersistRefreshToken } from './sso'
 
 const esi = new Api()
@@ -36,10 +36,27 @@ export const sendMail = async (recipient, subject, body) => {
       subject
     }, { token: accessToken })
 
-    console.log('result', result)
+    console.log('result', result.data)
   } catch (error) {
     console.log('sendMail ERROR', error)
 
     // NOTE: There can be some blocked contacts, I think there are a few limits too
   }
+}
+export const getEvePaymentJournal = async () => {
+  console.log('getEvePaymentJournal')
+  const appAuth = await getAppAuth()
+  const appConfig = await getAppConfig(true)
+  const { characterId, accessToken } = await ensureAccessTokenIsValid()
+
+  console.log('getEvePaymentJournal', characterId, accessToken, appAuth.corpId, appConfig.corpDivisionId)
+  try {
+    const result = (await esi.corporations.getCorporationsCorporationIdWalletsDivisionJournal(appAuth.corpId, appConfig.corpDivisionId, { token: accessToken })).data
+    console.log('result', result)
+    return result
+  } catch (error) {
+    console.log('getEvePaymentJournal ERROR', error)
+    // NOTE: There can be some blocked contacts, I think there are a few limits too
+  }
+  return []
 }

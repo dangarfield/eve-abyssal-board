@@ -113,7 +113,7 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
     html += `
     <div class="row row-cols-lg-auto g-3 align-items-center flex-row-reverse px-2">
       <div class="col-12">
-        <input class="form-control ms-2 data-search" type="search" placeholder="Search" aria-label="Search">
+        <input class="form-control ms-2 data-search" type="search" placeholder="Search inventory">
       </div>
       <div class="col-12">
         <div class="form-check form-switch">

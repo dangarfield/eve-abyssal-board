@@ -26,7 +26,6 @@ export const getSellerInventory = async (characterId) => {
 export const getCurrentSellerPayments = async () => {
   const { accessToken } = getCurrentUserAccessToken()
   const url = `${API_ROOT}/api/seller/@me/payments`
-
   const res = await fetchWithRetry(url, {
     method: 'GET',
     headers: {
@@ -35,7 +34,10 @@ export const getCurrentSellerPayments = async () => {
       Authorization: `Bearer ${accessToken}`
     }
   })
-  // console.log('getSellerPayments', characterId, res)
+  for (const p of res) {
+    p.creationDate = new Date(p.creationDate)
+  }
+  res.sort((a, b) => b.creationDate - a.creationDate)
   return res
 }
 
@@ -119,4 +121,17 @@ export const getSSOAdminLoginUrl = async () => {
   const res = await req.json()
   console.log('getSSOAdminLoginUrl', res)
   return res.loginUrl
+}
+export const triggerPeriodicAdminTask = async () => {
+  const data = loadData()
+  const req = await window.fetch(`${API_ROOT}/api/admin-task`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `${data['admin-password']}`
+    }
+  })
+  const res = await req.json()
+  console.log('triggerPeriodicAdminTask', res)
 }

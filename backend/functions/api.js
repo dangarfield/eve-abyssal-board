@@ -4,7 +4,7 @@ import { verifyAdmin, verifyToken } from '../app/auth'
 import { getSellerInventory } from '../app/inventory'
 import { initiateListingFlow } from '../app/listing-flow'
 import { ssoAdminLoginStart, ssoAdminReturn } from '../app/sso'
-import { getSellerPayments } from '../app/payments'
+import { findAndUpdateCompletedPayments, getSellerPayments } from '../app/payments'
 
 const app = API()
 
@@ -41,6 +41,11 @@ app.get('/api/sso/login', verifyAdmin, async function (req, res) {
 app.get('/api/sso/return', async function (req, res) {
   await ssoAdminReturn(req.query.code, req.query.state)
   res.redirect('/#/admin')
+})
+app.get('/api/admin-task', verifyAdmin, async function (req, res) {
+  // const loginUrl = await ssoAdminLoginStart()
+  await findAndUpdateCompletedPayments()
+  res.json({})
 })
 
 export async function handler (event, context) {

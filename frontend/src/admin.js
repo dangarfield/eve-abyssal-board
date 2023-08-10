@@ -1,5 +1,5 @@
 import { isLoginPasswordSet } from './auth'
-import { getAppConfigAdmin, getAppAuth, getSSOAdminLoginUrl, setAppConfig } from './board-api'
+import { getAppConfigAdmin, getAppAuth, getSSOAdminLoginUrl, setAppConfig, triggerPeriodicAdminTask } from './board-api'
 import { saveData, clearData, loadData } from './utils'
 
 const renderAdminLogin = () => {
@@ -172,6 +172,7 @@ export const initAdmin = async () => {
       console.log('LOGGED IN!!! DATA', appAuth, appConfig)
       const data = loadData()
       renderAdminDetails(appAuth, appConfig, data['admin-token'])
+      await triggerPeriodicAdminTask()
     }
     // TODO is null, password is bad, clear password and reload page
   } else {

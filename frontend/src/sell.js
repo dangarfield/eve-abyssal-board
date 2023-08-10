@@ -136,7 +136,7 @@ const renderSellerListing = (listedItems) => {
     html += `
     <div class="row row-cols-lg-auto g-3 align-items-center flex-row-reverse px-2">
       <div class="col-12">
-        <input class="form-control ms-2 data-search" type="search" placeholder="Search">
+        <input class="form-control ms-2 data-search" type="search" placeholder="Search listings">
       </div>
     </div>
 `
@@ -175,17 +175,28 @@ const renderPaymentsListing = (payments, appConfig) => {
             <h4>Outstanding Payments</h4>
             <p>Payments should be made in game to <code>${appConfig.corpName}</code>. Right click, give ISK. Always pay into the <code>${appConfig.corpDivisionName}</code> account with the reason shown below.</p>
             <p>Any issues? Contact us on discord. <i><b>Note:</b> Payments take up to 1 hour to be registered</i></p>
-        </div>`
+        </div>
+    </div>`
 
+    html += `
+        <div class="row row-cols-lg-auto g-3 align-items-center flex-row-reverse px-2">
+          <div class="col-12">
+            <div class="form-check form-switch ms-2">
+              <input class="form-check-input show-completed-payments" type="checkbox" role="switch" id="show-completed-payments">
+              <label class="form-check-label" for="show-completed-payments">Show completed payments</label>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+    `
     for (const payment of payments) {
       html += `
-          <div class="col-3">
-              
-              <div class="card border-danger h-100 payment" role="button"${payment.inventory ? ` data-inventory="${payment.inventory.join(',')}"` : ''}>
+          <div class="col-3"${payment.paid ? ' style="display:none;"' : ''}>
+              <div class="card ${payment.paid ? 'border-success' : 'border-danger'} h-100 payment" role="button"${payment.inventory ? ` data-paid="${payment.paid}" data-inventory="${payment.inventory.join(',')}"` : ''}>
                 <div class="card-body">
                     <div class="d-flex">
                         <div class="flex-grow-1">
-                            <h5 class="">Amount: </h5>
+                            <h5 class="">${payment.paid ? 'PAID' : 'Amount Due'}: </h5>
                         </div>
                         <div class="text-end">
                             <h5 class="">${formatToISKString(payment.amount)}</h5>
@@ -214,8 +225,23 @@ const renderPaymentsListing = (payments, appConfig) => {
     }
     html += '</div>'
   }
+  // TODO - Hide paid payments
   document.querySelector('.payment-content').innerHTML = html
 
+  const showCompletedPaymentsEle = document.querySelector('.show-completed-payments')
+  if (showCompletedPaymentsEle) {
+    showCompletedPaymentsEle.addEventListener('change', () => {
+      const showAll = showCompletedPaymentsEle.checked
+      document.querySelectorAll('.payment').forEach((element) => {
+        const isPaid = element.getAttribute('data-paid') === 'true'
+        if (isPaid && !showAll) {
+          element.parentElement.style.display = 'none'
+        } else {
+          element.parentElement.style.display = 'block'
+        }
+      })
+    })
+  }
   for (const paymentEle of [...document.querySelectorAll('.payment')]) {
     paymentEle.addEventListener('mouseenter', () => {
       const inventory = paymentEle.getAttribute('data-inventory')

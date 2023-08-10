@@ -1,5 +1,4 @@
 import { inventoryCollection, paymentCollection } from '../app/db.js'
-import { ObjectId } from 'mongodb'
 import { getAppAuth, getAppConfig } from './config.js'
 import { nanoid } from 'nanoid'
 import { sendMail } from './eve-api.js'
@@ -35,7 +34,8 @@ export const initiateListingFlow = async (auth, inventoryItems) => {
     amount: appConfig.listingPrice * inventoryItems.length,
     inventory: inventoryItems.map(i => i._id),
     type: PAYMENT_TYPES.LISTING_FEE,
-    creationDate: new Date()
+    creationDate: new Date(),
+    paid: false
   }
   console.log('paymentItem', paymentItem)
   try {
@@ -66,5 +66,35 @@ Thanks</font>`.replace(/\n/g, '')
     account: appConfig.corpDivisionName,
     amount: paymentItem.amount,
     reason: paymentItem._id
+  }
+}
+
+export const receivePaymentAndPutInventoryOnSale = async (paymentsMade) => {
+  console.log('receivePaymentAndPutInventoryOnSale a', paymentsMade)
+  const uniqueInventoryValues = new Set()
+  paymentsMade.forEach(item => {
+    item.inventory.forEach(value => {
+      uniqueInventoryValues.add(value)
+    })
+  })
+  const uniqueInventoryArray = Array.from(uniqueInventoryValues)
+
+  console.log('receivePaymentAndPutInventoryOnSale b', paymentsMade, uniqueInventoryArray)
+
+  const updateResult = await inventoryCollection.updateMany(
+    { _id: { $in: uniqueInventoryArray } },
+    { $set: { status: INVENTORY_STATUS.ON_SALE } }
+  )
+  console.log('updateIDs', uniqueInventoryArray, updateResult)
+
+  const appConfig = await getAppConfig()
+  for (const paymentMade of paymentsMade) {
+    const body = `
+<font size="14" color="#bfffffff">
+Thanks for paying your listing fee on Abyss Board.<br><br>
+Your ${paymentMade.inventory.length} mod${paymentMade.inventory.length > 1 ? 's have' : ' has'} now been listed for sale!<br>
+For any specific questions, contact us on </font><font size="14" color="#ffffe400"><loc><a href="${appConfig.discordUrl}">discord</a></loc></font><font size="14" color="#bfffffff">.<br><br>
+Thanks</font>`.replace(/\n/g, '')
+    await sendMail(paymentMade.characterId, 'Abyss Board Listing Payment Received', body)
   }
 }

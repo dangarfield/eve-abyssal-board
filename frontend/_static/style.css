@@ -29,6 +29,9 @@
 .inventory-item.listed .card {
     background-color: lightgray;
 }
+.inventory-item.listed.on-sale .card {
+    background-color: lightgreen;
+}
 .selected-inventory-item {
     position: relative;
 }

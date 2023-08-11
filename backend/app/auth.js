@@ -1,14 +1,19 @@
+const PASSWORD = process.env.ADMIN_PASSWORD
 export const verifyAdmin = (req, res, next) => {
-  const bearerHeader = req.headers.authorization
-  if (typeof bearerHeader === 'undefined') {
-    res.status(403).json({ error: 'bad-password' })
-    return
-  }
-  //   console.log('bearerHeader', req.headers, bearerHeader, process.env.ADMIN_PASSWORD)
-  if (bearerHeader === process.env.ADMIN_PASSWORD) {
+  if (req.query && req.query.token === PASSWORD) {
     next()
   } else {
-    res.status(403).json({ error: 'bad-password' })
+    const bearerHeader = req.headers.authorization
+    if (typeof bearerHeader === 'undefined') {
+      res.status(403).json({ error: 'bad-password' })
+      return
+    }
+    //   console.log('bearerHeader', req.headers, bearerHeader, process.env.ADMIN_PASSWORD)
+    if (bearerHeader === PASSWORD) {
+      next()
+    } else {
+      res.status(403).json({ error: 'bad-password' })
+    }
   }
 }
 

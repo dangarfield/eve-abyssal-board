@@ -70,7 +70,7 @@ Thanks</font>`.replace(/\n/g, '')
 }
 
 export const receivePaymentAndPutInventoryOnSale = async (paymentsMade) => {
-  console.log('receivePaymentAndPutInventoryOnSale a', paymentsMade)
+  // console.log('receivePaymentAndPutInventoryOnSale a', paymentsMade)
   const uniqueInventoryValues = new Set()
   paymentsMade.forEach(item => {
     item.inventory.forEach(value => {
@@ -79,13 +79,13 @@ export const receivePaymentAndPutInventoryOnSale = async (paymentsMade) => {
   })
   const uniqueInventoryArray = Array.from(uniqueInventoryValues)
 
-  console.log('receivePaymentAndPutInventoryOnSale b', paymentsMade, uniqueInventoryArray)
+  // console.log('receivePaymentAndPutInventoryOnSale b', paymentsMade, uniqueInventoryArray)
 
-  const updateResult = await inventoryCollection.updateMany(
+  await inventoryCollection.updateMany(
     { _id: { $in: uniqueInventoryArray } },
     { $set: { status: INVENTORY_STATUS.ON_SALE } }
   )
-  console.log('updateIDs', uniqueInventoryArray, updateResult)
+  // console.log('updateIDs', uniqueInventoryArray, updateResult)
 
   const appConfig = await getAppConfig()
   for (const paymentMade of paymentsMade) {

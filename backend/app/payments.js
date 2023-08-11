@@ -29,11 +29,11 @@ export const findAndUpdateCompletedPayments = async () => {
   const unpaidPayments = await paymentCollection.find({ paid: false }).toArray()
   const journalItems = (await getEvePaymentJournal()).filter(j => j.ref_type === 'player_donation')
 
-  const testJournalItem = journalItems.find(j => j.reason === 'abc123')
-  testJournalItem.reason = 'm11ZdStYj7'
-  testJournalItem.amount = 12000000
+  // const testJournalItem = journalItems.find(j => j.reason === 'abc123')
+  // testJournalItem.reason = 'm11ZdStYj7'
+  // testJournalItem.amount = 12000000
 
-  console.log('evePaymentTransactions: START', unpaidPayments, journalItems)
+  console.log('evePaymentTransactions: START')
   for (const unpaidPayment of unpaidPayments) {
     for (const journalItem of journalItems) {
       if (unpaidPayment._id === journalItem.reason) {
@@ -57,5 +57,5 @@ export const findAndUpdateCompletedPayments = async () => {
     }
   }
 
-  console.log('findAndUpdateCompletedPayments: END')
+  console.log('findAndUpdateCompletedPayments: END - Updated:', paidPayments.length)
 }

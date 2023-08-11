@@ -42,8 +42,9 @@ app.get('/api/sso/return', async function (req, res) {
   await ssoAdminReturn(req.query.code, req.query.state)
   res.redirect('/#/admin')
 })
-app.get('/api/admin-task', verifyAdmin, async function (req, res) {
+app.any('/api/admin-task', verifyAdmin, async function (req, res) {
   // const loginUrl = await ssoAdminLoginStart()
+  console.log('/api/admin-task', 'SUCCESS')
   await findAndUpdateCompletedPayments()
   res.json({})
 })

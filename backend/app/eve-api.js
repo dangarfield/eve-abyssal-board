@@ -10,9 +10,9 @@ export const ensureAccessTokenIsValid = async () => {
     const { characterId, accessToken, refreshToken } = await getAppAuth()
     const req = await fetch(`https://esi.evetech.net/verify?token=${accessToken}`)
     const res = await req.json()
-    console.log('verify', res)
+    // console.log('verify', res)
     if (res.ExpiresOn && new Date(`${res.ExpiresOn}Z`) - new Date() < 0) {
-      console.log('token expired', res.ExpiresOn, new Date())
+      // console.log('token expired', res.ExpiresOn, new Date())
       const newAccessToken = await updateAndPersistRefreshToken(refreshToken)
       return { characterId, accessToken: newAccessToken }
     }
@@ -44,15 +44,15 @@ export const sendMail = async (recipient, subject, body) => {
   }
 }
 export const getEvePaymentJournal = async () => {
-  console.log('getEvePaymentJournal')
+  // console.log('getEvePaymentJournal')
   const appAuth = await getAppAuth()
   const appConfig = await getAppConfig(true)
-  const { characterId, accessToken } = await ensureAccessTokenIsValid()
+  const { accessToken } = await ensureAccessTokenIsValid()
 
-  console.log('getEvePaymentJournal', characterId, accessToken, appAuth.corpId, appConfig.corpDivisionId)
+  // console.log('getEvePaymentJournal', characterId, accessToken, appAuth.corpId, appConfig.corpDivisionId)
   try {
     const result = (await esi.corporations.getCorporationsCorporationIdWalletsDivisionJournal(appAuth.corpId, appConfig.corpDivisionId, { token: accessToken })).data
-    console.log('result', result)
+    // console.log('result', result)
     return result
   } catch (error) {
     console.log('getEvePaymentJournal ERROR', error)

@@ -20,7 +20,7 @@ const appAuthDefault = {
   refreshToken: 'r'
 }
 export const getAppConfig = async (showPrivateFields) => {
-  console.log('getAppConfig')
+  // console.log('getAppConfig')
   let appConfig = await configCollection.findOne({ _id: ID_APP_CONFIG })
   if (!appConfig) {
     await configCollection.insertOne(appConfigDefault)

@@ -1,6 +1,9 @@
 import { formatForUnit, formatToISKString } from '../utils'
 import { getUnitForDogma } from '../dogma-utils'
 
+const getFriendlyStatus = (status) => {
+  return status.replace(/_/g, ' ')
+}
 export const renderInventoryCard = (item) => {
   let html = ''
   const dogmaHtml = item.attributes.map(dogma => {
@@ -52,8 +55,11 @@ export const renderInventoryCard = (item) => {
     </div>`
   const listingPriceHtml = item.listingPrice !== undefined ? `<div class="listing-price px-2"><p>Listing price: <b>${formatToISKString(item.listingPrice)}</b></p></div>` : ''
 
+  let itemDisplayClass = ''
+  if (item.status)itemDisplayClass = ' listed'
+  if (item.status === 'ON_SALE') itemDisplayClass = ' listed on-sale'
   html += `
-        <div class="card-container inventory-item${item.status ? ' listed' : ''}" data-item-id="${item.itemId}" data-status="${item.status}" role="button">
+        <div class="card-container inventory-item${itemDisplayClass}" data-item-id="${item.itemId}" data-status="${item.status}" role="button">
             <div class="card">
                 <div class="card-body px-0 pb-0">
                     <div class="d-flex flex-row gap-2 align-items-center px-1">
@@ -62,7 +68,7 @@ export const renderInventoryCard = (item) => {
                             <p class="lead mb-0 type-name"><b>${item.typeName}</b></p>
                             <span class="badge bg-secondary">${item.abyssalModuleGroup}</span>
                             <span class="badge bg-secondary">${item.abyssalModuleCategory}</span>
-                            ${item.status ? `<span class="badge bg-primary">${item.status}</span>` : ''}
+                            ${item.status ? `<span class="badge bg-primary">${getFriendlyStatus(item.status)}</span>` : ''}
                         </div>
                     </div>
                     <hr class="my-2"/>

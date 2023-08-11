@@ -53,7 +53,7 @@ export const renderInventoryCard = (item) => {
   const listingPriceHtml = item.listingPrice !== undefined ? `<div class="listing-price px-2"><p>Listing price: <b>${formatToISKString(item.listingPrice)}</b></p></div>` : ''
 
   html += `
-        <div class="card-container inventory-item${item.status ? ' listed' : ''}" data-item-id="${item.itemId}" role="button">
+        <div class="card-container inventory-item${item.status ? ' listed' : ''}" data-item-id="${item.itemId}" data-status="${item.status}" role="button">
             <div class="card">
                 <div class="card-body px-0 pb-0">
                     <div class="d-flex flex-row gap-2 align-items-center px-1">

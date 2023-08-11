@@ -121,6 +121,12 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
           <label class="form-check-label" for="toggle-show-all">Show already on sale</label>
         </div>
       </div>
+      <div class="col-12">
+        <div class="form-check form-switch">
+          <input class="form-check-input toggle-select-all" type="checkbox" role="switch" id="toggle-select-all">
+          <label class="form-check-label" for="toggle-select-all">Select / deselect all</label>
+        </div>
+      </div>
     </div>
 `
     html += '<div class="row">'
@@ -152,20 +158,21 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
   triggerRefreshTime('.refresh-time-inventory', 'Inventory data', cacheExpires, lastModified)
 
   document.querySelector('.toggle-show-all').addEventListener('click', function () {
-    const showAll = this.getAttribute('data-show-all') === 'true'
-    if (showAll) {
-      this.setAttribute('data-show-all', false)
-      this.textContent = 'Show all'
-    } else {
-      this.setAttribute('data-show-all', true)
-      this.textContent = 'Hide already on sale'
-    }
     filterCards()
   })
   document.querySelector('.data-search').addEventListener('input', function () {
-    const value = this.value
-    console.log('value', value)
     filterCards()
+  })
+  document.querySelector('.toggle-select-all').addEventListener('change', function () {
+    const selectAll = this.checked
+    document.querySelectorAll('.inventory-item').forEach(element => {
+      const isListed = element.classList.contains('listed')
+      const isSelected = element.classList.contains('selected')
+      // console.log('e', element, isListed, '-', selectAll, isSelected)
+      if (isListed) return
+      if (selectAll && !isSelected) element.click()
+      if (!selectAll && isSelected) element.click()
+    })
   })
   // Bind add and remove inventory
   for (const inventoryItemEle of [...document.querySelectorAll('.inventory-item')]) {

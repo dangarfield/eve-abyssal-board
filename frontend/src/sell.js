@@ -138,6 +138,16 @@ const renderSellerListing = (listedItems) => {
       <div class="col-12">
         <input class="form-control ms-2 data-search" type="search" placeholder="Search listings">
       </div>
+      <div class="col-12">
+        <select class="form-select filter-status">
+            <option value="AWAITING_PAYMENT,ON_SALE" selected>Filter: Active</option>
+            <option value="AWAITING_PAYMENT,ON_SALE,CANCELLED,SOLD">Filter: All</option>
+            <option value="ON_SALE">Filter: On Sale</option>
+            <option value="AWAITING_PAYMENT">Filter: Awaiting Payment</option>
+            <option value="SOLD">Filter: Sold</option>
+            <option value="CANCELLED">Filter: Cancelled</option>
+        </select>
+      </div>
     </div>
 `
     html += '<div class="row">'
@@ -152,6 +162,11 @@ const renderSellerListing = (listedItems) => {
   document.querySelector('.inventory-content').innerHTML = html
   document.querySelector('.placeholder-content').remove()
   document.querySelector('.data-search').addEventListener('input', function () {
+    const value = this.value
+    console.log('value', value)
+    filterCards()
+  })
+  document.querySelector('.filter-status').addEventListener('change', function () {
     const value = this.value
     console.log('value', value)
     filterCards()
@@ -267,12 +282,14 @@ const renderPaymentsListing = (payments, appConfig) => {
 }
 const filterCards = () => {
   const searchQuery = document.querySelector('.data-search').value.toLowerCase()
+  const allowedStatuses = document.querySelector('.filter-status').value
   //   const hideListed = !document.querySelector('.toggle-show-all').checked
   document.querySelectorAll('.inventory-item').forEach((element) => {
     // TODO - Update
     const text = element.querySelector('.type-name').textContent.toLowerCase()
+    const status = element.getAttribute('data-status')
     // const isListed = element.classList.contains('listed')
-    const shouldHide = (searchQuery && !text.includes(searchQuery))// || (hideListed && isListed)
+    const shouldHide = (searchQuery && !text.includes(searchQuery)) || (!allowedStatuses.includes(status))
     element.parentElement.style.display = shouldHide ? 'none' : 'block'
   })
   console.log('filterCards')

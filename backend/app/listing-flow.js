@@ -3,7 +3,7 @@ import { getAppAuth, getAppConfig } from './config.js'
 import { nanoid } from 'nanoid'
 import { sendMail } from './eve-api.js'
 
-const INVENTORY_STATUS = { AWAITING_PAYMENT: 'AWAITING_PAYMENT', ON_SALE: 'ON_SALE', CANCELLED: 'CANCELLED', SOLD: 'SOLD', CONTRACT: 'CONTRACT' }
+const INVENTORY_STATUS = { AWAITING_PAYMENT: 'AWAITING_PAYMENT', ON_SALE: 'ON_SALE', CANCELLED: 'CANCELLED', COMPLETE: 'COMPLETE', CONTRACT: 'CONTRACT' }
 // CONST APPRAISAL_STATUS = {AWAITING_APPRAISAL: 'AWAITING_APPRAISAL', COMPLETE:'COMPLETE'}
 const PAYMENT_TYPES = { LISTING_FEE: 'LISTING_FEE' }
 export const initiateListingFlow = async (auth, inventoryItems) => {
@@ -97,4 +97,33 @@ For any specific questions, contact us on </font><font size="14" color="#ffffe40
 Thanks</font>`.replace(/\n/g, '')
     await sendMail(paymentMade.characterId, 'Abyss Board Listing Payment Received', body)
   }
+}
+export const cancelListing = async (itemId) => {
+  const payment = await paymentCollection.findOne({ inventory: itemId, type: PAYMENT_TYPES.LISTING_FEE, paid: false })
+
+  if (payment) {
+    if (payment.inventory.length > 1) {
+      payment.inventory = payment.inventory.filter(i => i !== itemId)
+      const config = await getAppConfig()
+      payment.amount = (config.listingPrice * payment.inventory.length)
+      const updateRes = await paymentCollection.updateOne({ _id: payment._id }, { $set: { inventory: payment.inventory, amount: payment.amount } })
+      console.log('updateRes', updateRes)
+    } else {
+      await paymentCollection.deleteOne({ _id: payment._id })
+    }
+  }
+
+  const item = await inventoryCollection.deleteOne({ _id: itemId })
+
+  console.log('cancelListing', itemId, item, payment)
+  return { itemId, status: INVENTORY_STATUS.CANCELLED }
+}
+export const amendListing = async (itemId, amend) => {
+  if (amend && amend.status && INVENTORY_STATUS[amend.status]) {
+    await inventoryCollection.updateOne({ _id: itemId }, { $set: { status: amend.status } })
+    console.log('Good to amend', amend)
+  }
+  // const item = await inventoryCollection.deleteOne({ _id: itemId })
+  console.log('amendListing', itemId, amend)
+  return { itemId, status: amend.status }
 }

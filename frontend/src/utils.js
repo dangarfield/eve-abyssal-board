@@ -92,7 +92,7 @@ export const triggerRefreshTime = (elementSelector, typeMessage, expireTime, las
   refreshTime()
 }
 
-export const showModalAlert = async (title, contentHtml) => {
+export const showModalAlert = async (title, contentHtml, footerConfig) => {
   return new Promise((resolve, reject) => {
     const id = `modal-${nanoid(10)}`
     const html = `<div class="modal fade" id="${id}" tabindex="-1" role="dialog">
@@ -106,12 +106,21 @@ export const showModalAlert = async (title, contentHtml) => {
             ${contentHtml}
           </div>
           <div class="modal-footer">
+            ${footerConfig ? footerConfig.map((f, i) => `<button type="button" class="btn ${f.style} modal-footer-btn-${i}">${f.buttonText}</button>`).join('') : ''}
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
         </div>
       </div>
     </div>`
     document.body.insertAdjacentHTML('beforeend', html)
+    if (footerConfig) {
+      for (let i = 0; i < footerConfig.length; i++) {
+        document.querySelector(`.modal .modal-footer-btn-${i}`).addEventListener('click', () => {
+          footerConfig[i].cb()
+        })
+      }
+    }
+
     const modalEle = document.getElementById(id)
     const modal = new window.bootstrap.Modal(modalEle, {})
     modal.show()

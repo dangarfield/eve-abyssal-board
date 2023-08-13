@@ -16,6 +16,7 @@ const renderInventoryPlaceholder = (userDetails) => {
                   <p>EVE Online servers cache this data and it is made available to us up to 60 minutes after requesting.</p>
                   <p class="refresh-time-inventory">This text will update with the next refresh time.</p>
                   <p>Select the mods that you wish to sell and add your listing price. You can update the listing price at any time after it is listed.</p>
+                  <p><i><b>Note:</b> Once you send a listing fee payment and you cancel after the mod is on sale or sell the item elsewhere, the listing fee will not be returned.</i></p>
               </div>
           </div>
           <div class="inner-content">

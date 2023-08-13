@@ -2,7 +2,7 @@ import API from 'lambda-api'
 import { getAppAuth, getAppConfig, setAppConfig } from '../app/config'
 import { verifyAdmin, verifyToken } from '../app/auth'
 import { getSellerInventory } from '../app/inventory'
-import { initiateListingFlow } from '../app/listing-flow'
+import { cancelListing, initiateListingFlow, amendListing } from '../app/listing-flow'
 import { ssoAdminLoginStart, ssoAdminReturn } from '../app/sso'
 import { findAndUpdateCompletedPayments, getSellerPayments } from '../app/payments'
 
@@ -31,7 +31,14 @@ app.get('/api/app-auth', verifyAdmin, async (req, res) => {
 })
 
 app.post('/api/listing', verifyToken, async function (req, res) {
-  res.json((await initiateListingFlow(req.auth, req.body)))
+  res.json(await initiateListingFlow(req.auth, req.body))
+})
+app.delete('/api/listing/:itemId', verifyToken, async function (req, res) {
+  res.json(await cancelListing(parseInt(req.params.itemId)))
+})
+
+app.patch('/api/listing/:itemId', verifyToken, async function (req, res) {
+  res.json(await amendListing(parseInt(req.params.itemId), req.body))
 })
 
 app.get('/api/sso/login', verifyAdmin, async function (req, res) {

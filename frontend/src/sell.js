@@ -1,7 +1,7 @@
 import { doesCurrentCharacterHaveSellerScope, getCurrentUserDetails, triggerLoginFlow } from './auth'
-import { getAppConfig, getCurrentSellerInventory, getCurrentSellerPayments } from './board-api'
+import { amendListing, cancelListing, getAppConfig, getCurrentSellerInventory, getCurrentSellerPayments } from './board-api'
 import { renderInventoryCard } from './component/inventory-card'
-import { formatToISKString } from './utils'
+import { formatToISKString, showModalAlert } from './utils'
 
 const askForSellerScopePermission = () => {
   const html = `
@@ -141,16 +141,24 @@ const renderSellerListing = (listedItems) => {
       <div class="col-12">
         <select class="form-select filter-status">
             <option value="AWAITING_PAYMENT,ON_SALE" selected>Filter: Active</option>
-            <option value="AWAITING_PAYMENT,ON_SALE,CANCELLED,SOLD">Filter: All</option>
+            <option value="AWAITING_PAYMENT,ON_SALE,COMPLETE">Filter: All</option>
             <option value="ON_SALE">Filter: On Sale</option>
             <option value="AWAITING_PAYMENT">Filter: Awaiting Payment</option>
-            <option value="SOLD">Filter: Sold</option>
-            <option value="CANCELLED">Filter: Cancelled</option>
+            <option value="COMPLETE">Filter: Complete / Sold</option>
         </select>
       </div>
     </div>
 `
-    html += '<div class="row">'
+    html += `
+        <div class="row mt-4 all-items-filtered" style="display:none">
+            <div class="col">
+                <div class="alert alert-info" role="alert">
+                    <p class="m-0">Some listed mods are hidden - Use <code>Filter: All</code> to see all item</p>
+                </div>
+            </div>
+        </div>
+        `
+    html += '<div class="row mb-3">'
     for (const listedItem of listedItems) {
       html += `
         <div class="col-3 mt-4">
@@ -171,6 +179,55 @@ const renderSellerListing = (listedItems) => {
     console.log('value', value)
     filterCards()
   })
+  filterCards()
+  for (const invAwaitingEle of [...document.querySelectorAll('.inventory-item.awaiting-payment')]) {
+    invAwaitingEle.addEventListener('click', async () => {
+      const itemId = parseInt(invAwaitingEle.getAttribute('data-item-id'))
+      const payment = payments.find(p => p.inventory.includes(itemId))
+      const otherInventories = payment.inventory.filter(pi => pi !== itemId)
+      console.log('awaiting-payment', itemId, payment, otherInventories)
+
+      const otherInvWording = otherInventories.length > 0 ? `<p><i><b>Note:</b> This mod was listed at the same time with ${otherInventories.length} other mod${otherInventories.length > 1 ? 's' : ''}. The listing fee due balance will be updated to include only the remaining items</i></p>` : ''
+      await showModalAlert('Cancel Listing', `
+      <p>It doesn't look as though you've paid a listing fee yet, so nothing is lost!</p>
+      <p>If you cancel this listing, it'll disappear from this screen along with any payment reminders, if you want to relist it, simply add a new mod listing as before.</p>
+      ${otherInvWording}`, [{
+        buttonText: 'Cancel listing',
+        style: 'btn-danger',
+        cb: async () => {
+          console.log('callback', invAwaitingEle, itemId)
+          await cancelListing(itemId)
+          console.log('listing cancelled')
+        }
+      }])
+    })
+  }
+  for (const invOnSaleEle of [...document.querySelectorAll('.inventory-item.on-sale')]) {
+    invOnSaleEle.addEventListener('click', async () => {
+      const itemId = parseInt(invOnSaleEle.getAttribute('data-item-id'))
+      console.log('on-sale', itemId)
+      await showModalAlert('Amend Listing', `
+      <p>You've already paid the listing fee, if you want to cancel or have sold it elsewhere, the listing fee will not be returned.</p>
+      <p>If you cancel this listing, it'll disappear from this screen along but the completed payments will remain visible. If you want to relist it, simply add a new mod listing as before.</p>
+      `, [{
+        buttonText: 'Cancel listing',
+        style: 'btn-danger',
+        cb: async () => {
+          console.log('callback', invOnSaleEle, itemId)
+          await cancelListing(itemId)
+          console.log('listing cancelled')
+        }
+      }, {
+        buttonText: 'Listing complete / sold',
+        style: 'btn-success',
+        cb: async () => {
+          console.log('callback', invOnSaleEle, itemId)
+          await amendListing(itemId, { status: 'COMPLETE' })
+          console.log('listing complete')
+        }
+      }])
+    })
+  }
 }
 const renderPaymentsListing = (payments, appConfig) => {
   let html = ''
@@ -194,7 +251,7 @@ const renderPaymentsListing = (payments, appConfig) => {
     </div>`
 
     html += `
-        <div class="row row-cols-lg-auto g-3 align-items-center flex-row-reverse px-2">
+        <div class="row row-cols-lg-auto g-3 align-items-center flex-row-reverse px-2 mb-3">
           <div class="col-12">
             <div class="form-check form-switch ms-2">
               <input class="form-check-input show-completed-payments" type="checkbox" role="switch" id="show-completed-payments">
@@ -202,7 +259,7 @@ const renderPaymentsListing = (payments, appConfig) => {
             </div>
           </div>
         </div>
-        <div class="row">
+        <div class="row mb-3">
     `
     for (const payment of payments) {
       html += `
@@ -264,18 +321,16 @@ const renderPaymentsListing = (payments, appConfig) => {
         return
       }
       const inventories = inventory.split(',')
-      console.log('mouseenter', inventories)
-
+      //   console.log('mouseenter', inventories)
       document.querySelectorAll('.inventory-item').forEach((element) => {
         const itemId = element.getAttribute('data-item-id')
         const shouldHide = !inventories.includes(itemId)
-        console.log('element', element, itemId, shouldHide)
+        // console.log('element', element, itemId, shouldHide)
         element.parentElement.style.display = shouldHide ? 'none' : 'block'
       })
     })
     paymentEle.addEventListener('mouseleave', () => {
-      //
-      console.log('mouseleave')
+    //   console.log('mouseleave')
       filterCards()
     })
   }
@@ -283,21 +338,27 @@ const renderPaymentsListing = (payments, appConfig) => {
 const filterCards = () => {
   const searchQuery = document.querySelector('.data-search').value.toLowerCase()
   const allowedStatuses = document.querySelector('.filter-status').value
-  //   const hideListed = !document.querySelector('.toggle-show-all').checked
+  let count = 0
+  let hidden = 0
   document.querySelectorAll('.inventory-item').forEach((element) => {
-    // TODO - Update
     const text = element.querySelector('.type-name').textContent.toLowerCase()
     const status = element.getAttribute('data-status')
-    // const isListed = element.classList.contains('listed')
     const shouldHide = (searchQuery && !text.includes(searchQuery)) || (!allowedStatuses.includes(status))
+    if (shouldHide) hidden++
     element.parentElement.style.display = shouldHide ? 'none' : 'block'
+    count++
   })
-  console.log('filterCards')
+  if (count > 0 && count === hidden) {
+    document.querySelector('.all-items-filtered').style.display = 'block'
+  } else {
+    document.querySelector('.all-items-filtered').style.display = 'none'
+  }
+  console.log('filterCards', count, hidden)
 }
+let payments
 const displayPayments = async () => {
   const appConfig = await getAppConfig()
-
-  const payments = await getCurrentSellerPayments()
+  payments = await getCurrentSellerPayments()
   console.log('payments', payments)
   renderPaymentsListing(payments, appConfig)
 }

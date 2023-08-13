@@ -56,8 +56,9 @@ export const renderInventoryCard = (item) => {
   const listingPriceHtml = item.listingPrice !== undefined ? `<div class="listing-price px-2"><p>Listing price: <b>${formatToISKString(item.listingPrice)}</b></p></div>` : ''
 
   let itemDisplayClass = ''
-  if (item.status)itemDisplayClass = ' listed'
+  if (item.status) itemDisplayClass = ' listed'
   if (item.status === 'ON_SALE') itemDisplayClass = ' listed on-sale'
+  if (item.status === 'AWAITING_PAYMENT') itemDisplayClass = ' listed awaiting-payment'
   html += `
         <div class="card-container inventory-item${itemDisplayClass}" data-item-id="${item.itemId}" data-status="${item.status}" role="button">
             <div class="card">

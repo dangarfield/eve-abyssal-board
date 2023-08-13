@@ -105,7 +105,40 @@ export const initiateListingFlow = async (inventoryItems) => {
     body: JSON.stringify(inventoryItems)
   })
   const res = await req.json()
-  console.log('initialListing res', req)
+  console.log('initialListing res', res)
+  return res
+}
+export const cancelListing = async (itemId) => {
+  const { accessToken } = getCurrentUserAccessToken()
+  const url = `${API_ROOT}/api/listing/${itemId}`
+
+  const req = await window.fetch(url, {
+    method: 'DELETE',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+  const res = await req.json()
+  console.log('cancelListing res', res)
+  return res
+}
+export const amendListing = async (itemId, amend) => {
+  const { accessToken } = getCurrentUserAccessToken()
+  const url = `${API_ROOT}/api/listing/${itemId}`
+
+  const req = await window.fetch(url, {
+    method: 'PATCH',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(amend)
+  })
+  const res = await req.json()
+  console.log('amendListing res', res)
   return res
 }
 export const getSSOAdminLoginUrl = async () => {

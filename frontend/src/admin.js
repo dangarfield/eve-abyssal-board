@@ -1,5 +1,6 @@
 import { isLoginPasswordSet } from './auth'
 import { getAppConfigAdmin, getAppAuth, getSSOAdminLoginUrl, setAppConfig, triggerPeriodicAdminTask } from './board-api'
+import { renderAdminHeader } from './component/admin-header'
 import { saveData, clearData, loadData } from './utils'
 
 const renderAdminLogin = () => {
@@ -8,7 +9,7 @@ const renderAdminLogin = () => {
     <div class="container">
         <div class="row">
             <div class="col">
-                <h3>Admin</h3>
+                <h3>Admin Login</h3>
                 <form class="row gx-3 gy-2 align-items-center password-form">
                     <div class="col-sm-3">
                         <input type="text" class="form-control password" placeholder="Admin password">
@@ -33,10 +34,10 @@ const renderAdminLogin = () => {
 const renderAdminDetails = (appAuth, appConfig, adminToken) => {
   let html = ''
   html += `
-        <div class="container">
+        <div class="container pt-3">
             <div class="row">
                 <div class="col">
-                    <h3>Admin</h3>
+                    ${renderAdminHeader()}
                     <form class="admin-form">
                         <div class="row">
                             <div class="col">

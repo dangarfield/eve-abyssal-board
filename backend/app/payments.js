@@ -1,6 +1,6 @@
-import { paymentCollection } from './db'
+import { inventoryCollection, paymentCollection } from './db'
 import { getEvePaymentJournal } from './eve-api'
-import { receivePaymentAndPutInventoryOnSale } from './listing-flow'
+import { PAYMENT_TYPES, receivePaymentAndPutInventoryOnSale } from './listing-flow'
 
 function groupByAttribute (objects, attribute) {
   const grouped = {}
@@ -58,4 +58,29 @@ export const findAndUpdateCompletedPayments = async () => {
   }
 
   console.log('findAndUpdateCompletedPayments: END - Updated:', paidPayments.length)
+}
+export const getPendingPayments = async () => {
+  console.log('getPendingPayments')
+  const payments = await paymentCollection.find({ paid: false }).toArray()
+  return payments
+}
+export const deletePayment = async (paymentId) => {
+  console.log('deletePayment', paymentId)
+  const payment = await paymentCollection.findOne({ _id: paymentId, paid: false })
+  if (payment.type === PAYMENT_TYPES.LISTING_FEE) {
+    const iD = await inventoryCollection.deleteMany({ _id: { $in: payment.inventory } })
+    const pD = await paymentCollection.deleteOne({ _id: paymentId })
+    console.log('deleted', iD, pD)
+  }
+  return payment
+}
+export const amendPayment = async (paymentId, update) => {
+  console.log('amendPayment', paymentId, update)
+  const payment = await paymentCollection.findOne({ _id: paymentId, paid: false })
+  if (update && update.paid) {
+    console.log('Update to PAID', payment)
+    await paymentCollection.updateOne({ _id: paymentId }, { $set: { paid: true } })
+    await receivePaymentAndPutInventoryOnSale([payment])
+  }
+  return payment
 }

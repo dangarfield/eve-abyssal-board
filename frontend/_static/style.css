@@ -56,3 +56,8 @@
     border-radius: 0;
     height: 10px;
 }
+
+.payment-grid .gridjs-tr th,
+.payment-grid .gridjs-tr td {
+    padding: 2px;
+}

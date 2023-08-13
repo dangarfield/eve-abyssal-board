@@ -5,7 +5,7 @@ import { sendMail } from './eve-api.js'
 
 const INVENTORY_STATUS = { AWAITING_PAYMENT: 'AWAITING_PAYMENT', ON_SALE: 'ON_SALE', CANCELLED: 'CANCELLED', COMPLETE: 'COMPLETE', CONTRACT: 'CONTRACT' }
 // CONST APPRAISAL_STATUS = {AWAITING_APPRAISAL: 'AWAITING_APPRAISAL', COMPLETE:'COMPLETE'}
-const PAYMENT_TYPES = { LISTING_FEE: 'LISTING_FEE' }
+export const PAYMENT_TYPES = { LISTING_FEE: 'LISTING_FEE' }
 export const initiateListingFlow = async (auth, inventoryItems) => {
   for (const inventoryItem of inventoryItems) {
     inventoryItem._id = inventoryItem.itemId

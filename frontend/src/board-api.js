@@ -181,4 +181,38 @@ export const getPendingPaymentsAdmin = async (filter) => {
   })
   const res = await req.json()
   console.log('getPendingPaymentsAdmin', res)
+  for (const p of res) {
+    p.creationDate = new Date(p.creationDate).toLocaleString() // Not easily sortable...
+  }
+  return res
+}
+export const cancelPayment = async (paymentId) => {
+  const data = loadData()
+  const req = await window.fetch(`${API_ROOT}/api/payments/${paymentId}`, {
+    method: 'DELETE',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `${data['admin-password']}`
+    }
+  })
+  const res = await req.json()
+  console.log('cancelPayment', res)
+  return res
+}
+
+export const updatePayment = async (paymentId, update) => {
+  const data = loadData()
+  const req = await window.fetch(`${API_ROOT}/api/payments/${paymentId}`, {
+    method: 'PATCH',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `${data['admin-password']}`
+    },
+    body: JSON.stringify(update)
+  })
+  const res = await req.json()
+  console.log('updatePayment', res)
+  return res
 }

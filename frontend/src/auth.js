@@ -6,11 +6,11 @@ const SELLER_SCOPES = 'publicData esi-assets.read_assets.v1'.split(' ')
 const ssoConfig = window.location.href.includes('localhost')
   ? {
       clientId: 'dc6490d2eafc421a8cc35cf0394d60d1',
-      redirectUri: 'http://localhost:8888/#/login/return/'
+      redirectUri: 'http://localhost:8888/login/return/'
     }
   : {
       clientId: '63adc68f3b214e63a79b2b612e4c4a10',
-      redirectUri: 'https://abyssalboard.netlify.app/#/login/return/'
+      redirectUri: 'https://abyssalboard.netlify.app/login/return/'
     }
 
 // console.log('ssoConfig', ssoConfig)
@@ -124,7 +124,7 @@ export const fetchWithRetry = async (url, fetchOptions, maxRetries = 3) => {
       response = await req.json()
       if (response.error) {
         console.log('response.error', response.error)
-        window.location.hash = '#/error'
+        window.location.assign('/error')
         throw new Error(response.error)
       } else if (response.expired) {
         console.log('Token expired')
@@ -140,6 +140,6 @@ export const fetchWithRetry = async (url, fetchOptions, maxRetries = 3) => {
     }
     retries++
   }
-  window.location.hash = '#/error'
+  window.location.assign('/error')
   throw new Error('Max retries exceeded')
 }

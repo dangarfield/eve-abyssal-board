@@ -4,6 +4,11 @@
   publish = "./frontend/_static"
 
 [[redirects]]
+  from = "/api*"
+  to = "/.netlify/functions/api"
+  status = 200
+
+[[redirects]]
   from = "/*"
-  to = "/.netlify/functions/:splat"
+  to = "/index.html"
   status = 200

@@ -28,7 +28,9 @@ const askForSellerScopePermission = () => {
                         These are filtered by abyssal types and presented to you for you to automatically create a listing</li>
                     </ul>
 
-                    <p><i>Note: No information is sent or used by Abyssal Board other than identifying and validating the items for sale. All source code is available</a></p>
+                    <p><i>Note: No information is sent or used by Abyssal Board other than identifying and validating the items for sale.
+                    This includes refresh tokens. They are all persisted in your browser and not on any Abyss Board servers. We have no way of refreshing your tokens ourselves.
+                    All source code is available.</a></p>
                 </div>
             </div>
         </div>
@@ -48,7 +50,7 @@ const renderSellerPlaceholder = (userDetails) => {
             <div class="col">
                 <div class="d-grid gap-2 d-md-flex justify-content-between my-2">
                     <h1>Hi ${userDetails.characterName}! Here are your mod listings!</h1>
-                    <a href="#/sell/inventory" class="btn btn-primary align-self-center" type="button"><i class="bi bi-plus-lg"></i> Add new mod listings</a>
+                    <a href="/sell/inventory" class="btn btn-primary align-self-center" type="button"><i class="bi bi-plus-lg"></i> Add new mod listings</a>
                 </div>
             </div>
         </div>
@@ -115,24 +117,12 @@ const renderSellerListing = (listedItems) => {
         <div class="row mt-4">
             <div class="col">
                 <div class="alert alert-info" role="alert">
-                    <p class="m-0">No items listed - Please add some</p>
+                    <p class="m-0">No items listed - Click on the <code>Add new mod listings</code> button to select one to sell</p>
                 </div>
             </div>
         </div>
         `
   } else {
-    // html += `
-    // <div class="row mt-4">
-    //     <div class="col">
-    //         <div class="hstack gap-3">
-    //             <input class="form-control me-auto" type="text" placeholder="TODO - Filter your items somehow">
-    //             <button type="button" class="btn btn-secondary">Submit</button>
-    //             <div class="vr"></div>
-    //             <button type="button" class="btn btn-outline-danger">Reset</button>
-    //         </div>
-    //     </div>
-    // </div>
-    // `
     html += `
     <div class="row row-cols-lg-auto g-3 align-items-center flex-row-reverse px-2">
       <div class="col-12">
@@ -150,7 +140,7 @@ const renderSellerListing = (listedItems) => {
     </div>
 `
     html += `
-        <div class="row mt-4 all-items-filtered" style="display:none">
+        <div class="row mt-4 all-items-filtered" style="display:none;">
             <div class="col">
                 <div class="alert alert-info" role="alert">
                     <p class="m-0">Some listed mods are hidden - Use <code>Filter: All</code> to see all item</p>
@@ -169,17 +159,20 @@ const renderSellerListing = (listedItems) => {
   }
   document.querySelector('.inventory-content').innerHTML = html
   document.querySelector('.placeholder-content').remove()
-  document.querySelector('.data-search').addEventListener('input', function () {
-    const value = this.value
-    console.log('value', value)
+  if (listedItems.length > 0) {
+    document.querySelector('.data-search').addEventListener('input', function () {
+      const value = this.value
+      console.log('value', value)
+      filterCards()
+    })
+    document.querySelector('.filter-status').addEventListener('change', function () {
+      const value = this.value
+      console.log('value', value)
+      filterCards()
+    })
     filterCards()
-  })
-  document.querySelector('.filter-status').addEventListener('change', function () {
-    const value = this.value
-    console.log('value', value)
-    filterCards()
-  })
-  filterCards()
+  }
+
   for (const invAwaitingEle of [...document.querySelectorAll('.inventory-item.awaiting-payment')]) {
     invAwaitingEle.addEventListener('click', async () => {
       const itemId = parseInt(invAwaitingEle.getAttribute('data-item-id'))
@@ -236,7 +229,7 @@ const renderPaymentsListing = (payments, appConfig) => {
           <div class="row mt-4">
               <div class="col">
                   <div class="alert alert-info" role="alert">
-                      <p class="m-0">No payments required</p>
+                      <p class="m-0">You don't have any payments awaiting settling</p>
                   </div>
               </div>
           </div>
@@ -263,7 +256,7 @@ const renderPaymentsListing = (payments, appConfig) => {
     `
     for (const payment of payments) {
       html += `
-          <div class="col-3"${payment.paid ? ' style="display:none;"' : ''}>
+          <div class="col-3 mb-3"${payment.paid ? ' style="display:none;"' : ''}>
               <div class="card ${payment.paid ? 'border-success' : 'border-danger'} h-100 payment" role="button"${payment.inventory ? ` data-paid="${payment.paid}" data-inventory="${payment.inventory.join(',')}"` : ''}>
                 <div class="card-body">
                     <div class="d-flex">

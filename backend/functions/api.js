@@ -47,7 +47,7 @@ app.get('/api/sso/login', verifyAdmin, async function (req, res) {
 })
 app.get('/api/sso/return', async function (req, res) {
   await ssoAdminReturn(req.query.code, req.query.state)
-  res.redirect('/#/admin')
+  res.redirect('/admin')
 })
 app.any('/api/admin-task', verifyAdmin, async function (req, res) {
   // const loginUrl = await ssoAdminLoginStart()

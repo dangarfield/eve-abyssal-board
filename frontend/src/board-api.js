@@ -168,3 +168,17 @@ export const triggerPeriodicAdminTask = async () => {
   const res = await req.json()
   console.log('triggerPeriodicAdminTask', res)
 }
+export const getPendingPaymentsAdmin = async (filter) => {
+  const data = loadData()
+  const req = await window.fetch(`${API_ROOT}/api/payments/pending`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `${data['admin-password']}`
+    },
+    body: JSON.stringify(filter)
+  })
+  const res = await req.json()
+  console.log('getPendingPaymentsAdmin', res)
+}

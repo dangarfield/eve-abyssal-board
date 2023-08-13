@@ -1,4 +1,5 @@
 import { initAdmin } from './admin'
+import { initAdminPayments } from './admin-payments'
 import { triggerLoginFlow, triggerLoginReturnFlow } from './auth'
 import { initSellFlow } from './sell'
 import { initListModInventory } from './sell-inventory'
@@ -77,6 +78,9 @@ const updateContent = (route) => {
     case '/admin':
       initAdmin()
       break
+    case '/admin/payments':
+      initAdminPayments()
+      break
 
     default:
       render404()
@@ -84,9 +88,10 @@ const updateContent = (route) => {
 }
 
 export const handleRouteChange = () => {
-  let route = window.location.hash
+  console.log('handleRouteChange')
+  let route = window.location.pathname
   if (route[0] === '#') route = route.substring(1)
   console.log('handleRouteChange', route)
   updateContent(route)
 }
-window.addEventListener('hashchange', handleRouteChange)
+// window.addEventListener('hashchange', handleRouteChange)

@@ -119,7 +119,7 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
       <div class="col-12">
         <div class="form-check form-switch">
           <input class="form-check-input toggle-show-all" type="checkbox" role="switch" id="toggle-show-all" checked>
-          <label class="form-check-label" for="toggle-show-all">Show already on sale</label>
+          <label class="form-check-label" for="toggle-show-all">Show already listed</label>
         </div>
       </div>
       <div class="col-12">
@@ -302,7 +302,7 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
     const paymentDetails = await initiateListingFlow(selectedInventoryToListShort)
     console.log('paymentDetails', paymentDetails)
     await showModalAlert('Listing Payment Details', `
-        <p class="mb-3">You will receive an ingame mail containing the payment information. It will also be available no your <a href="/#/sell">seller</a> page<p>
+        <p class="mb-3">You will receive an ingame mail containing the payment information. It will also be available no your <a href="/sell">seller</a> page<p>
         <p class="mb-3">In game, search for and right click on the <code>${paymentDetails.corpName}</code> corporation, then click 'Gigve Money'. Fill in the details as follows</p>
         <p class="ps-3 mb-0"><b>Account:</b> <code>${paymentDetails.account}</code></p>
         <p class="ps-3 mb-0"><b>Amount:</b> <code>${paymentDetails.amount}</code></p>
@@ -310,7 +310,7 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
         <p>Please be careful to fill this information in carefully.</p>
         <p>It may take up to 1 hour for the transation to be registered and your items listed.</p>
         `)
-    window.location.hash = '#/sell'
+    window.location.assign('/sell')
   })
 }
 const updateAppraisals = async () => {
@@ -346,9 +346,12 @@ export const initListModInventory = async () => {
     console.log('Seller logged in, show available mods')
     const { inventory, cacheExpires, lastModified } = await getCurrentUserModInventory()
     renderAvailableInventory(inventory, cacheExpires, lastModified)
-    bindInventoryActions(inventory, cacheExpires, lastModified)
+    if (inventory.length > 0) {
+      bindInventoryActions(inventory, cacheExpires, lastModified)
+    }
+
     await updateAppraisals()
   } else {
-    window.location.hash = '#/sell'
+    window.location.assign('/sell')
   }
 }

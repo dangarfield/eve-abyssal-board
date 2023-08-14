@@ -81,10 +81,10 @@ const renderCompletePayments = (payments) => {
       { name: 'Character ID', sort: true },
       { name: 'Character Name', sort: true },
       { name: 'LIST No.', sort: true },
-      { name: 'LIST Ƶ', sort: true },
+      { name: 'LIST Ƶ', sort: true, formatter: (cell) => cell.toLocaleString() },
       { name: 'APPRAISAL No.', sort: true },
-      { name: 'APPRAISAL Ƶ', sort: true },
-      { name: 'Total Ƶ', sort: true }
+      { name: 'APPRAISAL Ƶ', sort: true, formatter: (cell) => cell.toLocaleString() },
+      { name: 'Total Ƶ', sort: true, formatter: (cell) => cell.toLocaleString() }
     ],
     data: paymentsCol,
     search: true

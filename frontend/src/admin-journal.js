@@ -5,8 +5,8 @@ import { clearData } from './utils'
 import { Grid, h } from 'gridjs'
 import { renderAdminHeader } from './component/admin-header'
 
-const renderAdminJournal = (journal) => {
-  console.log('renderAdminJournal', journal)
+const renderAdminJournal = (journal, lastModified) => {
+  console.log('renderAdminJournal', journal, lastModified)
 
   let html = ''
   html += `
@@ -14,6 +14,11 @@ const renderAdminJournal = (journal) => {
     <div class="row">
       <div class="col">
         ${renderAdminHeader()}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <p class="lead">Journal cached from: <code>${lastModified.toLocaleString()}</code> <i>(Your local time)</i></p>
       </div>
     </div>
     <div class="row">
@@ -44,14 +49,14 @@ const renderAdminJournal = (journal) => {
     columns: [
       { name: 'i', hidden: true },
       { name: 'ID', sort: true },
-      { name: 'Date', sort: true },
+      { name: 'Date (EVE time)', sort: true },
       { name: 'Ref Type', sort: true },
       { name: 'To', sort: true },
       { name: 'From', sort: true },
       { name: 'Description', sort: true },
       { name: 'Reason', sort: true },
-      { name: 'Amount', sort: true },
-      { name: 'Balance', sort: true }
+      { name: 'Amount', sort: true, formatter: (cell) => cell.toLocaleString() },
+      { name: 'Balance', sort: true, formatter: (cell) => cell.toLocaleString() }
     ],
     data: journalCol,
     search: true
@@ -72,8 +77,8 @@ export const initAdminJournal = async () => {
     } else {
       // const appConfig = await getAppConfigAdmin()
       console.log('LOGGED IN!!! ADMIN PAYMENTS', appAuth)
-      const journal = await getJournalAdmin()
-      renderAdminJournal(journal)
+      const { journal, lastModified } = await getJournalAdmin()
+      renderAdminJournal(journal, lastModified)
     }
     // TODO is null, password is bad, clear password and reload page
   } else {

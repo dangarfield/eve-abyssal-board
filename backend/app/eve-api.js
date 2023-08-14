@@ -51,9 +51,10 @@ export const getEvePaymentJournal = async () => {
 
   // console.log('getEvePaymentJournal', characterId, accessToken, appAuth.corpId, appConfig.corpDivisionId)
   try {
-    const result = (await esi.corporations.getCorporationsCorporationIdWalletsDivisionJournal(appAuth.corpId, appConfig.corpDivisionId, { token: accessToken })).data
-    // console.log('result', result)
-    return result
+    const result = (await esi.corporations.getCorporationsCorporationIdWalletsDivisionJournal(appAuth.corpId, appConfig.corpDivisionId, { token: accessToken }))
+    const lastModified = new Date(result.headers.get('last-modified'))
+    console.log('result', result, lastModified, lastModified.toLocaleString())
+    return { journal: result.data, lastModified }
   } catch (error) {
     console.log('getEvePaymentJournal ERROR', error)
     // NOTE: There can be some blocked contacts, I think there are a few limits too

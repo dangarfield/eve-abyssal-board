@@ -212,9 +212,10 @@ export const getJournalAdmin = async (filter) => {
     }
   })
   const res = await req.json()
-  for (const p of res) {
+  for (const p of res.journal) {
     p.date = new Date(p.date).toLocaleString() // Not easily sortable...
   }
+  res.lastModified = new Date(res.lastModified)
   console.log('getJournalAdmin', res)
   return res
 }

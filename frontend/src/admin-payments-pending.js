@@ -35,7 +35,7 @@ const renderPendingPayments = (payments) => {
       { name: 'Type', sort: true },
       { name: 'Inventory', sort: true },
       { name: 'Creation Date', sort: true },
-      { name: 'Amount', sort: true },
+      { name: 'Amount', sort: true, formatter: (cell) => cell.toLocaleString() },
       { name: 'Paid', sort: true },
       {
         name: 'Cancel',

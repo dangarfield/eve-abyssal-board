@@ -4,6 +4,7 @@ import { initAdminCompletePayments } from './admin-payments-complete'
 import { triggerLoginFlow, triggerLoginReturnFlow } from './auth'
 import { initSellFlow } from './sell'
 import { initListModInventory } from './sell-inventory'
+import { initAdminJournal } from './admin-journal'
 
 const tempRender = (text) => {
   let html = ''
@@ -84,6 +85,9 @@ const updateContent = (route) => {
       break
     case '/admin/payments-complete':
       initAdminCompletePayments()
+      break
+    case '/admin/journal':
+      initAdminJournal()
       break
 
     default:

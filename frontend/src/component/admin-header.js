@@ -9,6 +9,9 @@ export const renderAdminHeader = () => {
   <li class="nav-item">
     <a class="nav-link${window.location.pathname === '/admin/payments-complete' ? ' active disabled' : ''}" href="/admin/payments-complete">Completed Payments</a>
   </li>
+  <li class="nav-item">
+    <a class="nav-link${window.location.pathname === '/admin/journal' ? ' active disabled' : ''}" href="/admin/journal">Corp Journal</a>
+  </li>
 </ul>
 `
 }

@@ -5,6 +5,7 @@ import { getSellerInventory } from '../app/inventory'
 import { cancelListing, initiateListingFlow, amendListing } from '../app/listing-flow'
 import { ssoAdminLoginStart, ssoAdminReturn } from '../app/sso'
 import { findAndUpdateCompletedPayments, getPendingPayments, getCompletePayments, getSellerPayments, deletePayment, amendPayment } from '../app/payments'
+import { getEvePaymentJournal } from '../app/eve-api'
 
 const app = API()
 
@@ -57,6 +58,9 @@ app.patch('/api/payments/:paymentId', verifyAdmin, async (req, res) => {
 app.delete('/api/payments/:paymentId', verifyAdmin, async (req, res) => {
   res.json(await deletePayment(req.params.paymentId))
 })
+app.get('/api/journal', verifyAdmin, async (req, res) => {
+  res.json(await getEvePaymentJournal())
+})
 
 // Admin
 app.get('/api/sso/login', verifyAdmin, async function (req, res) {
@@ -68,7 +72,6 @@ app.get('/api/sso/return', async function (req, res) {
   res.redirect('/admin')
 })
 app.any('/api/admin-task', verifyAdmin, async function (req, res) {
-  // const loginUrl = await ssoAdminLoginStart()
   console.log('/api/admin-task', 'SUCCESS')
   await findAndUpdateCompletedPayments()
   res.json({})

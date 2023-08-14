@@ -60,7 +60,9 @@
 .payment-grid .gridjs-tr th,
 .payment-grid .gridjs-tr td,
 .payment-complete-grid .gridjs-tr th,
-.payment-complete-grid .gridjs-tr td {
+.payment-complete-grid .gridjs-tr td,
+.journal-grid .gridjs-tr th,
+.journal-grid .gridjs-tr td {
     padding: 2px;
 }
 

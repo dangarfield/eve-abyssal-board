@@ -201,6 +201,23 @@ export const getCompletePaymentsAdmin = async (filter) => {
   console.log('getCompletePaymentsAdmin', res)
   return res
 }
+export const getJournalAdmin = async (filter) => {
+  const data = loadData()
+  const req = await window.fetch(`${API_ROOT}/api/journal`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `${data['admin-password']}`
+    }
+  })
+  const res = await req.json()
+  for (const p of res) {
+    p.date = new Date(p.date).toLocaleString() // Not easily sortable...
+  }
+  console.log('getJournalAdmin', res)
+  return res
+}
 export const cancelPayment = async (paymentId) => {
   const data = loadData()
   const req = await window.fetch(`${API_ROOT}/api/payments/${paymentId}`, {

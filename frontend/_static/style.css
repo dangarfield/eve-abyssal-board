@@ -58,6 +58,20 @@
 }
 
 .payment-grid .gridjs-tr th,
-.payment-grid .gridjs-tr td {
+.payment-grid .gridjs-tr td,
+.payment-complete-grid .gridjs-tr th,
+.payment-complete-grid .gridjs-tr td {
     padding: 2px;
+}
+
+.payment-complete-grid .gridjs-tr th:nth-child(3),
+.payment-complete-grid .gridjs-tr td:nth-child(3),
+.payment-complete-grid .gridjs-tr th:nth-child(4),
+.payment-complete-grid .gridjs-tr td:nth-child(4) {
+    background-color: #cfe2ff;
+}
+
+.payment-complete-grid .gridjs-tr th:nth-child(7),
+.payment-complete-grid .gridjs-tr td:nth-child(7) {
+    background-color: #d1e7dd;
 }

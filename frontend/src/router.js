@@ -1,5 +1,6 @@
 import { initAdmin } from './admin'
-import { initAdminPayments } from './admin-payments-pending'
+import { initAdminPendingPayments } from './admin-payments-pending'
+import { initAdminCompletePayments } from './admin-payments-complete'
 import { triggerLoginFlow, triggerLoginReturnFlow } from './auth'
 import { initSellFlow } from './sell'
 import { initListModInventory } from './sell-inventory'
@@ -79,7 +80,10 @@ const updateContent = (route) => {
       initAdmin()
       break
     case '/admin/payments-pending':
-      initAdminPayments()
+      initAdminPendingPayments()
+      break
+    case '/admin/payments-complete':
+      initAdminCompletePayments()
       break
 
     default:

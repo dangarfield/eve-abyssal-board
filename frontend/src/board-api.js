@@ -186,6 +186,21 @@ export const getPendingPaymentsAdmin = async (filter) => {
   }
   return res
 }
+export const getCompletePaymentsAdmin = async (filter) => {
+  const data = loadData()
+  const req = await window.fetch(`${API_ROOT}/api/payments/complete`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `${data['admin-password']}`
+    },
+    body: JSON.stringify(filter)
+  })
+  const res = await req.json()
+  console.log('getCompletePaymentsAdmin', res)
+  return res
+}
 export const cancelPayment = async (paymentId) => {
   const data = loadData()
   const req = await window.fetch(`${API_ROOT}/api/payments/${paymentId}`, {

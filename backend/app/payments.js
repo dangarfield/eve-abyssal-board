@@ -64,6 +64,33 @@ export const getPendingPayments = async () => {
   const payments = await paymentCollection.find({ paid: false }).toArray()
   return payments
 }
+export const getCompletePayments = async () => {
+  console.log('getCompletePayments')
+  const result = await paymentCollection.aggregate([
+    { $match: { paid: true } },
+    {
+      $group: {
+        _id: { characterId: '$characterId', characterName: '$characterName', type: '$type' },
+        inventoryCount: { $sum: { $size: '$inventory' } },
+        totalAmount: { $sum: '$amount' }
+      }
+    },
+    {
+      $group: {
+        _id: { characterId: '$_id.characterId', characterName: '$_id.characterName' },
+        types: {
+          $push: {
+            type: '$_id.type',
+            inventoryCount: '$inventoryCount',
+            totalAmount: '$totalAmount'
+          }
+        }
+      }
+    }
+  ]).toArray()
+  console.log('getCompletePayments', result)
+  return result
+}
 export const deletePayment = async (paymentId) => {
   console.log('deletePayment', paymentId)
   const payment = await paymentCollection.findOne({ _id: paymentId, paid: false })

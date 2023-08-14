@@ -4,7 +4,7 @@ import { verifyAdmin, verifyToken } from '../app/auth'
 import { getSellerInventory } from '../app/inventory'
 import { cancelListing, initiateListingFlow, amendListing } from '../app/listing-flow'
 import { ssoAdminLoginStart, ssoAdminReturn } from '../app/sso'
-import { findAndUpdateCompletedPayments, getPendingPayments, getSellerPayments, deletePayment, amendPayment } from '../app/payments'
+import { findAndUpdateCompletedPayments, getPendingPayments, getCompletePayments, getSellerPayments, deletePayment, amendPayment } from '../app/payments'
 
 const app = API()
 
@@ -47,6 +47,9 @@ app.patch('/api/listing/:itemId', verifyToken, async function (req, res) {
 // Payments
 app.get('/api/payments/pending', verifyAdmin, async (req, res) => {
   res.json(await getPendingPayments())
+})
+app.get('/api/payments/complete', verifyAdmin, async (req, res) => {
+  res.json(await getCompletePayments())
 })
 app.patch('/api/payments/:paymentId', verifyAdmin, async (req, res) => {
   res.json(await amendPayment(req.params.paymentId, req.body))

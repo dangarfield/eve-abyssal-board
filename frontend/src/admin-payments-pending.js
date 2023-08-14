@@ -68,8 +68,8 @@ const renderPendingPayments = (payments) => {
   }).render(document.querySelector('.payment-grid'))
 }
 
-export const initAdminPayments = async () => {
-  console.log('initAdminPayments')
+export const initAdminPendingPayments = async () => {
+  console.log('initAdminPendingPayments')
   //   clearData('admin-password')
   if (isLoginPasswordSet()) {
     console.log('initAdmin - LOGGED IN')

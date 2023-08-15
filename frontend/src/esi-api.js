@@ -1,6 +1,6 @@
 import { Api } from 'eve-esi-swaggerts'
 import { getCurrentUserAccessToken, refreshTokenAndGetNewUserAccessToken } from './auth'
-import { getAbyssModuleTypes, getAbyssModuleTypesFlatIds, getRelevantDogmaAttributesForTypeId, getUnitStringForUnitId } from './module-types'
+import { getAbyssModuleTypes, getAbyssModuleTypesFlatIds, getUnitStringForUnitId } from './module-types'
 import sde from './generated-data/sde.json'
 import { getCurrentSellerInventory } from './board-api'
 
@@ -40,7 +40,7 @@ export const getCurrentUserModInventory = async () => {
   const abyssTypesFlat = getAbyssModuleTypesFlatIds()
   console.log('abyssTypesFlat', abyssTypesFlat)
   const abyssModuleTypes = getAbyssModuleTypes()
-  inventory = inventory.filter(i => abyssTypesFlat.includes(i.type_id) && i.location_flag === 'Hangar')
+  inventory = inventory.filter(i => abyssTypesFlat.includes(i.type_id) && ['Hangar', 'Cargo', 'AutoFit'].includes(i.location_flag))
 
   console.log('sde', sde)
   inventory = await Promise.all(inventory.map(async (i) => {
@@ -78,8 +78,7 @@ export const getCurrentUserModInventory = async () => {
         }
       }
     }
-
-    i.attributes = getRelevantDogmaAttributesForTypeId(i.typeId + '').map(dogmaAttributeId => {
+    i.attributes = sde.abyssalTypes[i.typeId].attributes.map(dogmaAttributeId => {
       const dogmaAttributeHolder = i.dogma.dogma_attributes.find(d => d.attribute_id === dogmaAttributeId)
       //   console.log('dogmaAttributeHolder', i.type_id, i, dogmaAttributeId, dogmaAttributeHolder)
       if (dogmaAttributeHolder === undefined || dogmaAttributeHolder.attribute === undefined) return null // TODO - It seems as though this fixed list is wrong
@@ -92,6 +91,7 @@ export const getCurrentUserModInventory = async () => {
       let sourceValue = sourceBaseValue
       let value = dogmaAttributeHolder.value
       let diff = dogmaAttributeHolder.value - sourceValue
+      // console.log('i.mutatorAttributes.attributeIDs[dogmaAttributeId]', i, dogmaAttributeId, i.mutatorAttributes.attributeIDs[dogmaAttributeId])
       const minPercent = dogmaAttribute.highIsGood ? i.mutatorAttributes.attributeIDs[dogmaAttributeId].min : i.mutatorAttributes.attributeIDs[dogmaAttributeId].max
       const maxPercent = dogmaAttribute.highIsGood ? i.mutatorAttributes.attributeIDs[dogmaAttributeId].max : i.mutatorAttributes.attributeIDs[dogmaAttributeId].min
       let min = sourceValue * minPercent

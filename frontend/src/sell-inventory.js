@@ -118,7 +118,7 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
       </div>
       <div class="col-12">
         <div class="form-check form-switch">
-          <input class="form-check-input toggle-show-all" type="checkbox" role="switch" id="toggle-show-all" checked>
+          <input class="form-check-input toggle-show-all" type="checkbox" role="switch" id="toggle-show-all">
           <label class="form-check-label" for="toggle-show-all">Show already listed</label>
         </div>
       </div>
@@ -164,6 +164,7 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
   document.querySelector('.data-search').addEventListener('input', function () {
     filterCards()
   })
+  filterCards()
   document.querySelector('.toggle-select-all').addEventListener('change', function () {
     const selectAll = this.checked
     document.querySelectorAll('.inventory-item').forEach(element => {
@@ -328,7 +329,7 @@ const updateAppraisals = async () => {
 const validateListingPrice = (inputValue) => {
   const digitsString = inputValue.match(/[\d.]+/g)
   const value = parseFloat(digitsString ? digitsString.join('') : '')
-  console.log('validateListingPrice', inputValue, value)
+  // console.log('validateListingPrice', inputValue, value)
   if (isNaN(value)) return 0
 
   const inputValueLower = inputValue.toLowerCase().replace('isk', '')

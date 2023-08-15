@@ -61,7 +61,7 @@ const UNIT_STR = {
   143: 'None'
 }
 export const getUnitStringForUnitId = (unitId) => {
-  return UNIT_STR[unitId]
+  return UNIT_STR[unitId] || ''
 }
 export const getAbyssModuleTypes = () => {
   return [

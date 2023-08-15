@@ -55,11 +55,12 @@ export const formatForUnit = (value, unit, addSign) => {
     case 'x': outputValue = value.toFixed(3); break
     case 'm': outputValue = Math.floor(value).toFixed(0); break
     // case '%': outputValue = (100 * (1 - value)).toFixed(2); break
+    case '%': outputValue = (value / 100).toFixed(2); break
     default: outputValue = value.toFixed(2); break
   }
   const signValue = addSign && value > 0 ? '+' : ''
   outputValue = outputValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-  return `${signValue}${outputValue} ${unit}`
+  return `${signValue}${outputValue}${unit !== '' ? ` ${unit}` : ''}`
 }
 export const formatMilliseconds = (milliseconds) => {
   const seconds = Math.floor(milliseconds / 1000)

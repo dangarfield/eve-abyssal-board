@@ -71,7 +71,6 @@ export const getAllRelevantDogmaAttributes = (mutatorAttributes) => {
   return u
 }
 const getRelevantDogmaAttributesForTypeId = (mutatorAttributes, type) => {
-  const relevantAttributeIDs = []
   for (const attributeName in mutatorAttributes) {
     const attribute = mutatorAttributes[attributeName]
     if (attribute.inputOutputMapping.resultingType === type) {
@@ -80,10 +79,36 @@ const getRelevantDogmaAttributesForTypeId = (mutatorAttributes, type) => {
       return keys
     }
   }
-
-  return relevantAttributeIDs
+  return null
 }
-const repairDynamicAttributes = (mutatorAttributes, types) => {
+const getAbyssalTypeForSourceTypeId = (mutatorAttributes, type) => {
+  for (const attributeName in mutatorAttributes) {
+    const attribute = mutatorAttributes[attributeName]
+    if (attribute.inputOutputMapping.applicableTypes.includes(type)) {
+      return attribute.inputOutputMapping.resultingType
+    }
+  }
+  return null
+}
+const setBaseModelAttribute = (mutatorAttributes, typeDogmas, dogmaAttributes, dynamicAttributes, abyssalItemId, attributeId) => {
+  for (const attributeName in mutatorAttributes) {
+    const attribute = mutatorAttributes[attributeName]
+    if (attribute.inputOutputMapping.resultingType === abyssalItemId) {
+      const applicableTypeValues = attribute.inputOutputMapping.applicableTypes.map(t => typeDogmas[t].dogmaAttributes.find(a => a.attributeID === attributeId).value)
+      const highIsGood = dogmaAttributes[attributeId].highIsGood
+      const min = highIsGood ? Math.min(...applicableTypeValues) : Math.max(...applicableTypeValues)
+      const max = highIsGood ? Math.max(...applicableTypeValues) : Math.min(...applicableTypeValues)
+      // console.log('setBaseModelAttribute', attributeId, applicableTypeValues, min, max, highIsGood)
+      if (dynamicAttributes[abyssalItemId] === undefined) dynamicAttributes[abyssalItemId] = {}
+      if (dynamicAttributes[abyssalItemId].baseModuleAttributes === undefined) dynamicAttributes[abyssalItemId].baseModuleAttributes = {}
+      dynamicAttributes[abyssalItemId].baseModuleAttributes[attributeId] = { min, max, highIsGood }
+      return { min, max, highIsGood }
+    }
+  }
+  return null
+}
+const getDynamicAttributes = (mutatorAttributes, typeDogmas, dogmaAttributes, types) => {
+  const dynamicAttributes = {}
   for (const attributeId in mutatorAttributes) {
     const attribute = mutatorAttributes[attributeId]
     attribute.inputOutputMapping = attribute.inputOutputMapping[0]
@@ -92,60 +117,36 @@ const repairDynamicAttributes = (mutatorAttributes, types) => {
   // Are these all muta change attributes that were removed from the game at some point?!
 
   // // attr 47740 [ 6, 20, 30, 50, 147, 554 ] [ 6, 20, 30, 50, 554 ] false - 147
-  // mutatorAttributes[47739].attributeIDs[147] = { max: 2, min: 1 } // Gravid 5MN Microwarpdrive Mutaplasmid
-  // mutatorAttributes[47738].attributeIDs[147] = { max: 2, min: 1 } // Unstable 5MN Microwarpdrive Mutaplasmid
-  // mutatorAttributes[47737].attributeIDs[147] = { max: 2, min: 1 } // Decayed 5MN Microwarpdrive Mutaplasmid
+  setBaseModelAttribute(mutatorAttributes, typeDogmas, dogmaAttributes, dynamicAttributes, 47740, 147) // 5MN Microwarpdrive
   // // attr 47408 [ 6, 20, 30, 50, 147, 554 ] [ 6, 20, 30, 50, 554 ] false - 147
-  // mutatorAttributes[47741].attributeIDs[147] = { max: 2, min: 1 } // Gravid 50MN Microwarpdrive Mutaplasmid
-  // mutatorAttributes[47297].attributeIDs[147] = { max: 2, min: 1 } // Unstable 50MN Microwarpdrive Mutaplasmid
-  // mutatorAttributes[47742].attributeIDs[147] = { max: 2, min: 1 } // Decayed 50MN Microwarpdrive Mutaplasmid
+  setBaseModelAttribute(mutatorAttributes, typeDogmas, dogmaAttributes, dynamicAttributes, 47408, 147) // 50MN Microwarpdrive
   // // attr 47745 [ 6, 20, 30, 50, 147, 554 ] [ 6, 20, 30, 50, 554 ] false - 147
-  // mutatorAttributes[47744].attributeIDs[147] = { max: 2, min: 1 } // Gravid 500MN Microwarpdrive Mutaplasmid
-  // mutatorAttributes[47743].attributeIDs[147] = { max: 2, min: 1 } // Unstable 500MN Microwarpdrive Mutaplasmid
-  // mutatorAttributes[47299].attributeIDs[147] = { max: 2, min: 1 } // Decayed 500MN Microwarpdrive Mutaplasmid
+  setBaseModelAttribute(mutatorAttributes, typeDogmas, dogmaAttributes, dynamicAttributes, 47745, 147) // 500MN Microwarpdrive
   // // attr 56306 [ 6, 20, 30, 50, 147, 554 ] [ 6, 20, 30, 50, 554 ] false - 147
-  // mutatorAttributes[56280].attributeIDs[147] = { max: 2, min: 1 } // Gravid 50000MN Microwarpdrive Mutaplasmid
-  // mutatorAttributes[56279].attributeIDs[147] = { max: 2, min: 1 } // Unstable 50000MN Microwarpdrive Mutaplasmid
-  // mutatorAttributes[56278].attributeIDs[147] = { max: 2, min: 1 } // Decayed 50000MN Microwarpdrive Mutaplasmid
+  setBaseModelAttribute(mutatorAttributes, typeDogmas, dogmaAttributes, dynamicAttributes, 56306, 147) // 5000MN Microwarpdrive
 
   // // attr 47824 [ 6, 30, 50, 54, 97, 2044 ] [ 6, 30, 50, 54, 97 ] false - 2044
-  // mutatorAttributes[47823].attributeIDs[2044] = { max: 2, min: 1 } // Gravid Small Energy Neutralizer Mutaplasmid
-  // mutatorAttributes[47822].attributeIDs[2044] = { max: 2, min: 1 } // Unstable Small Energy Neutralizer Mutaplasmid
-  // mutatorAttributes[47821].attributeIDs[2044] = { max: 2, min: 1 } // Decayed Small Energy Neutralizer Mutaplasmid
+  setBaseModelAttribute(mutatorAttributes, typeDogmas, dogmaAttributes, dynamicAttributes, 47824, 2044) // Small Energy Neutralizer
   // // attr 47828 [ 6, 30, 50, 54, 97, 2044 ] [ 6, 30, 50, 54, 97 ] false - 2044
-  // mutatorAttributes[47827].attributeIDs[2044] = { max: 2, min: 1 } // Gravid Medium Energy Neutralizer Mutaplasmid
-  // mutatorAttributes[47826].attributeIDs[2044] = { max: 2, min: 1 } // Unstable Medium Energy Neutralizer Mutaplasmid
-  // mutatorAttributes[47825].attributeIDs[2044] = { max: 2, min: 1 } // Decayed Medium Energy Neutralizer Mutaplasmid
+  setBaseModelAttribute(mutatorAttributes, typeDogmas, dogmaAttributes, dynamicAttributes, 47828, 2044) // Small Energy Neutralizer
   // // attr 47832 [ 6, 30, 50, 54, 97, 2044 ] [ 6, 30, 50, 54, 97 ] false - 2044
-  // mutatorAttributes[47831].attributeIDs[2044] = { max: 2, min: 1 } // Gravid Heavy Energy Neutralizer Mutaplasmid
-  // mutatorAttributes[47830].attributeIDs[2044] = { max: 2, min: 1 } // Unstable Heavy Energy Neutralizer Mutaplasmid
-  // mutatorAttributes[47829].attributeIDs[2044] = { max: 2, min: 1 } // Decayed Heavy Energy Neutralizer Mutaplasmid
+  setBaseModelAttribute(mutatorAttributes, typeDogmas, dogmaAttributes, dynamicAttributes, 47832, 2044) // Small Energy Neutralizer
+  // // attr 56312 [ 6, 30, 50, 54, 97, 2044 ] [ 6, 30, 50, 54, 97 ] false - 2044
+  setBaseModelAttribute(mutatorAttributes, typeDogmas, dogmaAttributes, dynamicAttributes, 56312, 2044) // Capital Energy Neutralizer
 
   // // attr 48419 [ 30, 50, 54, 90, 2044 ] [ 30, 50, 54, 90 ] false - 2044
-  // mutatorAttributes[48417].attributeIDs[2044] = { max: 2, min: 1 } // Gravid Small Energy Nosferatu Mutaplasmid
-  // mutatorAttributes[48418].attributeIDs[2044] = { max: 2, min: 1 } // Unstable Small Energy Nosferatu Mutaplasmid
-  // mutatorAttributes[48416].attributeIDs[2044] = { max: 2, min: 1 } // Decayed Small Energy Nosferatu Mutaplasmid
+  setBaseModelAttribute(mutatorAttributes, typeDogmas, dogmaAttributes, dynamicAttributes, 48419, 2044) // Small Energy Nosferatu
   // // attr 48423 [ 30, 50, 54, 90, 2044 ] [ 30, 50, 54, 90 ] false - 2044
-  // mutatorAttributes[48421].attributeIDs[2044] = { max: 2, min: 1 } // Gravid Medium Energy Nosferatu Mutaplasmid
-  // mutatorAttributes[48422].attributeIDs[2044] = { max: 2, min: 1 } // Unstable Medium Energy Nosferatu Mutaplasmid
-  // mutatorAttributes[48420].attributeIDs[2044] = { max: 2, min: 1 } // Decayed Medium Energy Nosferatu Mutaplasmid
+  setBaseModelAttribute(mutatorAttributes, typeDogmas, dogmaAttributes, dynamicAttributes, 48423, 2044) // Medium Energy Nosferatu
   // // attr 48427 [ 30, 50, 54, 90, 2044 ] [ 30, 50, 54, 90 ] false - 2044
-  // mutatorAttributes[48425].attributeIDs[2044] = { max: 2, min: 1 } // Gravid Heavy Energy Nosferatu Mutaplasmid
-  // mutatorAttributes[48426].attributeIDs[2044] = { max: 2, min: 1 } // Unstable Heavy Energy Nosferatu Mutaplasmid
-  // mutatorAttributes[48424].attributeIDs[2044] = { max: 2, min: 1 } // Decayed Heavy Energy Nosferatu Mutaplasmid
+  setBaseModelAttribute(mutatorAttributes, typeDogmas, dogmaAttributes, dynamicAttributes, 48427, 2044) // Heavy Energy Nosferatu
   // // attr 56311 [ 30, 50, 54, 90, 2044 ] [ 30, 50, 54, 90 ] false - 2044
-  // mutatorAttributes[56291].attributeIDs[2044] = { max: 2, min: 1 } // Gravid Capital Energy Nosferatu Mutaplasmid
-  // mutatorAttributes[56290].attributeIDs[2044] = { max: 2, min: 1 } // Unstable Capital Energy Nosferatu Mutaplasmid
-  // mutatorAttributes[56289].attributeIDs[2044] = { max: 2, min: 1 } // Decayed Capital Energy Nosferatu Mutaplasmid
+  setBaseModelAttribute(mutatorAttributes, typeDogmas, dogmaAttributes, dynamicAttributes, 56311, 2044) // Capital Energy Nosferatu
 
   // // attr 47732 [ 6, 50, 54, 105 ] [ 6, 50, 54 ] false - 105
-  // mutatorAttributes[47731].attributeIDs[105] = { max: 2, min: 1 } // Gravid Warp Scrambler Mutaplasmid
-  // mutatorAttributes[47730].attributeIDs[105] = { max: 2, min: 1 } // Unstable Warp Scrambler Mutaplasmid
-  // mutatorAttributes[47729].attributeIDs[105] = { max: 2, min: 1 } // Decayed Warp Scrambler Mutaplasmid
+  setBaseModelAttribute(mutatorAttributes, typeDogmas, dogmaAttributes, dynamicAttributes, 47732, 105) // Warp Scrambler
   // // attr 56303 [ 6, 50, 54, 105 ] [ 6, 50, 54 ] false - 105
-  // mutatorAttributes[56271].attributeIDs[105] = { max: 2, min: 1 } // Gravid Heavy Warp Scrambler Mutaplasmid
-  // mutatorAttributes[56270].attributeIDs[105] = { max: 2, min: 1 } // Unstable Heavy Warp Scrambler Mutaplasmid
-  // mutatorAttributes[56269].attributeIDs[105] = { max: 2, min: 1 } // Decayed Heavy Warp Scrambler Mutaplasmid
+  setBaseModelAttribute(mutatorAttributes, typeDogmas, dogmaAttributes, dynamicAttributes, 56303, 105) // Heavy Warp Scrambler
 
   // // attr 47702 [ 6, 20, 30, 50, 54 ] [ 6, 20, 50, 54 ] false - 30
   // mutatorAttributes[47701].attributeIDs[30] = { max: 2, min: 1 } // Gravid Stasis Webifier Mutaplasmid
@@ -163,6 +164,7 @@ const repairDynamicAttributes = (mutatorAttributes, types) => {
   //     console.log('47702', attributeId, types[attributeId].name.en, attribute)
   //   }
   // }
+  return dynamicAttributes
 }
 const populateRequiredData = async () => {
   // Abyssal Types
@@ -170,9 +172,11 @@ const populateRequiredData = async () => {
   const groups = yamlToJson('./_data/sde/fsd/groupIDs.yaml')
   const metaGroups = yamlToJson('./_data/sde/fsd/metaGroups.yaml')
 
+  const typeDogmas = yamlToJson('./_data/sde/fsd/typeDogma.yaml')
+  const dogmaAttributes = yamlToJson('./_data/sde/fsd/dogmaAttributes.yaml')
   const mutatorAttributes = JSON.parse(fs.readFileSync('./_data/dynamicitemattributes.json', 'utf8'))
-  repairDynamicAttributes(mutatorAttributes, types)
-
+  const dynamicAttributes = getDynamicAttributes(mutatorAttributes, typeDogmas, dogmaAttributes, types)
+  // console.log('dynamicAttributes', dynamicAttributes)
   const abyssalTypes = Object.keys(types)
     .map((key) => {
       const type = types[key]
@@ -201,7 +205,7 @@ const populateRequiredData = async () => {
     }, {})
 
   // Dogma Attributes
-  const dogmaAttributes = yamlToJson('./_data/sde/fsd/dogmaAttributes.yaml')
+
   const dogmaAttributeCategories = yamlToJson('./_data/sde/fsd/dogmaAttributeCategories.yaml')
 
   for (const dogmaAttributeId in dogmaAttributes) {
@@ -243,7 +247,7 @@ const populateRequiredData = async () => {
   }
 
   // Item Names
-  const typeDogmas = yamlToJson('./_data/sde/fsd/typeDogma.yaml')
+
   const relevantAttributes = getAllRelevantDogmaAttributes(mutatorAttributes)
   const itemData = Object.keys(types)
     .map((key) => {
@@ -266,12 +270,25 @@ const populateRequiredData = async () => {
             return obj
           }, {})
       }
+
+      // if (item.typeID === '19325') {
+      const abyssalType = getAbyssalTypeForSourceTypeId(mutatorAttributes, parseInt(item.typeID))
+
+      acc[item.typeID].baseModuleAttributes = {}
+      if (abyssalType !== null && dynamicAttributes[abyssalType]) {
+        // console.log('item', item.name.en, abyssalType, dynamicAttributes)
+        for (const attributeId in dynamicAttributes[abyssalType].baseModuleAttributes) {
+          const value = typeDogmas[item.typeID].dogmaAttributes.find(a => a.attributeID === parseInt(attributeId)).value
+          // console.log('attributeId', attributeId, value)
+          acc[item.typeID].baseModuleAttributes[attributeId] = value
+        }
+      }
       return acc
     }, {})
 
   // https://sde.hoboleaks.space/tq/dynamicitemattributes.json
   // https://github.com/stephenswat/eve-abyssal-market/blob/0ef588480f7a4fbe70c4fa1c68a0e8c5d9c99700/abyssal_modules/management/commands/get_abyssal_types.py
-  return { abyssalTypes, dogmaAttributes, dogmaEffects, itemData, mutatorAttributes }
+  return { abyssalTypes, dogmaAttributes, dogmaEffects, itemData, mutatorAttributes, dynamicAttributes }
 }
 const copyDogmaAttributeImages = async (mutatorAttributes) => {
   const dogmaAttributes = yamlToJson('./_data/sde/fsd/dogmaAttributes.yaml')

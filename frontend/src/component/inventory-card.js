@@ -35,6 +35,34 @@ export const renderInventoryCard = (item) => {
     </div>`
   }).join('')
 
+  const baseAttributeHtml = item.baseAttributes.map(attr => {
+    const dogmaUnit = getUnitForDogma(attr.attributeId)
+
+    const maxDiff = attr.max - attr.min
+    const diff = attr.value - attr.min
+    const perc = Math.round(100 * (Math.abs(diff) / maxDiff))
+    return `
+    <div class="d-flex flex-row gap-2 align-items-center px-1">
+        <div class="p-0"><img src="/icons/${attr.iconID}.png" width="32" height="32"></div>
+        <div class="p-0">
+            <p class="m-0">${attr.displayName}</p>
+            <p class="m-0"><b>${formatForUnit(attr.value * 100, dogmaUnit)}  <span class="text-primary">(${formatForUnit(diff * 100, dogmaUnit, true)})</span></b></p>
+        </div>
+    </div>
+    <div class="row gx-0 mb-2">
+        <div class="col-6">
+            <div class="progress" role="progressbar">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" style="width: 0%"></div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="progress" role="progressbar">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" style="width: ${perc}%"></div>
+            </div>
+        </div>
+    </div>`
+  }).join('')
+
   const appraisalHtml = item.appraisal
     ? `<div class="appraisal px-2 appraisal-complete" data-item-id="${item.itemId}">
         <p>Appraisal: ${item.appraisal.value} <i>Type: ${item.appraisal.type}</i></p>
@@ -85,6 +113,7 @@ export const renderInventoryCard = (item) => {
 
                     <hr/>
                     ${dogmaHtml}
+                    ${baseAttributeHtml}
                     <hr />
                     ${appraisalHtml}
                     ${listingPriceHtml}

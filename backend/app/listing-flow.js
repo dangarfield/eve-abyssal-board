@@ -8,7 +8,7 @@ const INVENTORY_STATUS = { AWAITING_PAYMENT: 'AWAITING_PAYMENT', ON_SALE: 'ON_SA
 export const PAYMENT_TYPES = { LISTING_FEE: 'LISTING_FEE' }
 export const initiateListingFlow = async (auth, inventoryItems) => {
   for (const inventoryItem of inventoryItems) {
-    inventoryItem._id = inventoryItem.itemId
+    inventoryItem._id = inventoryItem.itemID
     inventoryItem.status = INVENTORY_STATUS.AWAITING_PAYMENT
     inventoryItem.characterId = auth.characterId
     inventoryItem.characterName = auth.characterName
@@ -98,12 +98,12 @@ Thanks</font>`.replace(/\n/g, '')
     await sendMail(paymentMade.characterId, 'Abyss Board Listing Payment Received', body)
   }
 }
-export const cancelListing = async (itemId) => {
-  const payment = await paymentCollection.findOne({ inventory: itemId, type: PAYMENT_TYPES.LISTING_FEE, paid: false })
+export const cancelListing = async (itemID) => {
+  const payment = await paymentCollection.findOne({ inventory: itemID, type: PAYMENT_TYPES.LISTING_FEE, paid: false })
 
   if (payment) {
     if (payment.inventory.length > 1) {
-      payment.inventory = payment.inventory.filter(i => i !== itemId)
+      payment.inventory = payment.inventory.filter(i => i !== itemID)
       const config = await getAppConfig()
       payment.amount = (config.listingPrice * payment.inventory.length)
       const updateRes = await paymentCollection.updateOne({ _id: payment._id }, { $set: { inventory: payment.inventory, amount: payment.amount } })
@@ -113,17 +113,25 @@ export const cancelListing = async (itemId) => {
     }
   }
 
-  const item = await inventoryCollection.deleteOne({ _id: itemId })
+  const item = await inventoryCollection.deleteOne({ _id: itemID })
 
-  console.log('cancelListing', itemId, item, payment)
-  return { itemId, status: INVENTORY_STATUS.CANCELLED }
+  console.log('cancelListing', itemID, item, payment)
+  return { itemID, status: INVENTORY_STATUS.CANCELLED }
 }
-export const amendListing = async (itemId, amend) => {
+export const amendListing = async (itemID, amend) => {
+  const setBody = {}
   if (amend && amend.status && INVENTORY_STATUS[amend.status]) {
-    await inventoryCollection.updateOne({ _id: itemId }, { $set: { status: amend.status } })
-    console.log('Good to amend', amend)
+    setBody.status = amend.status
+    console.log('Good to amend status', amend)
   }
-  // const item = await inventoryCollection.deleteOne({ _id: itemId })
-  console.log('amendListing', itemId, amend)
-  return { itemId, status: amend.status }
+  if (amend && amend.listingPrice) {
+    setBody.listingPrice = amend.listingPrice
+    console.log('Good to amend listingPrice', amend)
+  }
+  if (Object.keys(setBody).length > 0) {
+    await inventoryCollection.updateOne({ _id: itemID }, { $set: setBody })
+  }
+  // const item = await inventoryCollection.deleteOne({ _id: itemID })
+  console.log('amendListing', itemID, amend)
+  return { itemID, amend }
 }

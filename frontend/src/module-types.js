@@ -1,6 +1,6 @@
 export const getAbyssModuleTypesFlatIds = () => {
   const types = getAbyssModuleTypes()
-  return types.flatMap((item) => item.categories.map((category) => category.typeId))
+  return types.flatMap((item) => item.categories.map((category) => category.typeID))
 }
 
 const UNIT_STR = {
@@ -70,19 +70,19 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: '5MN',
-          typeId: 47740
+          typeID: 47740
         },
         {
           categoryName: '50MN',
-          typeId: 47408
+          typeID: 47408
         },
         {
           categoryName: '500MN',
-          typeId: 47745
+          typeID: 47745
         },
         {
           categoryName: '50000MN',
-          typeId: 56306
+          typeID: 56306
         }
       ]
     },
@@ -91,19 +91,19 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: '1MN',
-          typeId: 47749
+          typeID: 47749
         },
         {
           categoryName: '10MN',
-          typeId: 47753
+          typeID: 47753
         },
         {
           categoryName: '100MN',
-          typeId: 47757
+          typeID: 47757
         },
         {
           categoryName: '10000MN',
-          typeId: 56305
+          typeID: 56305
         }
       ]
     },
@@ -112,15 +112,15 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: 'Small',
-          typeId: 47800
+          typeID: 47800
         },
         {
           categoryName: 'Medium',
-          typeId: 47804
+          typeID: 47804
         },
         {
           categoryName: 'Large',
-          typeId: 47808
+          typeID: 47808
         }
       ]
     },
@@ -129,15 +129,15 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: 'Small',
-          typeId: 47812
+          typeID: 47812
         },
         {
           categoryName: 'Medium',
-          typeId: 47817
+          typeID: 47817
         },
         {
           categoryName: 'Large',
-          typeId: 47820
+          typeID: 47820
         }
       ]
     },
@@ -146,23 +146,23 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: 'Small',
-          typeId: 47781
+          typeID: 47781
         },
         {
           categoryName: 'Medium',
-          typeId: 47785
+          typeID: 47785
         },
         {
           categoryName: 'Large',
-          typeId: 47789
+          typeID: 47789
         },
         {
           categoryName: 'X-Large',
-          typeId: 47793
+          typeID: 47793
         },
         {
           categoryName: 'Capital',
-          typeId: 56309
+          typeID: 56309
         }
       ]
     },
@@ -171,19 +171,19 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: 'Small',
-          typeId: 47769
+          typeID: 47769
         },
         {
           categoryName: 'Medium',
-          typeId: 47773
+          typeID: 47773
         },
         {
           categoryName: 'Large',
-          typeId: 47777
+          typeID: 47777
         },
         {
           categoryName: 'Capital',
-          typeId: 56307
+          typeID: 56307
         }
       ]
     },
@@ -192,19 +192,19 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: 'Medium',
-          typeId: 47836
+          typeID: 47836
         },
         {
           categoryName: 'Large',
-          typeId: 47838
+          typeID: 47838
         },
         {
           categoryName: 'X-Large',
-          typeId: 47840
+          typeID: 47840
         },
         {
           categoryName: 'Capital',
-          typeId: 56310
+          typeID: 56310
         }
       ]
     },
@@ -213,19 +213,19 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: 'Small',
-          typeId: 47842
+          typeID: 47842
         },
         {
           categoryName: 'Medium',
-          typeId: 47844
+          typeID: 47844
         },
         {
           categoryName: 'Large',
-          typeId: 47846
+          typeID: 47846
         },
         {
           categoryName: 'Capital',
-          typeId: 56308
+          typeID: 56308
         }
       ]
     },
@@ -234,19 +234,19 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: 'Small',
-          typeId: 47824
+          typeID: 47824
         },
         {
           categoryName: 'Medium',
-          typeId: 47828
+          typeID: 47828
         },
         {
           categoryName: 'Heavy',
-          typeId: 47832
+          typeID: 47832
         },
         {
           categoryName: 'Capital',
-          typeId: 56312
+          typeID: 56312
         }
       ]
     },
@@ -255,19 +255,19 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: 'Small',
-          typeId: 48419
+          typeID: 48419
         },
         {
           categoryName: 'Medium',
-          typeId: 48423
+          typeID: 48423
         },
         {
           categoryName: 'Heavy',
-          typeId: 48427
+          typeID: 48427
         },
         {
           categoryName: 'Capital',
-          typeId: 56311
+          typeID: 56311
         }
       ]
     },
@@ -276,15 +276,15 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: 'Small',
-          typeId: 48431
+          typeID: 48431
         },
         {
           categoryName: 'Medium',
-          typeId: 48435
+          typeID: 48435
         },
         {
           categoryName: 'Large',
-          typeId: 48439
+          typeID: 48439
         }
       ]
     },
@@ -293,7 +293,7 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: 'Stasis Webifiers',
-          typeId: 47702
+          typeID: 47702
         }
       ]
     },
@@ -302,11 +302,11 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: 'Warp Scramblers',
-          typeId: 47732
+          typeID: 47732
         },
         {
           categoryName: 'Heavy Warp Scramblers',
-          typeId: 56303
+          typeID: 56303
         }
       ]
     },
@@ -315,11 +315,11 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: 'Warp Disruptors',
-          typeId: 47736
+          typeID: 47736
         },
         {
           categoryName: 'Heavy Warp Disruptors',
-          typeId: 56304
+          typeID: 56304
         }
       ]
     },
@@ -328,27 +328,27 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: 'Gyrostabilizer',
-          typeId: 49730
+          typeID: 49730
         },
         {
           categoryName: 'Mag. Field Stab.',
-          typeId: 49722
+          typeID: 49722
         },
         {
           categoryName: 'Heat Sink',
-          typeId: 49726
+          typeID: 49726
         },
         {
           categoryName: 'Ballistic Control',
-          typeId: 49738
+          typeID: 49738
         },
         {
           categoryName: 'Entropic Sink',
-          typeId: 49734
+          typeID: 49734
         },
         {
           categoryName: 'Drone Amp.',
-          typeId: 60482
+          typeID: 60482
         }
       ]
     },
@@ -357,11 +357,11 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: 'Standard',
-          typeId: 52227
+          typeID: 52227
         },
         {
           categoryName: 'Assault',
-          typeId: 52230
+          typeID: 52230
         }
       ]
     },
@@ -370,7 +370,7 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: 'Fighter Support Unit',
-          typeId: 60483
+          typeID: 60483
         }
       ]
     },
@@ -379,7 +379,7 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: 'Siege Module',
-          typeId: 56313
+          typeID: 56313
         }
       ]
     },
@@ -388,19 +388,19 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: 'Light',
-          typeId: 60478
+          typeID: 60478
         },
         {
           categoryName: 'Medium',
-          typeId: 60479
+          typeID: 60479
         },
         {
           categoryName: 'Heavy',
-          typeId: 60480
+          typeID: 60480
         },
         {
           categoryName: 'Sentry',
-          typeId: 60481
+          typeID: 60481
         }
       ]
     }

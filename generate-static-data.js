@@ -6,10 +6,14 @@ import yaml from 'js-yaml'
 import fs from 'fs'
 import path from 'path'
 
+import { getAbyssModuleTypes } from './frontend/src/module-types.js'
+
 const SDE_URL = 'https://eve-static-data-export.s3-eu-west-1.amazonaws.com/tranquility/sde.zip'
 const SDE_ICONS_URL = 'https://web.ccpgamescdn.com/aws/developers/Uprising_V21.03_Icons.zip'
 const SDE_TYPES_URL = 'https://web.ccpgamescdn.com/aws/developers/Uprising_V21.03_Types.zip'
 const DYN_ATTRS_URL = 'https://sde.hoboleaks.space/tq/dynamicitemattributes.json'
+
+const moduleTypes = getAbyssModuleTypes()
 
 const yamlToJson = (filePath) => {
   return yaml.load(fs.readFileSync(filePath, 'utf-8'))
@@ -74,22 +78,22 @@ const getRelevantDogmaAttributesForTypeId = (mutatorAttributes, type) => {
   for (const attributeName in mutatorAttributes) {
     const attribute = mutatorAttributes[attributeName]
     if (attribute.inputOutputMapping.resultingType === type) {
-      const keys = Object.keys(attribute.attributeIDs).map(i => parseInt(i))
+      const keys = Object.keys(attribute.attributeIDs).map(i => { return { id: parseInt(i), type: 'mutation' } })
       keys.sort((a, b) => a - b)
       return keys
     }
   }
   return null
 }
-const getAbyssalTypeForSourceTypeId = (mutatorAttributes, type) => {
-  for (const attributeName in mutatorAttributes) {
-    const attribute = mutatorAttributes[attributeName]
-    if (attribute.inputOutputMapping.applicableTypes.includes(type)) {
-      return attribute.inputOutputMapping.resultingType
-    }
-  }
-  return null
-}
+// const getAbyssalTypeForSourceTypeId = (mutatorAttributes, type) => {
+//   for (const attributeName in mutatorAttributes) {
+//     const attribute = mutatorAttributes[attributeName]
+//     if (attribute.inputOutputMapping.applicableTypes.includes(type)) {
+//       return attribute.inputOutputMapping.resultingType
+//     }
+//   }
+//   return null
+// }
 const setBaseModelAttribute = (mutatorAttributes, typeDogmas, dogmaAttributes, dynamicAttributes, abyssalItemId, attributeId) => {
   for (const attributeName in mutatorAttributes) {
     const attribute = mutatorAttributes[attributeName]
@@ -98,16 +102,23 @@ const setBaseModelAttribute = (mutatorAttributes, typeDogmas, dogmaAttributes, d
       const highIsGood = dogmaAttributes[attributeId].highIsGood
       const min = highIsGood ? Math.min(...applicableTypeValues) : Math.max(...applicableTypeValues)
       const max = highIsGood ? Math.max(...applicableTypeValues) : Math.min(...applicableTypeValues)
-      // console.log('setBaseModelAttribute', attributeId, applicableTypeValues, min, max, highIsGood)
+
       if (dynamicAttributes[abyssalItemId] === undefined) dynamicAttributes[abyssalItemId] = {}
       if (dynamicAttributes[abyssalItemId].baseModuleAttributes === undefined) dynamicAttributes[abyssalItemId].baseModuleAttributes = {}
       dynamicAttributes[abyssalItemId].baseModuleAttributes[attributeId] = { min, max, highIsGood }
+      // if (attributeId === 30) {
+      //   console.log('setBaseModelAttribute', attributeId, applicableTypeValues, attribute.inputOutputMapping.applicableTypes, min, max, highIsGood)
+      // }
+
       return { min, max, highIsGood }
     }
   }
   return null
 }
-const getDynamicAttributes = (mutatorAttributes, typeDogmas, dogmaAttributes, types) => {
+// const setMutaAttributes = (mutatorAttributes, typeDogmas, dogmaAttributes) => {
+
+// }
+const updateDynamicAttributes = (mutatorAttributes, typeDogmas, dogmaAttributes, types) => {
   const dynamicAttributes = {}
   for (const attributeId in mutatorAttributes) {
     const attribute = mutatorAttributes[attributeId]
@@ -149,33 +160,127 @@ const getDynamicAttributes = (mutatorAttributes, typeDogmas, dogmaAttributes, ty
   setBaseModelAttribute(mutatorAttributes, typeDogmas, dogmaAttributes, dynamicAttributes, 56303, 105) // Heavy Warp Scrambler
 
   // // attr 47702 [ 6, 20, 30, 50, 54 ] [ 6, 20, 50, 54 ] false - 30
-  // mutatorAttributes[47701].attributeIDs[30] = { max: 2, min: 1 } // Gravid Stasis Webifier Mutaplasmid
-  // mutatorAttributes[47700].attributeIDs[30] = { max: 2, min: 1 } // Unstable Stasis Webifier Mutaplasmid
-  // mutatorAttributes[47699].attributeIDs[30] = { max: 2, min: 1 } // Decayed Stasis Webifier Mutaplasmid
+  setBaseModelAttribute(mutatorAttributes, typeDogmas, dogmaAttributes, dynamicAttributes, 47702, 30) // Stasis Webifier
 
-  // // attr 56312 [ 6, 30, 50, 54, 97, 2044 ] [ 6, 30, 50, 54, 97 ] false - 2044
-  // mutatorAttributes[56294].attributeIDs[2044] = { max: 2, min: 1 } // Gravid Capital Energy Neutralizer Mutaplasmid
-  // mutatorAttributes[56293].attributeIDs[2044] = { max: 2, min: 1 } // Unstable Capital Energy Neutralizer Mutaplasmid
-  // mutatorAttributes[56292].attributeIDs[2044] = { max: 2, min: 1 } // Decayed Capital Energy Neutralizer Mutaplasmid
-
-  // for (const attributeId in mutatorAttributes) {
-  //   const attribute = mutatorAttributes[attributeId]
-  //   if (attribute.inputOutputMapping.resultingType === 47702) {
-  //     console.log('47702', attributeId, types[attributeId].name.en, attribute)
-  //   }
-  // }
   return dynamicAttributes
+}
+const updateBaseModuleAttributes = (attributes, typeID) => {
+  if (typeID === 47740) attributes.push({ id: 147, type: 'base-module' }) // 5MN Microwarpdrive
+  if (typeID === 47408) attributes.push({ id: 147, type: 'base-module' }) // 50MN Microwarpdrive
+  if (typeID === 47745) attributes.push({ id: 147, type: 'base-module' }) // 500MN Microwarpdrive
+  if (typeID === 56306) attributes.push({ id: 147, type: 'base-module' }) // 5000MN Microwarpdrive
+
+  if (typeID === 47824) attributes.push({ id: 2044, type: 'base-module' }) // Small Energy Neutralizer
+  if (typeID === 47828) attributes.push({ id: 2044, type: 'base-module' }) // Medium Energy Neutralizer
+  if (typeID === 47832) attributes.push({ id: 2044, type: 'base-module' }) // Large Energy Neutralizer
+  if (typeID === 56312) attributes.push({ id: 2044, type: 'base-module' }) // Capital Energy Neutralizer
+
+  if (typeID === 48419) attributes.push({ id: 2044, type: 'base-module' }) // Small Energy Nosferatu
+  if (typeID === 48423) attributes.push({ id: 2044, type: 'base-module' }) // Medium Energy Nosferatu
+  if (typeID === 48427) attributes.push({ id: 2044, type: 'base-module' }) // Large Energy Nosferatu
+  if (typeID === 56311) attributes.push({ id: 2044, type: 'base-module' }) // Capital Energy Nosferatu
+
+  if (typeID === 47732) attributes.push({ id: 105, type: 'base-module' }) // Warp Scrambler
+  if (typeID === 56303) attributes.push({ id: 105, type: 'base-module' }) // Heavy Warp Scrambler
+
+  if (typeID === 47702) attributes.push({ id: 30, type: 'base-module' }) // Stasis Webifier
+}
+const getDisplayGroupCategoryForAbyssItemType = (typeID) => {
+  for (const moduleType of moduleTypes) {
+    for (const category of moduleType.categories) {
+      if (category.typeID === typeID) return { group: moduleType.group, category: category.categoryName }
+    }
+  }
+  return {}
+}
+const getMutatorsAndSourcesForAbyssItem = (mutatorAttributes, types, typeDogmas, attributes, typeID) => {
+  const mutators = {}
+  const sources = {}
+  for (const mutatorIdString in mutatorAttributes) {
+    const mutatorConfig = mutatorAttributes[mutatorIdString]
+    if (mutatorConfig.inputOutputMapping.resultingType === typeID) {
+      const mutator = {}
+      const mutatorId = parseInt(mutatorIdString)
+      // mutator.id = mutatorId
+      mutator.name = types[mutatorId].name.en
+      mutator.iconID = types[mutatorId].iconID
+      // mutator.data = mutatorConfig
+      mutator.mutationValues = mutatorConfig.attributeIDs
+
+      for (const sourceTypeId of mutatorConfig.inputOutputMapping.applicableTypes) {
+        if (!sources[sourceTypeId]) {
+          const sourceValues = {}
+          // TODO add non-mutation attributes in here too. Should be working though
+          for (const attribute of attributes) {
+            sourceValues[attribute.id] = typeDogmas[sourceTypeId].dogmaAttributes.find(a => a.attributeID === attribute.id).value
+          }
+          sources[sourceTypeId] = {
+            name: types[sourceTypeId].name.en,
+            iconID: types[sourceTypeId].iconID,
+            attributes: sourceValues
+          }
+        }
+      }
+      mutators[mutatorId] = mutator
+    }
+  }
+  return { mutators, sources }
+}
+const updateMinMaxForAbyssItemAttributes = (attributes, mutators, sources) => {
+  const result = {}
+  for (const attribute of attributes) {
+    const sourceValues = Object.keys(sources).map(s => sources[s].attributes[attribute.id])
+    const allSourcesMin = Math.min(...sourceValues)
+    const allSourcesMax = Math.max(...sourceValues)
+
+    attribute.allSourcesMin = allSourcesMin
+    attribute.allSourcesMax = allSourcesMax
+    attribute.allComparisonZero = allSourcesMax - (0.5 * (allSourcesMax - allSourcesMin))
+    const shouldGetMutationStats = Object.values(mutators).some(obj => obj.mutationValues[attribute.id])
+    // console.log('attribute', attribute, sourceValues, sourceMin, sourceMax, shouldGetMutationStats)
+    if (shouldGetMutationStats) {
+      const mutatorValues = Object.keys(mutators).map(m => mutators[m].mutationValues[attribute.id])
+      const allMutatorsValuesMin = mutatorValues.map(m => m.min)
+      const allMutatorsMin = Math.min(...allMutatorsValuesMin)
+      const allMutatorsValuesMax = mutatorValues.map(m => m.max)
+      const allMutatorsMax = Math.max(...allMutatorsValuesMax)
+      // console.log('mutatorValues', mutatorValues, mutatorValuesMin, mutatorMin, mutatorValuesMax, mutatorMax)
+
+      const allMin = allSourcesMin * allMutatorsMin
+      const allMax = allSourcesMax * allMutatorsMax
+      // TODO - set the comparisonZero to a type specific value for officer mods etc
+      const allComparisonZero = allMax - (0.5 * (allMax - allMin)) // Updates existing one if muta
+      const toAdd = { allMutatorsMax, allMutatorsMin, allMin, allMax, allComparisonZero }
+      for (const key in toAdd) {
+        attribute[key] = toAdd[key]
+      }
+    }
+  }
+  // console.log('result', result)
+  return result
+}
+const updateAttributeInfo = (dogmaAttributes, attributes) => {
+  for (const attribute of attributes) {
+    // attribute.data = dogmaAttributes[attribute.id]
+    // attribute.dataString = JSON.stringify(dogmaAttributes[attribute.id])
+    attribute.name = dogmaAttributes[attribute.id].displayNameID.en
+    attribute.iconID = dogmaAttributes[attribute.id].iconID
+    attribute.unitID = dogmaAttributes[attribute.id].unitID
+    attribute.highIsGood = dogmaAttributes[attribute.id].highIsGood
+  }
 }
 const populateRequiredData = async () => {
   // Abyssal Types
   const types = yamlToJson('./_data/sde/fsd/typeIDs.yaml')
-  const groups = yamlToJson('./_data/sde/fsd/groupIDs.yaml')
-  const metaGroups = yamlToJson('./_data/sde/fsd/metaGroups.yaml')
+  // const groups = yamlToJson('./_data/sde/fsd/groupIDs.yaml')
+  // const metaGroups = yamlToJson('./_data/sde/fsd/metaGroups.yaml')
 
   const typeDogmas = yamlToJson('./_data/sde/fsd/typeDogma.yaml')
   const dogmaAttributes = yamlToJson('./_data/sde/fsd/dogmaAttributes.yaml')
   const mutatorAttributes = JSON.parse(fs.readFileSync('./_data/dynamicitemattributes.json', 'utf8'))
-  const dynamicAttributes = getDynamicAttributes(mutatorAttributes, typeDogmas, dogmaAttributes, types)
+
+  updateDynamicAttributes(mutatorAttributes, typeDogmas, dogmaAttributes, types)
+
   // console.log('dynamicAttributes', dynamicAttributes)
   const abyssalTypes = Object.keys(types)
     .map((key) => {
@@ -185,18 +290,29 @@ const populateRequiredData = async () => {
     })
     .filter((item) => item.published && item.metaGroupID && item.metaGroupID === 15) // Filter items by metaGroupID
     .map((type) => {
-      const group = groups[type.groupID]
-      const metaGroup = metaGroups[type.metaGroupID]
-      const attributes = getRelevantDogmaAttributesForTypeId(mutatorAttributes, parseInt(type.typeID))
+      // const group = groups[type.groupID]
+      // const metaGroup = metaGroups[type.metaGroupID]
+      const typeID = parseInt(type.typeID)
+      const attributes = getRelevantDogmaAttributesForTypeId(mutatorAttributes, typeID)
+      updateBaseModuleAttributes(attributes, typeID)
+      const { group, category } = getDisplayGroupCategoryForAbyssItemType(typeID)
+      const { mutators, sources } = getMutatorsAndSourcesForAbyssItem(mutatorAttributes, types, typeDogmas, attributes, typeID)
+      // if (typeID === 47408) {
+      // console.log('type.typeID', type.typeID)
+      updateMinMaxForAbyssItemAttributes(attributes, mutators, sources)
+      // }
+      updateAttributeInfo(dogmaAttributes, attributes)
+
       const obj = {
         typeID: parseInt(type.typeID),
         name: type.name.en,
-        metaGroupID: type.metaGroupID,
-        metaGroupName: metaGroup.nameID.en,
-        metaGroupIconID: metaGroup.iconID,
-        groupName: group.name.en,
-        groupIconID: group.iconID,
-        attributes
+        group,
+        category,
+        attributeIds: attributes.map(a => a.id),
+        attributes,
+
+        mutators,
+        sources
       }
       return obj
     }).reduce((acc, item) => {
@@ -204,91 +320,93 @@ const populateRequiredData = async () => {
       return acc
     }, {})
 
+  // TODO - Validate this, but I think I've replaced all of the data required in a simpler format above in abyssalTypes
+
   // Dogma Attributes
 
-  const dogmaAttributeCategories = yamlToJson('./_data/sde/fsd/dogmaAttributeCategories.yaml')
+  // const dogmaAttributeCategories = yamlToJson('./_data/sde/fsd/dogmaAttributeCategories.yaml')
 
-  for (const dogmaAttributeId in dogmaAttributes) {
-    const dogmaAttribute = dogmaAttributes[dogmaAttributeId]
-    const dogmaAttributeCategory = dogmaAttributeCategories[dogmaAttribute.categoryID]
-    if (dogmaAttributeCategory) dogmaAttribute.categoryName = dogmaAttributeCategory.name
-    if (dogmaAttribute.displayNameID) {
-      dogmaAttribute.displayName = dogmaAttribute.displayNameID.en
-      delete dogmaAttribute.displayNameID
-    }
-    if (dogmaAttribute.displayNameID) {
-      dogmaAttribute.displayName = dogmaAttribute.displayNameID.en
-      delete dogmaAttribute.displayNameID
-    }
-    if (dogmaAttribute.tooltipDescriptionID) {
-      dogmaAttribute.tooltipDescription = dogmaAttribute.tooltipDescriptionID.en
-      delete dogmaAttribute.tooltipDescriptionID
-    }
-    if (dogmaAttribute.tooltipTitleID) {
-      dogmaAttribute.tooltipTitle = dogmaAttribute.tooltipTitleID.en
-      delete dogmaAttribute.tooltipTitleID
-    }
-    // console.log('dogmaAttributeId', dogmaAttributeId, dogmaAttribute)
-    // dogmaAttribute.displayName = dogmaAttribute.displayNameID.en
-    if (!dogmaAttribute.published) {
-      delete dogmaAttributes[dogmaAttributeId]
-    }
-  }
+  // for (const dogmaAttributeId in dogmaAttributes) {
+  //   const dogmaAttribute = dogmaAttributes[dogmaAttributeId]
+  //   const dogmaAttributeCategory = dogmaAttributeCategories[dogmaAttribute.categoryID]
+  //   if (dogmaAttributeCategory) dogmaAttribute.categoryName = dogmaAttributeCategory.name
+  //   if (dogmaAttribute.displayNameID) {
+  //     dogmaAttribute.displayName = dogmaAttribute.displayNameID.en
+  //     delete dogmaAttribute.displayNameID
+  //   }
+  //   if (dogmaAttribute.displayNameID) {
+  //     dogmaAttribute.displayName = dogmaAttribute.displayNameID.en
+  //     delete dogmaAttribute.displayNameID
+  //   }
+  //   if (dogmaAttribute.tooltipDescriptionID) {
+  //     dogmaAttribute.tooltipDescription = dogmaAttribute.tooltipDescriptionID.en
+  //     delete dogmaAttribute.tooltipDescriptionID
+  //   }
+  //   if (dogmaAttribute.tooltipTitleID) {
+  //     dogmaAttribute.tooltipTitle = dogmaAttribute.tooltipTitleID.en
+  //     delete dogmaAttribute.tooltipTitleID
+  //   }
+  //   // console.log('dogmaAttributeId', dogmaAttributeId, dogmaAttribute)
+  //   // dogmaAttribute.displayName = dogmaAttribute.displayNameID.en
+  //   if (!dogmaAttribute.published) {
+  //     delete dogmaAttributes[dogmaAttributeId]
+  //   }
+  // }
 
-  const dogmaEffects = yamlToJson('./_data/sde/fsd/dogmaEffects.yaml')
-  for (const dogmaEffectId in dogmaEffects) {
-    const dogmaEffect = dogmaEffects[dogmaEffectId]
-    // const dogmaAttributeCategory = dogmaAttributeCategories[dogmaAttributeId]
-    // if (dogmaAttributeCategory) dogmaAttribute.attributeName = dogmaAttributeCategory.name
-    // console.log('dogmaAttributeId', dogmaAttributeId, dogmaAttribute)
-    if (!dogmaEffect.published) {
-      delete dogmaEffects[dogmaEffectId]
-    }
-  }
+  // const dogmaEffects = yamlToJson('./_data/sde/fsd/dogmaEffects.yaml')
+  // for (const dogmaEffectId in dogmaEffects) {
+  //   const dogmaEffect = dogmaEffects[dogmaEffectId]
+  //   // const dogmaAttributeCategory = dogmaAttributeCategories[dogmaAttributeId]
+  //   // if (dogmaAttributeCategory) dogmaAttribute.attributeName = dogmaAttributeCategory.name
+  //   // console.log('dogmaAttributeId', dogmaAttributeId, dogmaAttribute)
+  //   if (!dogmaEffect.published) {
+  //     delete dogmaEffects[dogmaEffectId]
+  //   }
+  // }
 
-  // Item Names
+  // // Item Names
 
-  const relevantAttributes = getAllRelevantDogmaAttributes(mutatorAttributes)
-  const itemData = Object.keys(types)
-    .map((key) => {
-      const type = types[key]
-      type.typeID = key
-      const group = groups[type.groupID]
-      type.categoryID = group.categoryID
-      return type
-    })
-    .filter((item) => item.published && (item.categoryID === 7 || item.categoryID === 17))// Only get modules, do mutaplasmids count as modules?
-    .reduce((acc, item) => {
-      acc[item.typeID] = {
-        name: item.name.en
-      }
-      if (typeDogmas[item.typeID]) {
-        acc[item.typeID].dogmaAttributes = typeDogmas[item.typeID].dogmaAttributes
-          .filter(a => relevantAttributes.includes(a.attributeID))
-          .reduce((obj, item) => {
-            obj[item.attributeID] = item.value
-            return obj
-          }, {})
-      }
+  // const relevantAttributes = getAllRelevantDogmaAttributes(mutatorAttributes)
+  // const itemData = Object.keys(types)
+  //   .map((key) => {
+  //     const type = types[key]
+  //     type.typeID = key
+  //     const group = groups[type.groupID]
+  //     type.categoryID = group.categoryID
+  //     return type
+  //   })
+  //   .filter((item) => item.published && (item.categoryID === 7 || item.categoryID === 17))// Only get modules, do mutaplasmids count as modules?
+  //   .reduce((acc, item) => {
+  //     acc[item.typeID] = {
+  //       name: item.name.en
+  //     }
+  //     if (typeDogmas[item.typeID]) {
+  //       acc[item.typeID].dogmaAttributes = typeDogmas[item.typeID].dogmaAttributes
+  //         .filter(a => relevantAttributes.includes(a.attributeID))
+  //         .reduce((obj, item) => {
+  //           obj[item.attributeID] = item.value
+  //           return obj
+  //         }, {})
+  //     }
 
-      // if (item.typeID === '19325') {
-      const abyssalType = getAbyssalTypeForSourceTypeId(mutatorAttributes, parseInt(item.typeID))
+  //     // if (item.typeID === '19325') {
+  //     const abyssalType = getAbyssalTypeForSourceTypeId(mutatorAttributes, parseInt(item.typeID))
 
-      acc[item.typeID].baseModuleAttributes = {}
-      if (abyssalType !== null && dynamicAttributes[abyssalType]) {
-        // console.log('item', item.name.en, abyssalType, dynamicAttributes)
-        for (const attributeId in dynamicAttributes[abyssalType].baseModuleAttributes) {
-          const value = typeDogmas[item.typeID].dogmaAttributes.find(a => a.attributeID === parseInt(attributeId)).value
-          // console.log('attributeId', attributeId, value)
-          acc[item.typeID].baseModuleAttributes[attributeId] = value
-        }
-      }
-      return acc
-    }, {})
-
+  //     acc[item.typeID].baseModuleAttributes = {}
+  //     if (abyssalType !== null && dynamicAttributes[abyssalType]) {
+  //       // console.log('item', item.name.en, abyssalType, dynamicAttributes)
+  //       for (const attributeId in dynamicAttributes[abyssalType].baseModuleAttributes) {
+  //         const value = typeDogmas[item.typeID].dogmaAttributes.find(a => a.attributeID === parseInt(attributeId)).value
+  //         // console.log('attributeId', attributeId, value)
+  //         acc[item.typeID].baseModuleAttributes[attributeId] = value
+  //       }
+  //     }
+  //     return acc
+  //   }, {})
+  // setMutaAttributes(mutatorAttributes, typeDogmas, dogmaAttributes)
   // https://sde.hoboleaks.space/tq/dynamicitemattributes.json
   // https://github.com/stephenswat/eve-abyssal-market/blob/0ef588480f7a4fbe70c4fa1c68a0e8c5d9c99700/abyssal_modules/management/commands/get_abyssal_types.py
-  return { abyssalTypes, dogmaAttributes, dogmaEffects, itemData, mutatorAttributes, dynamicAttributes }
+  return { abyssalTypes }
 }
 const copyDogmaAttributeImages = async (mutatorAttributes) => {
   const dogmaAttributes = yamlToJson('./_data/sde/fsd/dogmaAttributes.yaml')

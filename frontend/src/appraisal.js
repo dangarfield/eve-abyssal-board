@@ -16,10 +16,10 @@ const getValueAndConfidenceFromHtml = (text) => {
   }
   return { value: matches[0], confidence: matches[1] }
 }
-export const getAppraisalForItemId = async (itemId) => {
+export const getAppraisalForItemId = async (itemID) => {
   try {
     // For now, just use mutaplasmid.space appraisal
-    const req = await fetch(`https://thingproxy.freeboard.io/fetch/https://mutaplasmid.space/module/${itemId}/`)
+    const req = await fetch(`https://thingproxy.freeboard.io/fetch/https://mutaplasmid.space/module/${itemID}/`)
     const text = await req.text()
     const appraisal = getValueAndConfidenceFromHtml(text)
     // console.log('appraisal', appraisal)

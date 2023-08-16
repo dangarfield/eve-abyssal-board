@@ -1,7 +1,8 @@
 import { doesCurrentCharacterHaveSellerScope, getCurrentUserDetails, triggerLoginFlow } from './auth'
 import { amendListing, cancelListing, getAppConfig, getCurrentSellerInventory, getCurrentSellerPayments } from './board-api'
 import { renderInventoryCard } from './component/inventory-card'
-import { formatToISKString, showModalAlert } from './utils'
+import { inventoryToInventoryCardDTO } from './dogma-utils'
+import { formatToISKString, listingPriceStringToInt, showModalAlert } from './utils'
 
 const askForSellerScopePermission = () => {
   const html = `
@@ -175,10 +176,10 @@ const renderSellerListing = (listedItems) => {
 
   for (const invAwaitingEle of [...document.querySelectorAll('.inventory-item.awaiting-payment')]) {
     invAwaitingEle.addEventListener('click', async () => {
-      const itemId = parseInt(invAwaitingEle.getAttribute('data-item-id'))
-      const payment = payments.find(p => p.inventory.includes(itemId))
-      const otherInventories = payment.inventory.filter(pi => pi !== itemId)
-      console.log('awaiting-payment', itemId, payment, otherInventories)
+      const itemID = parseInt(invAwaitingEle.getAttribute('data-item-id'))
+      const payment = payments.find(p => p.inventory.includes(itemID))
+      const otherInventories = payment.inventory.filter(pi => pi !== itemID)
+      console.log('awaiting-payment', itemID, payment, otherInventories)
 
       const otherInvWording = otherInventories.length > 0 ? `<p><i><b>Note:</b> This mod was listed at the same time with ${otherInventories.length} other mod${otherInventories.length > 1 ? 's' : ''}. The listing fee due balance will be updated to include only the remaining items</i></p>` : ''
       await showModalAlert('Cancel Listing', `
@@ -188,35 +189,61 @@ const renderSellerListing = (listedItems) => {
         buttonText: 'Cancel listing',
         style: 'btn-danger',
         cb: async () => {
-          console.log('callback', invAwaitingEle, itemId)
-          await cancelListing(itemId)
+          console.log('callback', invAwaitingEle, itemID)
+          await cancelListing(itemID)
           console.log('listing cancelled')
+          window.location.reload()
         }
       }])
     })
   }
   for (const invOnSaleEle of [...document.querySelectorAll('.inventory-item.on-sale')]) {
     invOnSaleEle.addEventListener('click', async () => {
-      const itemId = parseInt(invOnSaleEle.getAttribute('data-item-id'))
-      console.log('on-sale', itemId)
+      const itemID = parseInt(invOnSaleEle.getAttribute('data-item-id'))
+      const listingPrice = listedItems.find(i => i.itemID === itemID).listingPrice
+      console.log('on-sale', itemID, listedItems, listingPrice)
       await showModalAlert('Amend Listing', `
       <p>You've already paid the listing fee, if you want to cancel or have sold it elsewhere, the listing fee will not be returned.</p>
       <p>If you cancel this listing, it'll disappear from this screen along but the completed payments will remain visible. If you want to relist it, simply add a new mod listing as before.</p>
+      <div class="row align-items-center">
+        <div class="col-auto">
+          <label for="list-price-modal" class="col-form-label">Listing Price</label>
+        </div>
+        <div class="col">
+          <input type="text" id="list-price-modal" class="form-control list-price-modal" value="${formatToISKString(listingPrice).replace(' ISK', '').trim()}">
+        </div>
+      </div>
+
       `, [{
         buttonText: 'Cancel listing',
         style: 'btn-danger',
         cb: async () => {
-          console.log('callback', invOnSaleEle, itemId)
-          await cancelListing(itemId)
+          console.log('callback', invOnSaleEle, itemID)
+          await cancelListing(itemID)
           console.log('listing cancelled')
+          window.location.reload()
         }
       }, {
         buttonText: 'Listing complete / sold',
         style: 'btn-success',
         cb: async () => {
-          console.log('callback', invOnSaleEle, itemId)
-          await amendListing(itemId, { status: 'COMPLETE' })
+          console.log('callback', invOnSaleEle, itemID)
+          await amendListing(itemID, { status: 'COMPLETE' })
           console.log('listing complete')
+          window.location.reload()
+        }
+      }, {
+        buttonText: 'Update list price',
+        style: 'btn-primary',
+        cb: async () => {
+          console.log('callback', invOnSaleEle, itemID)
+          // await amendListing(itemID, { status: 'COMPLETE' })
+          const listingPriceString = document.querySelector('.list-price-modal').value
+          const listingPrice = listingPriceStringToInt(listingPriceString)
+          console.log('listing complete', listingPriceString, listingPrice)
+          await amendListing(itemID, { listingPrice })
+          invOnSaleEle.querySelector('.listing-price').innerHTML = `<p>Listing price: <b>${formatToISKString(listingPrice)}</b></p>`
+          document.querySelector('.modal .btn-close').click()
         }
       }])
     })
@@ -316,9 +343,9 @@ const renderPaymentsListing = (payments, appConfig) => {
       const inventories = inventory.split(',')
       //   console.log('mouseenter', inventories)
       document.querySelectorAll('.inventory-item').forEach((element) => {
-        const itemId = element.getAttribute('data-item-id')
-        const shouldHide = !inventories.includes(itemId)
-        // console.log('element', element, itemId, shouldHide)
+        const itemID = element.getAttribute('data-item-id')
+        const shouldHide = !inventories.includes(itemID)
+        // console.log('element', element, itemID, shouldHide)
         element.parentElement.style.display = shouldHide ? 'none' : 'block'
       })
     })
@@ -356,7 +383,7 @@ const displayPayments = async () => {
   renderPaymentsListing(payments, appConfig)
 }
 const displayInventory = async () => {
-  const listedItems = await getCurrentSellerInventory()
+  const listedItems = (await getCurrentSellerInventory()).map(i => inventoryToInventoryCardDTO(i))
   console.log('listedItems', listedItems)
   renderSellerListing(listedItems)
 }

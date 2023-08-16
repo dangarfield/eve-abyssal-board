@@ -43,28 +43,43 @@ export const getCurrentUserModInventory = async () => {
   // const abyssModuleTypes = getAbyssModuleTypes()
   inventory = inventory.filter(i => abyssTypesFlat.includes(i.type_id) && ['Hangar', 'Cargo', 'AutoFit'].includes(i.location_flag))
 
+  // .filter(i => i.item_id === 1042480142523)
+  // .filter(i => i.item_id === 1037021119109)
+  // .filter(i => i.type_id === 47769)
+
+  inventory.sort((a, b) => a.item_id - b.item_id)
   console.log('sde', sde)
   inventory = await Promise.all(inventory.map(async (i) => {
-    i.itemId = i.item_id
-    delete i.item_id
-    i.typeId = i.type_id
-    delete i.type_id
+    const dogma = (await esi.dogma.getDogmaDynamicItemsTypeIdItemId(i.item_id, i.type_id)).data
+    // console.log('i.dogma', i, i.itemID, i.typeID, i.dogma)
+    const relevantAttributes = sde.abyssalTypes[i.type_id].attributes.map(a => a.id)
+    const filteredAttributes = dogma.dogma_attributes.filter(attr => relevantAttributes.includes(attr.attribute_id))// .map(a => { return { id: a.attribute_id, value: a.value } })
+    const filteredAttributesObject = filteredAttributes.reduce((acc, attr) => {
+      acc[attr.attribute_id] = attr.value
+      return acc
+    }, {})
 
-    i.dogma = (await esi.dogma.getDogmaDynamicItemsTypeIdItemId(i.itemId, i.typeId)).data
-    // console.log('i.dogma', i, i.itemId, i.typeId, i.dogma)
+    const data = {
+      itemID: i.item_id,
+      typeID: i.type_id,
+      sourceTypeID: dogma.source_type_id,
+      mutatorTypeID: dogma.mutator_type_id,
+      attributesRaw: filteredAttributesObject,
+      status: 'NONE'
+    }
 
-    return inventoryToInventoryCardDTO(i)
+    return inventoryToInventoryCardDTO(data)
   }))
   console.log('inventory', inventory)
 
   const currentInventory = await getCurrentSellerInventory()
   for (const inventoryItem of inventory) {
     for (const currentInventoryItem of currentInventory) {
-      if (inventoryItem.itemId === currentInventoryItem.itemId) {
+      if (inventoryItem.itemID === currentInventoryItem.itemID) {
         inventoryItem.status = currentInventoryItem.status
         inventoryItem.appraisal = currentInventoryItem.appraisal
         inventoryItem.listingPrice = currentInventoryItem.listingPrice
-        // console.log('currentInventoryItem', inventoryItem, currentInventoryItem)
+        console.log('currentInventoryItem', inventoryItem, currentInventoryItem)
       }
     }
   }

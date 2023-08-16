@@ -108,9 +108,9 @@ export const initiateListingFlow = async (inventoryItems) => {
   console.log('initialListing res', res)
   return res
 }
-export const cancelListing = async (itemId) => {
+export const cancelListing = async (itemID) => {
   const { accessToken } = getCurrentUserAccessToken()
-  const url = `${API_ROOT}/api/listing/${itemId}`
+  const url = `${API_ROOT}/api/listing/${itemID}`
 
   const req = await window.fetch(url, {
     method: 'DELETE',
@@ -124,9 +124,9 @@ export const cancelListing = async (itemId) => {
   console.log('cancelListing res', res)
   return res
 }
-export const amendListing = async (itemId, amend) => {
+export const amendListing = async (itemID, amend) => {
   const { accessToken } = getCurrentUserAccessToken()
-  const url = `${API_ROOT}/api/listing/${itemId}`
+  const url = `${API_ROOT}/api/listing/${itemID}`
 
   const req = await window.fetch(url, {
     method: 'PATCH',

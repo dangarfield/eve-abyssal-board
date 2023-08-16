@@ -27,8 +27,10 @@ export const getSellerPayments = async (characterId) => {
 }
 export const findAndUpdateCompletedPayments = async () => {
   const unpaidPayments = await paymentCollection.find({ paid: false }).toArray()
-  const journalItems = (await getEvePaymentJournal()).filter(j => j.ref_type === 'player_donation')
-
+  const { journal, lastModified } = await getEvePaymentJournal()
+  // console.log('journalItemsAll', journal, lastModified)
+  const journalItems = journal.filter(j => j.ref_type === 'player_donation')
+  // console.log('journalItems', journalItems)
   // const testJournalItem = journalItems.find(j => j.reason === 'abc123')
   // testJournalItem.reason = 'm11ZdStYj7'
   // testJournalItem.amount = 12000000

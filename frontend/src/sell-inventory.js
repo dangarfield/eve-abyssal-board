@@ -1,7 +1,7 @@
 import { doesCurrentCharacterHaveSellerScope, getCurrentUserDetails } from './auth'
 import { getAppConfig, initiateListingFlow } from './board-api'
 import { getCurrentUserModInventory } from './esi-api'
-import { listingPriceStringToInt, formatToISKString, triggerRefreshTime, showModalAlert } from './utils'
+import { listingPriceStringToInt, formatToISKString, triggerRefreshTime, showModalAlert, deepCopy } from './utils'
 import { getAppraisalForItemId } from './appraisal'
 import { renderInventoryCard } from './component/inventory-card'
 
@@ -180,9 +180,9 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
   for (const inventoryItemEle of [...document.querySelectorAll('.inventory-item')]) {
     inventoryItemEle.addEventListener('click', async function (event) {
       if (event.target.classList.contains('no-click-close')) return
-      const itemId = parseInt(inventoryItemEle.getAttribute('data-item-id'))
-      const item = availableInventory.find(i => i.itemId === itemId)
-      console.log('inventoryItemEle', inventoryItemEle, itemId, item)
+      const itemID = parseInt(inventoryItemEle.getAttribute('data-item-id'))
+      const item = availableInventory.find(i => i.itemID === itemID)
+      console.log('inventoryItemEle', inventoryItemEle, itemID, availableInventory, item)
       const isListed = inventoryItemEle.classList.contains('listed')
       if (isListed) {
         console.log('Item already listed')
@@ -193,7 +193,7 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
         console.log('Item already selected, remove from list')
         inventoryItemEle.classList.remove('selected')
         inventoryItemEle.querySelector('.interaction-button').innerHTML = '<button class="btn btn-primary btn-sm"><i class="bi bi-plus-circle-fill"></i></button>'
-        const selectedItemEle = document.querySelector(`.selected-inventory-item-holder [data-item-id="${itemId}"]`)
+        const selectedItemEle = document.querySelector(`.selected-inventory-item-holder [data-item-id="${itemID}"]`)
         selectedItemEle.remove()
         inventoryItemEle.querySelector('.listing-price-holder').style.display = 'none'
         inventoryItemEle.querySelector('.listing-price-holder .listing-price').focus()
@@ -204,10 +204,10 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
 
         let html = ''
         html += `
-            <div class="col-2" data-item-id="${itemId}">
+            <div class="col-2" data-item-id="${itemID}">
               <span class="selected-inventory-item">
                 <button class="btn btn-success btn-sm w-100 mb-2" type="submit">
-                  <img src="https://images.evetech.net/types/${item.typeId}/icon?size=32">
+                  <img src="https://images.evetech.net/types/${item.typeID}/icon?size=32">
                   <span class="title">${item.typeName}</span>
                 </button>
                 <span class="interaction-button">
@@ -224,7 +224,7 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
         if (selectedInventoryItems.length > 0) {
           const lastSelectedInventoryItem = selectedInventoryItems[selectedInventoryItems.length - 1]
           lastSelectedInventoryItem.addEventListener('click', () => {
-            document.querySelector(`.inventory-item[data-item-id="${itemId}"]`).click()
+            document.querySelector(`.inventory-item[data-item-id="${itemID}"]`).click()
           })
         }
       }
@@ -249,46 +249,14 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
   }
   document.querySelector('.confirm-inventory').addEventListener('click', async () => {
     const selectedInventoryToList = [...document.querySelectorAll('.inventory-item.selected[data-item-id]')].map(a => {
-      const inventory = availableInventory.find(i => i.itemId === parseInt(a.getAttribute('data-item-id')))
-      inventory.listingPriceString = a.querySelector('.listing-price').value
-      inventory.listingPrice = listingPriceStringToInt(a.querySelector('.listing-price').value)
-      inventory.appraisalValue = a.querySelector('.appraisal p').textContent.replace('Value: ', '')
+      const inventory = availableInventory.find(i => i.itemID === parseInt(a.getAttribute('data-item-id')))
+
+      const data = deepCopy(inventory.data)
+      // data.listingPriceString = a.querySelector('.listing-price').value
+      data.listingPrice = listingPriceStringToInt(a.querySelector('.listing-price').value)
+      data.appraisal = { type: 'AUTO', value: a.querySelector('.appraisal p').textContent.replace('Value: ', '') }
       // TODO - Appraisal value seems to have floating point issues
-      return inventory
-    })
-    const selectedInventoryToListShort = selectedInventoryToList.map(a => {
-      return {
-        itemId: a.itemId,
-        typeId: a.typeId,
-        typeName: a.typeName,
-        sourceTypeId: a.sourceTypeId,
-        sourceTypeName: a.sourceTypeName,
-        mutatorTypeId: a.mutatorTypeId,
-        mutatorTypeName: a.mutatorTypeName,
-        abyssalModuleGroup: a.abyssalModuleGroup,
-        abyssalModuleCategory: a.abyssalModuleCategory,
-        appraisal: {
-          type: 'AUTO',
-          value: a.appraisalValue
-        },
-        listingPrice: a.listingPrice,
-        attributes: a.attributes.map(d => {
-          return {
-            attributeId: d.attributeId,
-            attributeName: d.attributeName,
-            iconID: d.iconID,
-            value: d.value,
-            sourceValue: d.sourceValue,
-            diff: d.diff,
-            highIsGood: d.highIsGood,
-            isGood: d.isGood,
-            min: d.min,
-            minPercent: d.minPercent,
-            max: d.max,
-            maxPercent: d.maxPercent
-          }
-        })
-      }
+      return data
     })
 
     for (const item of selectedInventoryToList) {
@@ -297,10 +265,10 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
         return
       }
     }
-    console.log('selectedInventoryToList', selectedInventoryToList, selectedInventoryToListShort)
+    console.log('selectedInventoryToList', selectedInventoryToList)
     document.querySelector('.confirm-inventory').setAttribute('disabled', 'disabled')
 
-    const paymentDetails = await initiateListingFlow(selectedInventoryToListShort)
+    const paymentDetails = await initiateListingFlow(selectedInventoryToList)
     console.log('paymentDetails', paymentDetails)
     await showModalAlert('Listing Payment Details', `
         <p class="mb-3">You will receive an ingame mail containing the payment information. It will also be available no your <a href="/sell">seller</a> page<p>
@@ -317,9 +285,9 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
 const updateAppraisals = async () => {
   // console.log('start')
   await Promise.all([...document.querySelectorAll('.appraisal:not(.appraisal-complete)')].map(async appraisalEle => {
-    const itemId = appraisalEle.getAttribute('data-item-id')
-    const appraisal = await getAppraisalForItemId(itemId)
-    // console.log('appraisalEle', appraisalEle, itemId, appraisal)
+    const itemID = appraisalEle.getAttribute('data-item-id')
+    const appraisal = await getAppraisalForItemId(itemID)
+    // console.log('appraisalEle', appraisalEle, itemID, appraisal)
     appraisalEle.innerHTML = `<p>Value: ${appraisal.value} <i>(Confidence: ${appraisal.confidence})</></p>`
     appraisalEle.parentNode.querySelector('.listing-price').value = validateListingPrice(appraisal.value)
     return appraisalEle

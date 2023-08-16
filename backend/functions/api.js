@@ -37,12 +37,12 @@ app.get('/api/app-auth', verifyAdmin, async (req, res) => {
 app.post('/api/listing', verifyToken, async function (req, res) {
   res.json(await initiateListingFlow(req.auth, req.body))
 })
-app.delete('/api/listing/:itemId', verifyToken, async function (req, res) {
-  res.json(await cancelListing(parseInt(req.params.itemId)))
+app.delete('/api/listing/:itemID', verifyToken, async function (req, res) {
+  res.json(await cancelListing(parseInt(req.params.itemID)))
 })
 
-app.patch('/api/listing/:itemId', verifyToken, async function (req, res) {
-  res.json(await amendListing(parseInt(req.params.itemId), req.body))
+app.patch('/api/listing/:itemID', verifyToken, async function (req, res) {
+  res.json(await amendListing(parseInt(req.params.itemID), req.body))
 })
 
 // Payments

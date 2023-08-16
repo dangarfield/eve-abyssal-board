@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid'
+import { getUnitStringForUnitId } from './module-types'
 
 export const loadData = () => {
   const dataString = window.localStorage.getItem('abyssal-board')
@@ -47,14 +48,15 @@ export const formatToISKString = (number) => {
   const suffix = suffixes[suffixIndex]
   return number >= 0 ? formattedNumber + suffix + ' ISK' : '-' + formattedNumber + suffix + ' ISK'
 }
-export const formatForUnit = (value, unit, addSign) => {
+export const formatForUnit = (value, unitID, addSign) => {
+  const unit = getUnitStringForUnitId(unitID)
   let outputValue = ''
   switch (unit) {
     case 'GJ': outputValue = value.toFixed(1); break
     case 's': outputValue = (value / 1000).toFixed(2); break
     case 'x': outputValue = value.toFixed(3); break
     case 'm': outputValue = Math.floor(value).toFixed(0); break
-    // case '%': outputValue = (100 * (1 - value)).toFixed(2); break
+    // case '%': outputValue = (100 * (1 - value)).toFixed(2); break // Lots of mess here, should really use unit codes
     case '%': outputValue = (value / 100).toFixed(2); break
     default: outputValue = value.toFixed(2); break
   }
@@ -132,4 +134,11 @@ export const showModalAlert = async (title, contentHtml, footerConfig) => {
       resolve()
     })
   })
+}
+export const deepCopy = (obj) => {
+  return JSON.parse(JSON.stringify(obj))
+}
+
+export const cloneSimpleList = (originalList) => {
+  return originalList.map(obj => ({ ...obj }))
 }

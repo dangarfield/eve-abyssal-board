@@ -56,6 +56,9 @@
     border-radius: 0;
     height: 10px;
 }
+.inventory-item .progress.short {
+    height: 5px;
+}
 
 .payment-grid .gridjs-tr th,
 .payment-grid .gridjs-tr td,
@@ -80,4 +83,13 @@
 .selected-inventory-item-holder {
     max-height: 160px;
     overflow-y: auto;
+}
+
+@keyframes progress-bar-stripes-reverse {
+    0% {
+        background-position-x: -1rem;
+    }
+}
+.progress-bar-animated-reverse {
+    animation: 1s linear infinite progress-bar-stripes-reverse;
 }

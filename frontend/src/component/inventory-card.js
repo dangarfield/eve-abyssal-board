@@ -6,49 +6,49 @@ const getFriendlyStatus = (status) => {
 }
 export const renderInventoryCard = (item) => {
   let html = ''
-  const dogmaHtml = item.attributes.filter(a => a.type === 'mutation').map(dogma => {
-    // const dogmaUnit = getUnitForDogma(dogma.unitID)
+  const dogmaHtml = item.attributes.filter(a => a.type === 'mutation').map(attr => {
+    // const dogmaUnit = getUnitForDogma(attr.unitID)
     return `
     <div class="d-flex flex-row gap-2 align-items-center px-1">
-        <div class="p-0"><img src="/icons/${dogma.iconID}.png" width="32" height="32"></div>
+        <div class="p-0"><img src="/icons/${attr.iconID}.png" width="32" height="32"></div>
         <div class="p-0">
             <p class="m-0">
-                ${dogma.name}
+                ${attr.name}
                 <!--
                 <br/>
-                zero ${dogma.allComparisonZero}<br/>
-                diff ${dogma.allDiff}</p>
-                v ${dogma.value}<br/>
-                g ${dogma.allIsGood}<br/>
-                min ${dogma.allMin}<br/>
-                max ${dogma.allMax}<br/>
-                zeroDiff ${dogma.allZeroDiff}<br/>
-                perc ${dogma.allPerc}
+                zero ${attr.allComparisonZero}<br/>
+                diff ${attr.allDiff}</p>
+                v ${attr.value}<br/>
+                g ${attr.allIsGood}<br/>
+                min ${attr.allMin}<br/>
+                max ${attr.allMax}<br/>
+                zeroDiff ${attr.allZeroDiff}<br/>
+                perc ${attr.allPerc}
                 -->
             </p>
                 
-            <p class="m-0"><b>${formatForUnit(dogma.value, dogma.unitID)}  <span class="${dogma.isGood ? 'text-success' : 'text-danger'}">(${formatForUnit(dogma.diff, dogma.unitID, true)})</span></b></p>
+            <p class="m-0"><b>${formatForUnit(attr.valueDisplay, attr.unitID)}  <span class="${attr.isGood ? 'text-success' : 'text-danger'}">(${formatForUnit(attr.diffDisplay, attr.unitID, true)})</span></b> ${attr.unitID}</p>
         </div>
     </div>
     <div class="row gx-0 mb-2">
     <div class="col-6">
         <div class="progress justify-content-end" role="progressbar">
-            <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" style="width: ${dogma.isGood ? '0' : dogma.perc}%"></div>
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" style="width: ${attr.isGood ? '0' : attr.perc}%"></div>
         </div>
     </div>
     <div class="col-6">
         <div class="progress" role="progressbar">
-            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: ${dogma.isGood ? dogma.perc : '0'}%"></div>
+            <div class="progress-bar progress-bar-striped progress-bar-animated-reverse bg-success" style="width: ${attr.isGood ? attr.perc : '0'}%"></div>
         </div>
     </div>
     <div class="col-6">
-        <div class="progress justify-content-end" role="progressbar">
-            <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" style="width: ${dogma.allIsGood ? '0' : dogma.allPerc}%"></div>
+        <div class="progress short justify-content-end" role="progressbar">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" style="width: ${attr.allIsGood ? '0' : attr.allPerc}%"></div>
         </div>
     </div>
     <div class="col-6">
-        <div class="progress" role="progressbar">
-            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" style="width: ${dogma.allIsGood ? dogma.allPerc : '0'}%"></div>
+        <div class="progress short" role="progressbar">
+            <div class="progress-bar progress-bar-striped progress-bar-animated-reverse bg-primary" style="width: ${attr.allIsGood ? attr.allPerc : '0'}%"></div>
         </div>
     </div>
     </div>`
@@ -67,7 +67,8 @@ export const renderInventoryCard = (item) => {
         <div class="p-0"><img src="/icons/${attr.iconID}.png" width="32" height="32"></div>
         <div class="p-0">
             <p class="m-0">
-            ${attr.name}<br/>
+            ${attr.name}
+            <!--<br/>
             ${attr.highIsGood}<br/>
             v ${attr.value}<br/>
             s ${attr.sourceValue}<br/>
@@ -77,8 +78,9 @@ export const renderInventoryCard = (item) => {
             max ${attr.max}<br/>
             zeroDiff ${attr.zeroDiff}<br/>
             perc ${attr.perc}<br/>
+            -->
             </p>
-            <p class="m-0"><b>${formatForUnit(attr.value * 100, attr.unitID)}  <span class="text-primary">(${formatForUnit(attr.diff * 100, attr.unitID, true)})</span></b></p>
+            <p class="m-0"><b>${formatForUnit(attr.valueDisplay, attr.unitID)}  <span class="text-primary">(${formatForUnit(attr.diffDisplay, attr.unitID, true)})</span></b></p>
         </div>
     </div>
     <div class="row gx-0 mb-2">
@@ -89,10 +91,56 @@ export const renderInventoryCard = (item) => {
         </div>
         <div class="col-6">
             <div class="progress" role="progressbar">
-                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" style="width: ${attr.isGood ? attr.perc : '0'}%"></div>
+                <div class="progress-bar progress-bar-striped progress-bar-animated-reverse bg-primary" style="width: ${attr.isGood ? attr.perc : '0'}%"></div>
             </div>
         </div>
     </div>`
+  }).join('')
+
+  const derivedAttributeHtml = item.attributes.filter(a => a.type === 'derived').map(attr => {
+    // const dogmaUnit = getUnitForDogma(attr.unitID)
+
+    // const maxDiff = attr.max - attr.min
+    // const diff = attr.value - attr.min
+    // let perc = Math.round(100 * (Math.abs(diff) / maxDiff))
+    // if (!attr.highIsGood) perc = 100 - perc
+    // console.log('baseAttributeHtml', attr, maxDiff, diff, perc)
+    // console.log('derivedAttributeHtml', attr)
+    return `
+    <div class="d-flex flex-row gap-2 align-items-center px-1">
+        <div class="p-0"><img src="/icons/${attr.iconID}.png" width="32" height="32"></div>
+        <div class="p-0">
+            <p class="m-0">
+            ${attr.name}
+            <!--<br/>
+            ${attr.highIsGood}<br/>
+            v ${attr.value}<br/>
+            z ${attr.allComparisonZero}<br/>
+            d ${attr.diff}<br/>
+            g ${attr.isGood}<br/>
+            min ${attr.min}<br/>
+            max ${attr.max}<br/>
+            zeroDiff ${attr.zeroDiff}<br/>
+            perc ${attr.perc}<br/>
+            -->
+            </p>
+            <p class="m-0"><b>${formatForUnit(attr.valueDisplay, attr.unitID)}  <span class="${attr.isGood ? 'text-success' : 'text-danger'}">(${formatForUnit(attr.diffDisplay, attr.unitID, true)})</span></b></p>
+        </div>
+    </div>
+    
+    <div class="row gx-0 mb-2">
+        <div class="col-6">
+            <div class="progress justify-content-end" role="progressbar">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" style="width: ${attr.isGood ? '0' : attr.perc}%"></div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="progress" role="progressbar">
+                <div class="progress-bar progress-bar-striped progress-bar-animated-reverse bg-primary" style="width: ${attr.isGood ? attr.perc : '0'}%"></div>
+            </div>
+        </div>
+    </div>
+    `
   }).join('')
 
   const appraisalHtml = item.appraisal
@@ -134,18 +182,21 @@ export const renderInventoryCard = (item) => {
                     </div>
                     <hr class="my-2"/>
 
+                    <!--
                     <div class="d-flex flex-row gap-2 align-items-center px-1">
                         <div class="p-0"><img src="https://images.evetech.net/types/${item.mutatorTypeID}/icon?size=32"></div>
                         <div class="p-0">${item.mutatorTypeName}</div>
                     </div>
+                    -->
                     <div class="d-flex flex-row gap-2 align-items-center px-1">
                         <div class="p-0"><img src="https://images.evetech.net/types/${item.sourceTypeID}/icon?size=32"></div>
-                        <div class="p-0">${item.sourceTypeName}</div>
+                        <div class="p-0">${item.sourceTypeName} <span class="badge bg-secondary">${item.mutatorTypeName.split(' ')[0]}</span></div>
                     </div>
 
                     <hr/>
                     ${dogmaHtml}
                     ${baseAttributeHtml}
+                    ${derivedAttributeHtml}
                     <hr />
                     ${appraisalHtml}
                     ${listingPriceHtml}

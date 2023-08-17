@@ -20,6 +20,8 @@
   },
   "dependencies": {
     "eve-esi-swaggerts": "^1.11.1",
-    "eve-sso-pkce": "^1.0.1"
+    "eve-sso-pkce": "^1.0.1",
+    "mathjs": "^11.9.1",
+    "natural-sort": "^1.0.0"
   }
 }

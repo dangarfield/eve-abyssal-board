@@ -5,7 +5,7 @@ import yaml from 'js-yaml'
 
 import fs from 'fs'
 import path from 'path'
-
+import { evaluate } from 'mathjs'
 import { getAbyssModuleTypes } from './frontend/src/module-types.js'
 
 const SDE_URL = 'https://eve-static-data-export.s3-eu-west-1.amazonaws.com/tranquility/sde.zip'
@@ -185,6 +185,46 @@ const updateBaseModuleAttributes = (attributes, typeID) => {
 
   if (typeID === 47702) attributes.push({ id: 30, type: 'base-module' }) // Stasis Webifier
 }
+function addAttribute (attributes, id, type, name, unitID, iconID, highIsGood, valueExpression) {
+  attributes.push({
+    id,
+    type,
+    name,
+    unitID,
+    iconID,
+    highIsGood,
+    valueExpression
+  })
+}
+
+const updateDerivedAttributes = (attributes, typeID) => {
+  // For each group of typeIds, add the corresponding attributes
+  if ([47781, 47785, 47789, 47793, 47836, 47838, 47840, 56309, 56310].includes(typeID)) {
+    addAttribute(attributes, 100000, 'derived', 'Shield boost per second', 1001, 84, true, 'getValue(68) / getValue(73)') // HP/s
+  }
+
+  if ([47769, 47773, 47777, 47842, 47844, 47846, 56307, 56308].includes(typeID)) {
+    addAttribute(attributes, 100001, 'derived', 'Armor repair per second', 1001, 84, true, 'getValue(84) / getValue(73)') // HP/s
+  }
+
+  if ([47781, 47785, 47789, 47793, 56309, 56310].includes(typeID)) {
+    addAttribute(attributes, 100002, 'derived', 'Shield boost per capacitor', 1002, 1031, true, 'getValue(68) / getValue(6)') // HP/GJ
+  }
+
+  if ([47769, 47773, 47777, 47842, 47844, 47846, 56307, 56308].includes(typeID)) {
+    addAttribute(attributes, 100003, 'derived', 'Armor repair per capacitor', 1002, 1031, true, 'getValue(84) / getValue(6)') // HP/GJ
+  }
+
+  if ([49730, 49722, 49726, 49734].includes(typeID)) {
+    addAttribute(attributes, 100004, 'derived', 'DPS Bonus', 1003, 2893, true, '(((2-getValue(204))*getValue(64))-1)*100') // %
+    // addAttribute(attributes, 100004, 'derived', 'DPS Bonus A', 1003, 2893, true, '((getValue(64) * 1 / (1 - getValue(204) / 100)) - 1) * 100') // %
+  }
+
+  if ([49738].includes(typeID)) {
+    addAttribute(attributes, 100005, 'derived', 'DPS Bonus', 1003, 2893, true, '(((2 - getValue(204)) * getValue(213))-1)*100') // %
+  // addAttribute(attributes, 100005, 'derived', 'DPS Bonus B', 1003, 2893, true, '(((getValue(213) / 100 + 1) / (1 - (getValue(204) / 100))) - 1) * 100') // %
+  }
+}
 const getDisplayGroupCategoryForAbyssItemType = (typeID) => {
   for (const moduleType of moduleTypes) {
     for (const category of moduleType.categories) {
@@ -211,7 +251,8 @@ const getMutatorsAndSourcesForAbyssItem = (mutatorAttributes, types, typeDogmas,
         if (!sources[sourceTypeId]) {
           const sourceValues = {}
           // TODO add non-mutation attributes in here too. Should be working though
-          for (const attribute of attributes) {
+          for (const attribute of attributes.filter(a => a.type !== 'derived')) {
+            // console.log('attribute', attribute)
             sourceValues[attribute.id] = typeDogmas[sourceTypeId].dogmaAttributes.find(a => a.attributeID === attribute.id).value
           }
           sources[sourceTypeId] = {
@@ -227,8 +268,7 @@ const getMutatorsAndSourcesForAbyssItem = (mutatorAttributes, types, typeDogmas,
   return { mutators, sources }
 }
 const updateMinMaxForAbyssItemAttributes = (attributes, mutators, sources) => {
-  const result = {}
-  for (const attribute of attributes) {
+  for (const attribute of attributes.filter(a => a.type !== 'derived')) {
     const sourceValues = Object.keys(sources).map(s => sources[s].attributes[attribute.id])
     const allSourcesMin = Math.min(...sourceValues)
     const allSourcesMax = Math.max(...sourceValues)
@@ -256,17 +296,50 @@ const updateMinMaxForAbyssItemAttributes = (attributes, mutators, sources) => {
       }
     }
   }
-  // console.log('result', result)
-  return result
+}
+const updateMinMaxForAbyssItemAttributesDerived = (attributes, mutators, sources) => {
+  const minMaxAttrs = attributes.filter(a => a.type !== 'derived').reduce((acc, item) => ({ ...acc, [item.id]: { min: item.allMin, max: item.allMax } }), {})
+
+  for (const attribute of attributes.filter(a => a.type === 'derived')) {
+    const potentialArguments = Array.from(attribute.valueExpression.matchAll(/getValue\((\d+)\)/g), match => parseInt(match[1]))
+
+    const resultArray = []
+    const minMax = ['min', 'max']
+    potentialArguments.forEach(arg1 => {
+      potentialArguments.forEach(arg2 => {
+        if (arg1 !== arg2 && arg1 < arg2) {
+          minMax.forEach(arg3 => {
+            minMax.forEach(arg4 => {
+              resultArray.push({
+                [arg1]: minMaxAttrs[arg1][arg3],
+                [arg2]: minMaxAttrs[arg2][arg4]
+              })
+            })
+          })
+        }
+      })
+    })
+
+    const allCombinationResults = resultArray.map(c => evaluate(attribute.valueExpression, { getValue: valueID => c[valueID] }))
+    const allMin = Math.min(...allCombinationResults)
+    const allMax = Math.max(...allCombinationResults)
+    const allComparisonZero = allMax - (0.5 * (allMax - allMin))
+    // console.log('resallCombinationResultsult', allCombinationResults, allMin, allMax)
+
+    attribute.allMin = allMin
+    attribute.allMax = allMax
+    attribute.allComparisonZero = allComparisonZero
+  }
 }
 const updateAttributeInfo = (dogmaAttributes, attributes) => {
   for (const attribute of attributes) {
     // attribute.data = dogmaAttributes[attribute.id]
     // attribute.dataString = JSON.stringify(dogmaAttributes[attribute.id])
-    attribute.name = dogmaAttributes[attribute.id].displayNameID.en
-    attribute.iconID = dogmaAttributes[attribute.id].iconID
-    attribute.unitID = dogmaAttributes[attribute.id].unitID
-    attribute.highIsGood = dogmaAttributes[attribute.id].highIsGood
+    // console.log('attribute', attribute)
+    if (attribute.name === undefined) attribute.name = dogmaAttributes[attribute.id].displayNameID.en
+    if (attribute.iconID === undefined) attribute.iconID = dogmaAttributes[attribute.id].iconID
+    if (attribute.unitID === undefined) attribute.unitID = dogmaAttributes[attribute.id].unitID
+    if (attribute.highIsGood === undefined) attribute.highIsGood = dogmaAttributes[attribute.id].highIsGood
   }
 }
 const populateRequiredData = async () => {
@@ -295,11 +368,15 @@ const populateRequiredData = async () => {
       const typeID = parseInt(type.typeID)
       const attributes = getRelevantDogmaAttributesForTypeId(mutatorAttributes, typeID)
       updateBaseModuleAttributes(attributes, typeID)
+      updateDerivedAttributes(attributes, typeID)
       const { group, category } = getDisplayGroupCategoryForAbyssItemType(typeID)
       const { mutators, sources } = getMutatorsAndSourcesForAbyssItem(mutatorAttributes, types, typeDogmas, attributes, typeID)
       // if (typeID === 47408) {
       // console.log('type.typeID', type.typeID)
       updateMinMaxForAbyssItemAttributes(attributes, mutators, sources)
+      // }
+      // if (typeID === 49730) {
+      updateMinMaxForAbyssItemAttributesDerived(attributes, mutators, sources)
       // }
       updateAttributeInfo(dogmaAttributes, attributes)
 
@@ -408,18 +485,29 @@ const populateRequiredData = async () => {
   // https://github.com/stephenswat/eve-abyssal-market/blob/0ef588480f7a4fbe70c4fa1c68a0e8c5d9c99700/abyssal_modules/management/commands/get_abyssal_types.py
   return { abyssalTypes }
 }
-const copyDogmaAttributeImages = async (mutatorAttributes) => {
+const copyDogmaAttributeImages = async (abyssalTypes) => {
   const dogmaAttributes = yamlToJson('./_data/sde/fsd/dogmaAttributes.yaml')
   const iconIDs = yamlToJson('./_data/sde/fsd/iconIDs.yaml')
   const imgPath = path.join('./frontend/_static/icons')
   if (!fs.existsSync(imgPath)) fs.mkdirSync(imgPath)
-  const dogmaAttributeImages = [...new Set(getAllRelevantDogmaAttributes(mutatorAttributes).map(id => dogmaAttributes[id].iconID))].map(iconID => {
+
+  const iconIDSet = new Set()
+  for (const typeID in abyssalTypes) {
+    for (const attribute of abyssalTypes[typeID].attributes) {
+      iconIDSet.add(attribute.iconID)
+    }
+  }
+  // console.log('iconIDSet', iconIDSet)
+
+  const dogmaAttributeImages = [...iconIDSet].map(iconID => {
+    // console.log('iconID', iconID)
     return { iconID, from: iconIDs[iconID].iconFile.replace('res:/ui/texture/icons/', './_data/Icons/items/'), to: `${imgPath}/${iconID}.png` }
   })
+  // console.log('dogmaAttributeImages', dogmaAttributeImages)
   for (const dogmaAttributeImage of dogmaAttributeImages) {
     fs.copyFileSync(dogmaAttributeImage.from, dogmaAttributeImage.to)
   }
-//   console.log('copyDogmaAttributeImages', dogmaAttributeImages)
+  // console.log('copyDogmaAttributeImages', dogmaAttributeImages)
 }
 const init = async () => {
   await downloadAndUnzip(SDE_URL, './_data', 'sde')
@@ -428,6 +516,6 @@ const init = async () => {
   await downloadJson(DYN_ATTRS_URL, './_data')
   const data = await populateRequiredData()
   await saveRequiredData(data)
-  await copyDogmaAttributeImages(data.mutatorAttributes)
+  await copyDogmaAttributeImages(data.abyssalTypes)
 }
 init()

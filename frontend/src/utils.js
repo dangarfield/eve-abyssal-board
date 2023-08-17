@@ -48,20 +48,32 @@ export const formatToISKString = (number) => {
   const suffix = suffixes[suffixIndex]
   return number >= 0 ? formattedNumber + suffix + ' ISK' : '-' + formattedNumber + suffix + ' ISK'
 }
+export const calcValueForDisplay = (value, unitID) => {
+  switch (unitID) {
+    case 109: return (value * 100) - 100
+    case 111: return 100 - (value * 100)
+    default: return value
+  }
+}
+
 export const formatForUnit = (value, unitID, addSign) => {
   const unit = getUnitStringForUnitId(unitID)
   let outputValue = ''
-  switch (unit) {
-    case 'GJ': outputValue = value.toFixed(1); break
-    case 's': outputValue = (value / 1000).toFixed(2); break
-    case 'x': outputValue = value.toFixed(3); break
-    case 'm': outputValue = Math.floor(value).toFixed(0); break
-    // case '%': outputValue = (100 * (1 - value)).toFixed(2); break // Lots of mess here, should really use unit codes
-    case '%': outputValue = (value / 100).toFixed(2); break
+  switch (unitID) {
+    case 124: outputValue = value.toFixed(1); break // % Maximum velocity bonus, Signature Radius Modifier
+    case 109: case 104: outputValue = value.toFixed(3); break // x Damage Modifier
+    // case 'GJ': outputValue = value.toFixed(1); break
+    // case 's': outputValue = (value / 1000).toFixed(2); break
+    // case 'HP/s': outputValue = (value * 1000).toFixed(2); break
+    // case 'x': outputValue = value.toFixed(3); break
+    // case 'm': outputValue = Math.floor(value).toFixed(0); break
+    // // case '%': outputValue = (100 * (1 - value)).toFixed(2); break // Lots of mess here, should really use unit codes
+    // case '%': outputValue = (value / 100).toFixed(2); break
+    // // case '%': outputValue = (value).toFixed(2); break
     default: outputValue = value.toFixed(2); break
   }
-  const signValue = addSign && value > 0 ? '+' : ''
-  outputValue = outputValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  const signValue = (addSign && !outputValue.includes('-')) ? '+' : ''
+  outputValue = outputValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',').replace(/\.0+$/, '')
   return `${signValue}${outputValue}${unit !== '' ? ` ${unit}` : ''}`
 }
 export const formatMilliseconds = (milliseconds) => {

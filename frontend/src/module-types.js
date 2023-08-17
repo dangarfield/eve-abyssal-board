@@ -58,7 +58,10 @@ const UNIT_STR = {
   139: '+',
   140: 'Level',
   141: 'hardpoints',
-  143: 'None'
+  143: 'None',
+  1001: 'HP/s', // Derived Attribute,
+  1002: 'HP/GJ', // Derived Attribute,
+  1003: '%' // Derived Attribute
 }
 export const getUnitStringForUnitId = (unitId) => {
   return UNIT_STR[unitId] || ''

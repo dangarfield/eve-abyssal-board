@@ -3,8 +3,8 @@ import { getCurrentUserAccessToken, refreshTokenAndGetNewUserAccessToken } from 
 import { getAbyssModuleTypesFlatIds } from './module-types'
 import sde from './generated-data/sde.json'
 import { getCurrentSellerInventory } from './board-api'
-import { inventoryToInventoryCardDTO } from './dogma-utils'
-
+import { inventoryToInventoryCardDTO, dogmaToAttributesRaw } from './dogma-utils'
+import naturalSort from 'natural-sort'
 const esi = new Api()
 
 // TODO - Move a lot of this to dogma-utils.js etc
@@ -43,21 +43,15 @@ export const getCurrentUserModInventory = async () => {
   // const abyssModuleTypes = getAbyssModuleTypes()
   inventory = inventory.filter(i => abyssTypesFlat.includes(i.type_id) && ['Hangar', 'Cargo', 'AutoFit'].includes(i.location_flag))
 
-  // .filter(i => i.item_id === 1042480142523)
-  // .filter(i => i.item_id === 1037021119109)
-  // .filter(i => i.type_id === 47769)
+  // .filter(i => i.item_id === 1037642882589)
+  // .filter(i => i.item_id === 1039196810422)
+  // .filter(i => i.type_id === 49730)
 
-  inventory.sort((a, b) => a.item_id - b.item_id)
   console.log('sde', sde)
   inventory = await Promise.all(inventory.map(async (i) => {
     const dogma = (await esi.dogma.getDogmaDynamicItemsTypeIdItemId(i.item_id, i.type_id)).data
-    // console.log('i.dogma', i, i.itemID, i.typeID, i.dogma)
-    const relevantAttributes = sde.abyssalTypes[i.type_id].attributes.map(a => a.id)
-    const filteredAttributes = dogma.dogma_attributes.filter(attr => relevantAttributes.includes(attr.attribute_id))// .map(a => { return { id: a.attribute_id, value: a.value } })
-    const filteredAttributesObject = filteredAttributes.reduce((acc, attr) => {
-      acc[attr.attribute_id] = attr.value
-      return acc
-    }, {})
+    console.log('i.dogma', i, i.itemID, i.typeID, i.dogma)
+    const filteredAttributesObject = dogmaToAttributesRaw(i.type_id, dogma.dogma_attributes)
 
     const data = {
       itemID: i.item_id,
@@ -67,10 +61,13 @@ export const getCurrentUserModInventory = async () => {
       attributesRaw: filteredAttributesObject,
       status: 'NONE'
     }
-
+    // TODO - Note: that attributesRaw really needs to contain the base-module values as well as the dynamic values so it's searchable in the DB
+    // Update - This is set for base-module, just need to implement dynamic values
     return inventoryToInventoryCardDTO(data)
   }))
   console.log('inventory', inventory)
+
+  inventory.sort((a, b) => naturalSort()(a.typeName, b.typeName) || a.itemID - b.itemID)
 
   const currentInventory = await getCurrentSellerInventory()
   for (const inventoryItem of inventory) {

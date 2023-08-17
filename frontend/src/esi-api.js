@@ -50,7 +50,7 @@ export const getCurrentUserModInventory = async () => {
   console.log('sde', sde)
   inventory = await Promise.all(inventory.map(async (i) => {
     const dogma = (await esi.dogma.getDogmaDynamicItemsTypeIdItemId(i.item_id, i.type_id)).data
-    console.log('i.dogma', i, i.itemID, i.typeID, i.dogma)
+    // console.log('i.dogma', i, i.itemID, i.typeID, i.dogma)
     const filteredAttributesObject = dogmaToAttributesRaw(i.type_id, dogma.dogma_attributes)
 
     const data = {

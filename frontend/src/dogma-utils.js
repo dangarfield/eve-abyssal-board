@@ -79,6 +79,8 @@ export const inventoryToInventoryCardDTO = (data) => {
   data.mutatorTypeName = mutator.name
   data.sourceTypeName = source.name
 
+  data.metaGroupName = source.metaGroupName
+  data.metaGroupIconID = source.metaGroupIconID
   return data
 }
 

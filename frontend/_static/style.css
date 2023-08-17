@@ -32,7 +32,8 @@
 .inventory-item.listed.on-sale .card {
     background-color: lightgreen;
 }
-.selected-inventory-item {
+/* .selected-inventory-item, */
+.inventory-item {
     position: relative;
 }
 .inventory-item .interaction-button,
@@ -43,6 +44,11 @@
   cursor: pointer;
   visibility: hidden;
   pointer-events: none;
+}
+.inventory-item .faction-icon {
+    position: absolute;
+    top: 0px;
+    left: 0px;
 }
 .selected-inventory-item .interaction-button {
     top: inherit;

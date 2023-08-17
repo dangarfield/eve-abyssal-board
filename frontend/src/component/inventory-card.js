@@ -207,6 +207,7 @@ export const renderInventoryCard = (item) => {
                 <i class="bi bi-plus-circle-fill"></i>
             </button>
             </span>
+            ${item.metaGroupIconID ? `<span class="faction-icon"><img src="/icons/${item.metaGroupIconID}.png" width='32px'/></span>` : ''}
           </div>`
   return html
 }

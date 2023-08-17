@@ -233,7 +233,7 @@ const getDisplayGroupCategoryForAbyssItemType = (typeID) => {
   }
   return {}
 }
-const getMutatorsAndSourcesForAbyssItem = (mutatorAttributes, types, typeDogmas, attributes, typeID) => {
+const getMutatorsAndSourcesForAbyssItem = (mutatorAttributes, types, typeDogmas, metaGroups, attributes, typeID) => {
   const mutators = {}
   const sources = {}
   for (const mutatorIdString in mutatorAttributes) {
@@ -255,10 +255,18 @@ const getMutatorsAndSourcesForAbyssItem = (mutatorAttributes, types, typeDogmas,
             // console.log('attribute', attribute)
             sourceValues[attribute.id] = typeDogmas[sourceTypeId].dogmaAttributes.find(a => a.attributeID === attribute.id).value
           }
+
+          const metaGroup = metaGroups[types[sourceTypeId].metaGroupID]
+          // console.log('metaGroup', types[sourceTypeId], types[sourceTypeId].metaGroupID, metaGroup)
           sources[sourceTypeId] = {
             name: types[sourceTypeId].name.en,
             iconID: types[sourceTypeId].iconID,
-            attributes: sourceValues
+            attributes: sourceValues,
+            // metaGroupIcon: metaGroups[types[sourceTypeId].metaGroupID].iconID
+            metaGroupName: metaGroup !== undefined ? metaGroup.nameID.en : ''
+          }
+          if (metaGroup !== undefined && metaGroup.iconID) {
+            sources[sourceTypeId].metaGroupIconID = metaGroup.iconID
           }
         }
       }
@@ -350,6 +358,7 @@ const populateRequiredData = async () => {
 
   const typeDogmas = yamlToJson('./_data/sde/fsd/typeDogma.yaml')
   const dogmaAttributes = yamlToJson('./_data/sde/fsd/dogmaAttributes.yaml')
+  const metaGroups = yamlToJson('./_data/sde/fsd/metaGroups.yaml')
   const mutatorAttributes = JSON.parse(fs.readFileSync('./_data/dynamicitemattributes.json', 'utf8'))
 
   updateDynamicAttributes(mutatorAttributes, typeDogmas, dogmaAttributes, types)
@@ -370,7 +379,7 @@ const populateRequiredData = async () => {
       updateBaseModuleAttributes(attributes, typeID)
       updateDerivedAttributes(attributes, typeID)
       const { group, category } = getDisplayGroupCategoryForAbyssItemType(typeID)
-      const { mutators, sources } = getMutatorsAndSourcesForAbyssItem(mutatorAttributes, types, typeDogmas, attributes, typeID)
+      const { mutators, sources } = getMutatorsAndSourcesForAbyssItem(mutatorAttributes, types, typeDogmas, metaGroups, attributes, typeID)
       // if (typeID === 47408) {
       // console.log('type.typeID', type.typeID)
       updateMinMaxForAbyssItemAttributes(attributes, mutators, sources)
@@ -497,11 +506,20 @@ const copyDogmaAttributeImages = async (abyssalTypes) => {
       iconIDSet.add(attribute.iconID)
     }
   }
+  for (const typeID in abyssalTypes) {
+    for (const sourceID in abyssalTypes[typeID].sources) {
+      const source = abyssalTypes[typeID].sources[sourceID]
+      if (source.metaGroupIconID) {
+        iconIDSet.add(source.metaGroupIconID)
+      }
+    }
+    // console.log('abyssalType', abyssalType)
+  }
   // console.log('iconIDSet', iconIDSet)
 
   const dogmaAttributeImages = [...iconIDSet].map(iconID => {
     // console.log('iconID', iconID)
-    return { iconID, from: iconIDs[iconID].iconFile.replace('res:/ui/texture/icons/', './_data/Icons/items/'), to: `${imgPath}/${iconID}.png` }
+    return { iconID, from: iconIDs[iconID].iconFile.toLowerCase().replace('res:/ui/texture/icons/', './_data/Icons/items/'), to: `${imgPath}/${iconID}.png` }
   })
   // console.log('dogmaAttributeImages', dogmaAttributeImages)
   for (const dogmaAttributeImage of dogmaAttributeImages) {

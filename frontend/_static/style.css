@@ -99,3 +99,35 @@
 .progress-bar-animated-reverse {
     animation: 1s linear infinite progress-bar-stripes-reverse;
 }
+  
+
+.search-attr-holder {
+    position:relative;
+    overflow: hidden;
+}
+
+.search-attr-holder .form-range::-webkit-slider-runnable-track {
+    background-color: transparent !important; /* Hide the thumb background */
+  }
+.search-attr-holder .bg-track {
+    height:8px;
+    position:absolute;
+    top:8px;
+    width:100%;
+    z-index:2;
+    background-color: var(--bs-secondary-bg);
+}
+.search-attr-holder .bg-selected {
+    height:8px;
+    position:absolute;
+    top:8px;
+    z-index:3;
+    /* width: 100%; */
+    width:40%;
+    left: 30%;
+    background-color: #0dcaf0;
+}
+.search-attr-holder .search-attr {
+    z-index:3;
+    position:inherit;
+}

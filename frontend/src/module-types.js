@@ -70,6 +70,7 @@ export const getAbyssModuleTypes = () => {
   return [
     {
       group: 'Microwarpdrives',
+      iconID: 47740,
       categories: [
         {
           categoryName: '5MN',
@@ -91,6 +92,7 @@ export const getAbyssModuleTypes = () => {
     },
     {
       group: 'Afterburners',
+      iconID: 47740,
       categories: [
         {
           categoryName: '1MN',
@@ -112,6 +114,7 @@ export const getAbyssModuleTypes = () => {
     },
     {
       group: 'Shield Extenders',
+      iconID: 47740,
       categories: [
         {
           categoryName: 'Small',
@@ -129,6 +132,7 @@ export const getAbyssModuleTypes = () => {
     },
     {
       group: 'Armor Plates',
+      iconID: 47740,
       categories: [
         {
           categoryName: 'Small',

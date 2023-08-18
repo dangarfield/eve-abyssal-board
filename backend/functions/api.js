@@ -6,6 +6,7 @@ import { cancelListing, initiateListingFlow, amendListing } from '../app/listing
 import { ssoAdminLoginStart, ssoAdminReturn } from '../app/sso'
 import { findAndUpdateCompletedPayments, getPendingPayments, getCompletePayments, getSellerPayments, deletePayment, amendPayment } from '../app/payments'
 import { getEvePaymentJournal } from '../app/eve-api'
+import { searchForModulesOfType } from '../app/search'
 
 const app = API()
 
@@ -43,6 +44,9 @@ app.delete('/api/listing/:itemID', verifyToken, async function (req, res) {
 
 app.patch('/api/listing/:itemID', verifyToken, async function (req, res) {
   res.json(await amendListing(parseInt(req.params.itemID), req.body))
+})
+app.post('/api/search/:typeID', verifyToken, async function (req, res) {
+  res.json(await searchForModulesOfType(parseInt(req.params.typeID), req.body))
 })
 
 // Payments

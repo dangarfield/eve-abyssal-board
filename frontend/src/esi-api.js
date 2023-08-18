@@ -45,6 +45,7 @@ export const getCurrentUserModInventory = async () => {
 
   // .filter(i => i.item_id === 1037642882589)
   // .filter(i => i.item_id === 1039196810422)
+  // .filter(i => i.item_id === 1042529494917)
   // .filter(i => i.type_id === 49730)
 
   console.log('sde', sde)

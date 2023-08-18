@@ -204,7 +204,7 @@ const updateDerivedAttributes = (attributes, typeID) => {
   }
 
   if ([47769, 47773, 47777, 47842, 47844, 47846, 56307, 56308].includes(typeID)) {
-    addAttribute(attributes, 100001, 'derived', 'Armor repair per second', 1001, 84, true, 'getValue(84) / getValue(73)') // HP/s
+    addAttribute(attributes, 100001, 'derived', 'Armor repair per second', 1001, 84, true, '(getValue(84) / getValue(73)) * 1000') // HP/s
   }
 
   if ([47781, 47785, 47789, 47793, 56309, 56310].includes(typeID)) {
@@ -274,6 +274,7 @@ const getMutatorsAndSourcesForAbyssItem = (mutatorAttributes, types, typeDogmas,
   return { mutators, sources }
 }
 const updateMinMaxForAbyssItemAttributes = (attributes, mutators, sources) => {
+  // TODO - I don't think this is quite right, it doesn't show the complete min and max as available on mutaplasmid.space
   for (const attribute of attributes.filter(a => a.type !== 'derived')) {
     const sourceValues = Object.keys(sources).map(s => sources[s].attributes[attribute.id])
     const allSourcesMin = Math.min(...sourceValues)
@@ -300,6 +301,9 @@ const updateMinMaxForAbyssItemAttributes = (attributes, mutators, sources) => {
       for (const key in toAdd) {
         attribute[key] = toAdd[key]
       }
+    } else {
+      attribute.allMin = allSourcesMin
+      attribute.allMax = allSourcesMax
     }
   }
 }

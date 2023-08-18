@@ -3,7 +3,7 @@ import { getAppAuth, getAppConfig } from './config.js'
 import { nanoid } from 'nanoid'
 import { sendMail } from './eve-api.js'
 
-const INVENTORY_STATUS = { AWAITING_PAYMENT: 'AWAITING_PAYMENT', ON_SALE: 'ON_SALE', CANCELLED: 'CANCELLED', COMPLETE: 'COMPLETE', CONTRACT: 'CONTRACT' }
+export const INVENTORY_STATUS = { AWAITING_PAYMENT: 'AWAITING_PAYMENT', ON_SALE: 'ON_SALE', CANCELLED: 'CANCELLED', COMPLETE: 'COMPLETE', CONTRACT: 'CONTRACT' }
 // CONST APPRAISAL_STATUS = {AWAITING_APPRAISAL: 'AWAITING_APPRAISAL', COMPLETE:'COMPLETE'}
 export const PAYMENT_TYPES = { LISTING_FEE: 'LISTING_FEE' }
 export const initiateListingFlow = async (auth, inventoryItems) => {

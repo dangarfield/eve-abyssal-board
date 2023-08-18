@@ -261,7 +261,17 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
 
     for (const item of selectedInventoryToList) {
       if (item.listingPrice === 0) {
-        await showModalAlert('Error', '<p>Please ensure the listing prices are above zero</p>')
+        // document.querySelector(`.inventory-item[data-item-id="${item.itemID}"] .listing-price`).scrollIntoView()
+
+        // document.querySelector(`.inventory-item[data-item-id="${item.itemID}"] .listing-price`).focus()
+        document.querySelector(`.inventory-item[data-item-id="${item.itemID}"] .listing-price`).scrollIntoView({ behavior: 'instant' }) // Use 'instant' for immediate scroll
+        document.querySelector(`.inventory-item[data-item-id="${item.itemID}"] .listing-price`).focus()
+
+        console.log('FOCUS END') // TODO The above SHOULD be instant, but it's not for some reason
+        setTimeout(() => {
+          showModalAlert('Error', '<p>Please ensure the listing prices are above zero</p>')
+        }, 1000)
+
         return
       }
     }
@@ -292,6 +302,7 @@ const runBatches = async (promises, batchSize) => {
 }
 
 const updateAppraisals = async () => {
+  await getAppConfig() // Preloading appConfig
   const appraisalElements = [...document.querySelectorAll('.appraisal:not(.appraisal-complete)')]
   const appraisalPromises = appraisalElements.map(appraisalEle => async (batchID) => {
     const itemID = appraisalEle.getAttribute('data-item-id')

@@ -193,11 +193,11 @@ export const renderInventoryCard = (item) => {
                         <div class="p-0">${item.sourceTypeName} <span class="badge bg-secondary">${item.mutatorTypeName.split(' ')[0]}</span></div>
                     </div>
 
-                    <hr/>
+                    <hr class="my-2" />
                     ${dogmaHtml}
                     ${baseAttributeHtml}
                     ${derivedAttributeHtml}
-                    <hr />
+                    <hr class="my-2" />
                     ${appraisalHtml}
                     ${listingPriceHtml}
                 </div>

@@ -249,3 +249,19 @@ export const updatePayment = async (paymentId, update) => {
   console.log('updatePayment', res)
   return res
 }
+
+export const searchForModulesOfType = async (typeId, query) => {
+  const { accessToken } = getCurrentUserAccessToken()
+  const req = await window.fetch(`${API_ROOT}/api/search/${typeId}`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(query)
+  })
+  const res = await req.json()
+  console.log('searchTypes', res)
+  return res
+}

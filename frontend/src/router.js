@@ -5,6 +5,8 @@ import { triggerLoginFlow, triggerLoginReturnFlow } from './auth'
 import { initSellFlow } from './sell'
 import { initListModInventory } from './sell-inventory'
 import { initAdminJournal } from './admin-journal'
+import { displayBuyHome } from './buy'
+import { displayTypeSearch } from './buy-search'
 
 const tempRender = (text) => {
   let html = ''
@@ -53,45 +55,55 @@ const render404 = () => {
     `
   document.querySelector('.content').innerHTML = html
 }
+const routes = [
+  { path: '', handler: () => tempRender('home') },
+  { path: '/', handler: () => tempRender('home') },
+  { path: 'home', handler: () => tempRender('home') },
+  { path: '/login', handler: () => triggerLoginFlow() },
+  { path: '/login/return', handler: () => triggerLoginReturnFlow() },
+  { path: '/sell', handler: () => initSellFlow() },
+  { path: '/sell/inventory', handler: () => initListModInventory() },
+  { path: '/buy', handler: () => displayBuyHome() },
+  { path: '/buy/category/:categoryID', handler: (params) => displayTypeSearch(params.categoryID) },
+  { path: '/error', handler: () => renderError() },
+  { path: '/admin', handler: () => initAdmin() },
+  { path: '/admin/payments-pending', handler: () => initAdminPendingPayments() },
+  { path: '/admin/payments-complete', handler: () => initAdminCompletePayments() },
+  { path: '/admin/journal', handler: () => initAdminJournal() },
+  { path: '*', handler: () => render404() }
+]
+
 const updateContent = (route) => {
-  switch (route) {
-    case '': case '/': case 'home':
-      tempRender('home')
-      break
-    case '/login':
-      triggerLoginFlow()
-      break
-    case '/login/return': case '/login/return/':
-      triggerLoginReturnFlow()
-      break
-    case '/sell':
-      initSellFlow()
-      break
-    case '/sell/inventory':
-      initListModInventory()
-      break
-    case '/buy':
-      tempRender('buy')
-      break
-    case '/error':
-      renderError()
-      break
+  let matchedRoute = null
 
-    case '/admin':
-      initAdmin()
-      break
-    case '/admin/payments-pending':
-      initAdminPendingPayments()
-      break
-    case '/admin/payments-complete':
-      initAdminCompletePayments()
-      break
-    case '/admin/journal':
-      initAdminJournal()
-      break
+  for (const routeConfig of routes) {
+    const routeParts = route.split('/')
+    const pathParts = routeConfig.path.split('/')
 
-    default:
-      render404()
+    if (routeParts.length === pathParts.length) {
+      const params = {}
+      let isMatch = true
+
+      for (let i = 0; i < pathParts.length; i++) {
+        if (pathParts[i].startsWith(':')) {
+          const paramName = pathParts[i].substring(1)
+          params[paramName] = routeParts[i]
+        } else if (pathParts[i] !== routeParts[i]) {
+          isMatch = false
+          break
+        }
+      }
+
+      if (isMatch) {
+        routeConfig.handler(params)
+        matchedRoute = routeConfig
+        break
+      }
+    }
+  }
+
+  if (!matchedRoute) {
+    render404()
   }
 }
 

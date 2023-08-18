@@ -501,6 +501,7 @@ const copyDogmaAttributeImages = async (abyssalTypes) => {
   if (!fs.existsSync(imgPath)) fs.mkdirSync(imgPath)
 
   const iconIDSet = new Set()
+  const iconIDSetUpscale = new Set()
   for (const typeID in abyssalTypes) {
     for (const attribute of abyssalTypes[typeID].attributes) {
       iconIDSet.add(attribute.iconID)
@@ -510,22 +511,27 @@ const copyDogmaAttributeImages = async (abyssalTypes) => {
     for (const sourceID in abyssalTypes[typeID].sources) {
       const source = abyssalTypes[typeID].sources[sourceID]
       if (source.metaGroupIconID) {
-        iconIDSet.add(source.metaGroupIconID)
+        iconIDSetUpscale.add(source.metaGroupIconID)
       }
     }
-    // console.log('abyssalType', abyssalType)
   }
-  // console.log('iconIDSet', iconIDSet)
 
-  const dogmaAttributeImages = [...iconIDSet].map(iconID => {
-    // console.log('iconID', iconID)
-    return { iconID, from: iconIDs[iconID].iconFile.toLowerCase().replace('res:/ui/texture/icons/', './_data/Icons/items/'), to: `${imgPath}/${iconID}.png` }
-  })
   // console.log('dogmaAttributeImages', dogmaAttributeImages)
-  for (const dogmaAttributeImage of dogmaAttributeImages) {
-    fs.copyFileSync(dogmaAttributeImage.from, dogmaAttributeImage.to)
+  for (const iconID of [...iconIDSet]) {
+    const from = iconIDs[iconID].iconFile.toLowerCase().replace('res:/ui/texture/icons/', './_data/Icons/items/')
+    const to = `${imgPath}/${iconID}.png`
+    // console.log('iconID', iconID, from, to)
+    fs.copyFileSync(from, to)
   }
-  // console.log('copyDogmaAttributeImages', dogmaAttributeImages)
+
+  for (const iconID of [...iconIDSetUpscale]) {
+    const from = iconIDs[iconID].iconFile.toLowerCase().replace('res:/ui/texture/icons/', './_data/Icons/items/')
+    const to = `${imgPath}/${iconID}.png`
+    // console.log('iconID upscale', iconID, from, to)
+    // TODO - Find an upscaler that installs and works...
+    fs.copyFileSync(from, to)
+  }
+  console.log('copyDogmaAttributeImages END')
 }
 const init = async () => {
   await downloadAndUnzip(SDE_URL, './_data', 'sde')

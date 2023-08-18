@@ -282,17 +282,29 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
     window.location.assign('/sell')
   })
 }
+const runBatches = async (promises, batchSize) => {
+  for (let i = 0; i < promises.length; i += batchSize) {
+    const batch = promises.slice(i, i + batchSize)
+    // console.log('runBatches START', i)
+    await Promise.all(batch.map(promiseFn => promiseFn(i / batchSize)))
+    // console.log('runBatches END', i)
+  }
+}
+
 const updateAppraisals = async () => {
-  // console.log('start')
-  await Promise.all([...document.querySelectorAll('.appraisal:not(.appraisal-complete)')].map(async appraisalEle => {
+  const appraisalElements = [...document.querySelectorAll('.appraisal:not(.appraisal-complete)')]
+  const appraisalPromises = appraisalElements.map(appraisalEle => async (batchID) => {
     const itemID = appraisalEle.getAttribute('data-item-id')
-    const appraisal = await getAppraisalForItemId(itemID)
-    // console.log('appraisalEle', appraisalEle, itemID, appraisal)
-    appraisalEle.innerHTML = `<p>Value: ${appraisal.value} <i>(Confidence: ${appraisal.confidence})</></p>`
-    appraisalEle.parentNode.querySelector('.listing-price').value = validateListingPrice(appraisal.value)
-    return appraisalEle
-  }))
-  // console.log('end')
+    // console.log('itemID START', itemID, batchID)
+    const appraisal = await getAppraisalForItemId(itemID, batchID)
+    appraisalEle.innerHTML = `<p>Value: ${typeof appraisal.price === 'string' ? appraisal.price : formatToISKString(appraisal.price)} <i>(Confidence: ${appraisal.confidence})</></p>`
+    appraisalEle.parentNode.querySelector('.listing-price').value = typeof appraisal.price === 'string' ? 0 : formatToISKString(appraisal.price).replace(' ISK', '')
+    // console.log('itemID END', itemID)
+  })
+
+  await runBatches(appraisalPromises, 10)
+
+  // console.log('All appraisals have been processed.')
 }
 const validateListingPrice = (inputValue) => {
   const digitsString = inputValue.match(/[\d.]+/g)

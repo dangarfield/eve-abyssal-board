@@ -216,13 +216,11 @@ const updateDerivedAttributes = (attributes, typeID) => {
   }
 
   if ([49730, 49722, 49726, 49734].includes(typeID)) {
-    addAttribute(attributes, 100004, 'derived', 'DPS Bonus', 1003, 2893, true, '(((2-getValue(204))*getValue(64))-1)*100') // %
-    // addAttribute(attributes, 100004, 'derived', 'DPS Bonus A', 1003, 2893, true, '((getValue(64) * 1 / (1 - getValue(204) / 100)) - 1) * 100') // %
+    addAttribute(attributes, 100004, 'derived', 'DPS Bonus', 1003, 2893, true, '((getValue(64) / getValue(204)) -1)*100') // %
   }
 
   if ([49738].includes(typeID)) {
-    addAttribute(attributes, 100005, 'derived', 'DPS Bonus', 1003, 2893, true, '(((2 - getValue(204)) * getValue(213))-1)*100') // %
-  // addAttribute(attributes, 100005, 'derived', 'DPS Bonus B', 1003, 2893, true, '(((getValue(213) / 100 + 1) / (1 - (getValue(204) / 100))) - 1) * 100') // %
+    addAttribute(attributes, 100005, 'derived', 'DPS Bonus', 1003, 2893, true, '((getValue(213) / getValue(204)) -1)*100') // %
   }
 }
 const getDisplayGroupCategoryForAbyssItemType = (typeID) => {

@@ -1,6 +1,10 @@
 import { nanoid } from 'nanoid'
 import { getUnitStringForUnitId } from './module-types'
 
+export const sleep = (ms) => {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 export const loadData = () => {
   const dataString = window.localStorage.getItem('abyssal-board')
   if (dataString) {

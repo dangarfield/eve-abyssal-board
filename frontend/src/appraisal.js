@@ -1,30 +1,40 @@
-const getTextBetweenStrings = (mainString, startString, endString) => {
-  const startIndex = mainString.indexOf(startString)
-  if (startIndex === -1) return '' // Start string not found
-  const endIndex = mainString.indexOf(endString, startIndex + startString.length)
-  if (endIndex === -1) return '' // End string not found
-  return mainString.substring(startIndex + startString.length, endIndex)
-}
-const getValueAndConfidenceFromHtml = (text) => {
-  const appraisalText = getTextBetweenStrings(text, 'Estimated Value', 'Contract history')
-  const regex = /<dd>(.*?)<\/dd>/g
-  const matches = []
-  let match
-  while ((match = regex.exec(appraisalText)) !== null) {
-    matches.push(match[1].replace('(nan)', '').trim())
-    // console.log('match', match[1].trim())
+const predictionConfidence = (conf) => {
+  if (conf > 0.98) {
+    return 'Extremely high'
+  } else if (conf > 0.95) {
+    return 'Very high'
+  } else if (conf > 0.90) {
+    return 'High'
+  } else if (conf > 0.80) {
+    return 'Moderate'
+  } else if (conf > 0.70) {
+    return 'Low'
+  } else if (conf > 0.50) {
+    return 'Very low'
+  } else if (conf > 0.25) {
+    return 'Extremely low'
+  } else {
+    return 'Completely garbage'
   }
-  return { value: matches[0], confidence: matches[1] }
 }
-export const getAppraisalForItemId = async (itemID) => {
+
+export const getAppraisalForItemId = async (itemID, batchID) => {
   try {
+    const urls = [
+      `https://thingproxy.freeboard.io/fetch/https://mutaplasmid.space/api/modules/${itemID}/appraisal/`,
+      `https://api.allorigins.win/raw?url=https://mutaplasmid.space/api/modules/${itemID}/appraisal/`,
+      `https://corsproxy.io/?https://mutaplasmid.space/api/modules/${itemID}/appraisal/`
+    ]
     // For now, just use mutaplasmid.space appraisal
-    const req = await fetch(`https://thingproxy.freeboard.io/fetch/https://mutaplasmid.space/module/${itemID}/`)
-    const text = await req.text()
-    const appraisal = getValueAndConfidenceFromHtml(text)
-    // console.log('appraisal', appraisal)
-    return appraisal
+    const url = urls[batchID % urls.length]
+    const req = await fetch(url)
+
+    const res = await req.json()
+    // console.log('appraisal', itemID, batchID, url, res)
+    // TODO - Cache appraisals in localstorage etc
+
+    return { price: res.price, confidence: predictionConfidence(res.confidence) }
   } catch (error) {
-    return { value: 'Unavailable', confidence: 'Unavailable' }
+    return { price: 'Unavailable', confidence: 'Unavailable' }
   }
 }

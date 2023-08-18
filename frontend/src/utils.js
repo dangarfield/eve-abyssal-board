@@ -50,6 +50,7 @@ export const formatToISKString = (number) => {
 }
 export const calcValueForDisplay = (value, unitID) => {
   switch (unitID) {
+    case 101: return (value / 1000)
     case 109: return (value * 100) - 100
     case 111: return 100 - (value * 100)
     default: return value
@@ -57,9 +58,16 @@ export const calcValueForDisplay = (value, unitID) => {
 }
 
 export const formatForUnit = (value, unitID, addSign) => {
-  const unit = getUnitStringForUnitId(unitID)
+  let unit = getUnitStringForUnitId(unitID)
   let outputValue = ''
   switch (unitID) {
+    case 1:
+      outputValue = value > 0 ? (Math.floor(value) + '') : (Math.ceil(value) + '')
+      if (value > 10000) {
+        outputValue = (value / 1000).toFixed(2)
+        unit = 'km'
+      }
+      break
     case 124: outputValue = value.toFixed(1); break // % Maximum velocity bonus, Signature Radius Modifier
     case 109: case 104: outputValue = value.toFixed(3); break // x Damage Modifier
     // case 'GJ': outputValue = value.toFixed(1); break
@@ -73,7 +81,7 @@ export const formatForUnit = (value, unitID, addSign) => {
     default: outputValue = value.toFixed(2); break
   }
   const signValue = (addSign && !outputValue.includes('-')) ? '+' : ''
-  outputValue = outputValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',').replace(/\.0+$/, '')
+  outputValue = outputValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',').replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '')
   return `${signValue}${outputValue}${unit !== '' ? ` ${unit}` : ''}`
 }
 export const formatMilliseconds = (milliseconds) => {

@@ -272,7 +272,7 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
     console.log('paymentDetails', paymentDetails)
     await showModalAlert('Listing Payment Details', `
         <p class="mb-3">You will receive an ingame mail containing the payment information. It will also be available no your <a href="/sell">seller</a> page<p>
-        <p class="mb-3">In game, search for and right click on the <code>${paymentDetails.corpName}</code> corporation, then click 'Gigve Money'. Fill in the details as follows</p>
+        <p class="mb-3">In game, search for and right click on the <code>${paymentDetails.corpName}</code> corporation, then click 'Give Money'. Fill in the details as follows</p>
         <p class="ps-3 mb-0"><b>Account:</b> <code>${paymentDetails.account}</code></p>
         <p class="ps-3 mb-0"><b>Amount:</b> <code>${paymentDetails.amount}</code></p>
         <p class="ps-3 mb-3"><b>Reason:</b> <code>${paymentDetails.reason}</code></p>

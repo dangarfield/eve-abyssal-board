@@ -495,7 +495,7 @@ const populateRequiredData = async () => {
   return { abyssalTypes }
 }
 const copyDogmaAttributeImages = async (abyssalTypes) => {
-  const dogmaAttributes = yamlToJson('./_data/sde/fsd/dogmaAttributes.yaml')
+  // const dogmaAttributes = yamlToJson('./_data/sde/fsd/dogmaAttributes.yaml')
   const iconIDs = yamlToJson('./_data/sde/fsd/iconIDs.yaml')
   const imgPath = path.join('./frontend/_static/icons')
   if (!fs.existsSync(imgPath)) fs.mkdirSync(imgPath)

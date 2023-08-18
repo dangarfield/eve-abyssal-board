@@ -69,7 +69,8 @@ export const inventoryToInventoryCardDTO = (data) => {
       attribute.perc = Math.round(100 * (Math.abs(attribute.diff) / attribute.zeroDiff))
     }
   }
-  data.attributes.sort((a, b) => a.name.localeCompare(b.name))
+  data.attributes.sort((a, b) => a.name.localeCompare(b.name)) // TODO: There is a weird mechanic here (for Cap Battery, CPU is above Capacitor Bonus etc)
+
   data.baseAttributes = []
 
   data.typeName = abyssalTypeData.name

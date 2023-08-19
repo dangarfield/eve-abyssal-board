@@ -384,6 +384,7 @@ const displayPayments = async () => {
 }
 const displayInventory = async () => {
   const listedItems = (await getCurrentSellerInventory()).map(i => inventoryToInventoryCardDTO(i))
+  listedItems.sort((a, b) => a.typeName.localeCompare(b.typeName) || b.qualityScore - a.qualityScore)
   console.log('listedItems', listedItems)
   renderSellerListing(listedItems)
 }

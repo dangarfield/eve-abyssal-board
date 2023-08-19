@@ -174,7 +174,12 @@ export const renderInventoryCard = (item) => {
                     <div class="d-flex flex-row gap-2 align-items-center px-1">
                         <div class="p-0"><img src="https://images.evetech.net/types/${item.typeID}/icon?size=32"></div>
                         <div class="p-0">
-                            <p class="lead mb-0 type-name"><b>${item.typeName}</b></p>
+                            <p class="lead mb-0 type-name">
+                                <b>
+                                    ${item.typeName}
+                                    ${item.qualityScore !== undefined ? `<span class="badge bg-primary"><i class="bi bi-hand-thumbs-up-fill"></i> ${Math.round(item.qualityScore)}%</span>` : ''}
+                                </b>
+                            </p>
                             <span class="badge bg-secondary">${item.group}</span>
                             <span class="badge bg-secondary">${item.category}</span>
                             ${item.status !== 'NONE' ? `<span class="badge bg-primary">${getFriendlyStatus(item.status)}</span>` : ''}

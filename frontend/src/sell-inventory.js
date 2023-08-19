@@ -337,6 +337,8 @@ export const initListModInventory = async () => {
     renderInventoryPlaceholder(userDetails)
     console.log('Seller logged in, show available mods')
     const { inventory, cacheExpires, lastModified } = await getCurrentUserModInventory()
+    inventory.sort((a, b) => a.typeName.localeCompare(b.typeName) || b.qualityScore - a.qualityScore)
+
     renderAvailableInventory(inventory, cacheExpires, lastModified)
     if (inventory.length > 0) {
       bindInventoryActions(inventory, cacheExpires, lastModified)

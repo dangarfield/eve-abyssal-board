@@ -110,29 +110,9 @@ const bindSearchInteractions = () => {
 const updateResultsText = (text) => {
   document.querySelector('.results-text').innerHTML = text
 }
-const addQualityScoreToItem = (results) => {
-  // TODO - These are not weighted at all
-  for (const result of results) {
-    const qualityList = []
-    for (const attr of result.attributes) {
-      if (attr.allPerc !== undefined) {
-        const q = attr.allIsGood ? attr.allPerc : -attr.allPerc
-        qualityList.push(q)
-        // console.log('quality', result.itemID, attr.name, q)
-      } else {
-        const q = attr.isGood ? attr.perc : -attr.perc
-        qualityList.push(q)
-        // console.log('quality', result.itemID, attr.name, q)
-      }
-    }
-    const qualityScore = qualityList.reduce((sum, num) => sum + num, 0) / qualityList.length
-    // console.log('qualityList', result.itemID, qualityList, qualityScore)
-    result.qualityScore = qualityScore
-  }
-}
+
 const getInitialSearch = async () => {
   allResults = (await searchForModulesOfType(type.typeID, {})).map(r => inventoryToInventoryCardDTO(r))
-  addQualityScoreToItem(allResults)
 }
 
 const filterResults = (mainObjects, filteringObjects) => {

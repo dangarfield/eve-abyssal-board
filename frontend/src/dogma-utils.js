@@ -2,6 +2,26 @@ import { evaluate } from 'mathjs'
 import sde from './generated-data/sde.json'
 import { cloneSimpleList, deepCopy, calcValueForDisplay } from './utils'
 
+const addQualityScoreToItem = (item) => {
+  // TODO - These are not weighted at all
+
+  const qualityList = []
+  for (const attr of item.attributes) {
+    if (attr.allPerc !== undefined) {
+      const q = attr.allIsGood ? attr.allPerc : -attr.allPerc
+      qualityList.push(q)
+      // console.log('quality', result.itemID, attr.name, q)
+    } else {
+      const q = attr.isGood ? attr.perc : -attr.perc
+      qualityList.push(q)
+      // console.log('quality', result.itemID, attr.name, q)
+    }
+  }
+  const qualityScore = qualityList.reduce((sum, num) => sum + num, 0) / qualityList.length
+  // console.log('qualityList', result.itemID, qualityList, qualityScore)
+  item.qualityScore = qualityScore
+}
+
 export const inventoryToInventoryCardDTO = (data) => {
   const dataCopy = deepCopy(data)
   data.data = dataCopy
@@ -82,6 +102,7 @@ export const inventoryToInventoryCardDTO = (data) => {
 
   data.metaGroupName = source.metaGroupName
   data.metaGroupIconID = source.metaGroupIconID
+  addQualityScoreToItem(data)
   return data
 }
 

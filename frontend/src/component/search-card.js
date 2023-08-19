@@ -55,7 +55,7 @@ export const renderSearchCard = (type) => {
         <div class="d-flex flex-row gap-2 align-items-center px-1">
             <div class="p-0"><img class="search-source-img" src="https://images.evetech.net/types/${type.typeID}/icon?size=32" style="opacity:0;"></div>
             <div class="p-0">
-            <select class="form-select search-source">
+            <select class="form-select search-source my-1">
                 <option value="0" selected>Any base module</option>
                 ${Object.keys(type.sources).map(sourceTypeID => {
                     const source = type.sources[sourceTypeID]
@@ -68,7 +68,7 @@ export const renderSearchCard = (type) => {
         <hr class="my-2">
         ${dogmaHtml}
         <hr class="my-2">
-        <p class="px-1 text-center results-text">Waiting for results to load</p>
+        <p class="px-1 text-center results-text lead">Waiting for results to load</p>
     </div>
 </div>`
 }

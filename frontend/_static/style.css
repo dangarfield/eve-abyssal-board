@@ -104,6 +104,7 @@
 .search-attr-holder {
     position:relative;
     overflow: hidden;
+    height: 22px;
 }
 
 .search-attr-holder .form-range::-webkit-slider-runnable-track {

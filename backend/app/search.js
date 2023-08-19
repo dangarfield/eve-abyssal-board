@@ -1,5 +1,4 @@
 import { inventoryCollection } from './db'
-import { INVENTORY_STATUS } from './listing-flow'
 
 export const searchForModulesOfType = async (typeID, query) => {
   console.log('searchForModulesOfType', typeID, query)
@@ -16,21 +15,14 @@ export const searchForModulesOfType = async (typeID, query) => {
   if (query.source !== undefined) {
     andQuery.push({ sourceTypeID: query.source })
   }
-  //   const transformedArray = Object.keys(query).map(key => {
-  //     const attributeKey = `attributesRaw.${key}`
-  //     const { min, max } = query[key]
-  //     return {
-  //       [attributeKey]: { $gte: min, $lte: max }
-  //     }
-  //   })// .filter(q => q['attributesRaw.100003'])
-  //   const andQuery = [...[{ typeID, status: INVENTORY_STATUS.ON_SALE }], ...transformedArray]
-  //   const andQuery = [...[{ typeID }]]
   console.log('transformedArray', andQuery)
 
   const results = await inventoryCollection.find({
     $and: andQuery
   }).toArray()
+  for (const result of results) {
+    delete result._id
+  }
   console.log('results', results.length)
-
-  return { count: results.length, results }
+  return results
 }

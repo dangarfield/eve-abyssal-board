@@ -24,7 +24,6 @@ export const renderSearchCard = (type) => {
                     zeroDiff ${attr.allZeroDiff}<br/>
                     perc ${attr.allPerc}
                     -->
-                    ${attr.highIsGood}
                 </p>                    
                 <p class="m-0">
                     <b class=""><span class="search-attr-${attr.id}-display">${formatForUnit(calcValueForDisplay(attr.searchValue, attr.unitID), attr.unitID)}</span></b>

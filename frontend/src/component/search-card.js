@@ -1,8 +1,12 @@
-import { formatForUnit } from '../utils'
+import { calcValueForDisplay, formatForUnit } from '../utils'
 
 export const renderSearchCard = (type) => {
   const dogmaHtml = type.attributes.map(attr => {
-    // const dogmaUnit = getUnitForDogma(attr.unitID)
+    const plusMinusValue = ((calcValueForDisplay(attr.allMax, attr.unitID) - calcValueForDisplay(attr.allMin, attr.unitID)) / 100) * attr.range
+    const plusMinusDisplayValue = formatForUnit(plusMinusValue, attr.unitID)
+    // console.log('plusMinusDisplayValue', plusMinusValue, plusMinusDisplayValue, attr.allMax, attr.allMin)
+
+    // TODO - Ensure the slider direction is correct with highIsGood
     return `
         <div class="d-flex flex-row gap-2 align-items-center px-1">
             <div class="p-0"><img src="/icons/${attr.iconID}.png" width="32" height="32"></div>
@@ -20,10 +24,11 @@ export const renderSearchCard = (type) => {
                     zeroDiff ${attr.allZeroDiff}<br/>
                     perc ${attr.allPerc}
                     -->
+                    ${attr.highIsGood}
                 </p>                    
                 <p class="m-0">
-                    <b class=""><span class="search-attr-${attr.id}-display">${formatForUnit(attr.searchValue, attr.unitID)}</span></b>
-                    <b class="px-2"><span class="search-attr-${attr.id}-range-display text-primary">± ${formatForUnit(((attr.allMax - attr.allMin) / 100) * attr.range, attr.unitID)}</span></b>
+                    <b class=""><span class="search-attr-${attr.id}-display">${formatForUnit(calcValueForDisplay(attr.searchValue, attr.unitID), attr.unitID)}</span></b>
+                    <b class="px-2"><span class="search-attr-${attr.id}-range-display text-primary">± ${plusMinusDisplayValue}</span></b>
                 </p>
 
             </div>
@@ -33,7 +38,7 @@ export const renderSearchCard = (type) => {
                 <div class="search-attr-holder">
                     <span class="bg-track"></span>
                     <span class="bg-selected search-attr-${attr.id}-range"></span>
-                    <input type="range" class="form-range search-attr" data-search-attr-id="${attr.id}" min="${attr.allMin}" max="${attr.allMax}" step="any" value="${attr.allComparisonZero}">    
+                    <input type="range" class="form-range search-attr${attr.highIsGood ? '' : ' reverse'}" data-search-attr-id="${attr.id}" min="${attr.allMin}" max="${attr.allMax}" step="any" value="${attr.allComparisonZero}">    
                 </div>
             </div>
         </div>`

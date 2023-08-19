@@ -1,9 +1,9 @@
 import { getCurrentUserAccessToken, fetchWithRetry } from './auth'
 import { loadData } from './utils'
 
-const API_ROOT = ''// 'http://localhost:3001'
+const API_ROOT = ''
 let appConfig
-// Example usage:
+
 export const getCurrentSellerInventory = async () => {
   const { characterId } = getCurrentUserAccessToken()
   return getSellerInventory(characterId)
@@ -49,6 +49,84 @@ export const getAppConfig = async (forceRefresh) => {
   console.log('appConfig', appConfig)
   return appConfig
 }
+
+export const initiateListingFlow = async (inventoryItems) => {
+  const { accessToken } = getCurrentUserAccessToken()
+  const url = `${API_ROOT}/api/listing`
+  const res = await fetchWithRetry(url, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(inventoryItems)
+  })
+  console.log('initialListing res', res)
+  return res
+}
+export const cancelListing = async (itemID) => {
+  const { accessToken } = getCurrentUserAccessToken()
+  const url = `${API_ROOT}/api/listing/${itemID}`
+
+  const res = await fetchWithRetry(url, {
+    method: 'DELETE',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+  console.log('cancelListing res', res)
+  return res
+}
+export const amendListing = async (itemID, amend) => {
+  const { accessToken } = getCurrentUserAccessToken()
+  const url = `${API_ROOT}/api/listing/${itemID}`
+
+  const res = await fetchWithRetry(url, {
+    method: 'PATCH',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(amend)
+  })
+  console.log('amendListing res', res)
+  return res
+}
+
+export const searchForModulesOfType = async (typeId, query) => {
+  const { accessToken } = getCurrentUserAccessToken()
+  const res = await fetchWithRetry(`${API_ROOT}/api/search/${typeId}`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(query)
+  })
+  console.log('searchTypes', res)
+  return res
+}
+
+// ADMIN FUNCTIONS
+export const getAppAuth = async () => {
+  const data = loadData()
+  const req = await window.fetch(`${API_ROOT}/api/app-auth`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `${data['admin-password']}`
+    }
+  })
+  const appAuth = await req.json()
+  console.log('getAppAuth', appAuth)
+  return appAuth
+}
 export const getAppConfigAdmin = async () => {
   const data = loadData()
   const req = await window.fetch(`${API_ROOT}/api/app-config/admin`, {
@@ -75,71 +153,6 @@ export const setAppConfig = async (newAppConfig) => {
     body: JSON.stringify(newAppConfig)
   })
   appConfig = await req.json()
-}
-export const getAppAuth = async () => {
-  const data = loadData()
-  const req = await window.fetch(`${API_ROOT}/api/app-auth`, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json, text/plain, */*',
-      'Content-Type': 'application/json',
-      Authorization: `${data['admin-password']}`
-    }
-  })
-  const appAuth = await req.json()
-  console.log('getAppAuth', appAuth)
-  return appAuth
-}
-
-export const initiateListingFlow = async (inventoryItems) => {
-  const { accessToken } = getCurrentUserAccessToken()
-  const url = `${API_ROOT}/api/listing`
-
-  const req = await window.fetch(url, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json, text/plain, */*',
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`
-    },
-    body: JSON.stringify(inventoryItems)
-  })
-  const res = await req.json()
-  console.log('initialListing res', res)
-  return res
-}
-export const cancelListing = async (itemID) => {
-  const { accessToken } = getCurrentUserAccessToken()
-  const url = `${API_ROOT}/api/listing/${itemID}`
-
-  const req = await window.fetch(url, {
-    method: 'DELETE',
-    headers: {
-      Accept: 'application/json, text/plain, */*',
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`
-    }
-  })
-  const res = await req.json()
-  console.log('cancelListing res', res)
-  return res
-}
-export const amendListing = async (itemID, amend) => {
-  const { accessToken } = getCurrentUserAccessToken()
-  const url = `${API_ROOT}/api/listing/${itemID}`
-
-  const req = await window.fetch(url, {
-    method: 'PATCH',
-    headers: {
-      Accept: 'application/json, text/plain, */*',
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`
-    },
-    body: JSON.stringify(amend)
-  })
-  const res = await req.json()
-  console.log('amendListing res', res)
-  return res
 }
 export const getSSOAdminLoginUrl = async () => {
   const data = loadData()
@@ -247,21 +260,5 @@ export const updatePayment = async (paymentId, update) => {
   })
   const res = await req.json()
   console.log('updatePayment', res)
-  return res
-}
-
-export const searchForModulesOfType = async (typeId, query) => {
-  const { accessToken } = getCurrentUserAccessToken()
-  const req = await window.fetch(`${API_ROOT}/api/search/${typeId}`, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json, text/plain, */*',
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`
-    },
-    body: JSON.stringify(query)
-  })
-  const res = await req.json()
-  console.log('searchTypes', res)
   return res
 }

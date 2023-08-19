@@ -108,8 +108,12 @@
 }
 
 .search-attr-holder .form-range::-webkit-slider-runnable-track {
-    background-color: transparent !important; /* Hide the thumb background */
-  }
+    background-color: transparent !important;
+}
+.search-attr-holder .form-range.reverse {
+    direction: rtl;
+    /* transform: scaleX(-1); */
+}
 .search-attr-holder .bg-track {
     height:8px;
     position:absolute;

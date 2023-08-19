@@ -1,6 +1,6 @@
 import sde from './generated-data/sde.json'
 import { renderSearchCard } from './component/search-card'
-import { formatForUnit } from './utils'
+import { calcValueForDisplay, formatForUnit } from './utils'
 import { searchForModulesOfType } from './board-api'
 import { renderInventoryCard } from './component/inventory-card'
 import { inventoryToInventoryCardDTO } from './dogma-utils'
@@ -70,25 +70,39 @@ const bindSearchInteractions = () => {
     })
     searchAttrEle.addEventListener('input', () => {
       const value = parseFloat(searchAttrEle.value)
-      const displayValue = formatForUnit(value, attr.unitID)
-
+      const displayValue = formatForUnit(calcValueForDisplay(value, attr.unitID), attr.unitID)
       const percentage = (100 * ((value - attr.allMin) / (attr.allMax - attr.allMin))) - attr.range
       //   console.log('searchAttrEle VALUE', attr.name, attr.id, value, displayValue, percentage)
-      displayValueEle.innerHTML = displayValue
-      rangeEle.style.left = `${percentage}%`
-    })
 
+      displayValueEle.innerHTML = displayValue
+      if (attr.highIsGood) {
+        rangeEle.style.right = 'inherit'
+        rangeEle.style.left = `${percentage}%`
+      } else {
+        rangeEle.style.left = 'inherit'
+        rangeEle.style.right = `${percentage}%`
+      }
+    })
+    const percentage = (100 * ((searchAttrEle.value - attr.allMin) / (attr.allMax - attr.allMin))) - attr.range
+    if (attr.highIsGood) {
+      rangeEle.style.right = 'inherit'
+      rangeEle.style.left = `${percentage}%`
+    } else {
+      rangeEle.style.left = 'inherit'
+      rangeEle.style.right = `${percentage}%`
+    }
     searchAttrEle.addEventListener('mousedown', event => {
       const sliderRect = searchAttrEle.getBoundingClientRect()
       const sliderWidth = sliderRect.width
-      const offsetX = event.clientX - sliderRect.left
-
+      let offsetX = event.clientX - sliderRect.left
+      if (!attr.highIsGood) offsetX = sliderWidth - offsetX
       const min = parseFloat(searchAttrEle.min)
       const max = parseFloat(searchAttrEle.max)
       const value = parseFloat(searchAttrEle.value)
 
       const thumbPosition = (value - min) / (max - min) * sliderWidth
 
+      console.log('mousedown', offsetX, thumbPosition, sliderWidth)
       if (Math.abs(offsetX - thumbPosition) <= 10) {
         // console.log('Mousedown on the thumb', value)
       } else {
@@ -100,8 +114,19 @@ const bindSearchInteractions = () => {
         // console.log('Mousedown on the track', value, thumbPosition, sliderWidth, thumbPerc, perc, diff)
         attr.range = diff * 100
         rangeEle.style.width = `${diff * 200}%`
-        rangeEle.style.left = `${(thumbPerc * 100) - (diff * 100)}%`
-        rangeDisplayEle.innerHTML = `± ${formatForUnit(((attr.allMax - attr.allMin) / 100) * attr.range, attr.unitID)}`
+
+        const totalPerc = (thumbPerc * 100) - (diff * 100)
+        if (attr.highIsGood) {
+          rangeEle.style.right = 'inherit'
+          rangeEle.style.left = `${totalPerc}%`
+        } else {
+          rangeEle.style.left = 'inherit'
+          rangeEle.style.right = `${totalPerc}%`
+        }
+
+        const plusMinusValue = ((calcValueForDisplay(attr.allMax, attr.unitID) - calcValueForDisplay(attr.allMin, attr.unitID)) / 100) * attr.range
+        const plusMinusDisplayValue = formatForUnit(plusMinusValue, attr.unitID)
+        rangeDisplayEle.innerHTML = `± ${plusMinusDisplayValue}`
         triggerSearch()
       }
     })

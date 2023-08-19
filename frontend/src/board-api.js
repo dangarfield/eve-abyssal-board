@@ -98,13 +98,11 @@ export const amendListing = async (itemID, amend) => {
 }
 
 export const searchForModulesOfType = async (typeId, query) => {
-  const { accessToken } = getCurrentUserAccessToken()
   const res = await fetchWithRetry(`${API_ROOT}/api/search/${typeId}`, {
     method: 'POST',
     headers: {
       Accept: 'application/json, text/plain, */*',
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify(query)
   })

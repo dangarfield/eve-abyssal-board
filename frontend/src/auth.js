@@ -19,14 +19,17 @@ const sso = createSSO(ssoConfig)
 
 export const triggerLoginFlow = async (useScopes) => {
   console.log('triggerLoginFlow useScopes', useScopes)
-  await showModalAlert('EVE Online SSO', `
-  <p>We only ask for one permission when signing in as a buyer:</p>
-  <ul>
-    <li><code>esi-ui.open_window.v1</code> - We can quickly create an EVE mail draft for you with your an in game link to your chosen module and the sellers' contact details</li>
-  </ul>
-  <p><i>Note: No information is sent or used by Abyssal Board.
-    This includes refresh tokens. They are all persisted in your browser and not on any Abyss Board servers. We have no way of refreshing your tokens ourselves.</i></p>
-  `)
+  if (!useScopes) {
+    await showModalAlert('EVE Online SSO', `
+    <p>We only ask for one permission when signing in as a buyer:</p>
+    <ul>
+      <li><code>esi-ui.open_window.v1</code> - We can quickly create an EVE mail draft for you with your an in game link to your chosen module and the sellers' contact details</li>
+    </ul>
+    <p><i>Note: No information is sent or used by Abyssal Board.
+      This includes refresh tokens. They are all persisted in your browser and not on any Abyss Board servers. We have no way of refreshing your tokens ourselves.</i></p>
+    `)
+  }
+
   saveData('returnUrl', window.location.href)
   clearData('codeVerifier')
 
@@ -120,7 +123,8 @@ export const doesCurrentCharacterHaveSellerScope = () => {
   const data = loadData()
   const characterId = data.selectedCharacter
   if (characterId === undefined) return false
-  const scopes = data[`token-${characterId}`].payload.scp
+  let scopes = data[`token-${characterId}`].payload.scp
+  if (!Array.isArray(scopes)) scopes = [scopes]
   if (scopes && areListsEqual(scopes, SELLER_SCOPES)) {
     return true
   } else {

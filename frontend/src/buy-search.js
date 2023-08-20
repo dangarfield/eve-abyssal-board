@@ -1,11 +1,12 @@
 import sde from './generated-data/sde.json'
 import { renderSearchCard } from './component/search-card'
-import { calcValueForDisplay, formatForUnit, showModalAlert } from './utils'
+import { calcValueForDisplay, formatForUnit, formatToISKString, showModalAlert } from './utils'
 import { getAppConfig, searchForModulesOfType } from './board-api'
 import { renderInventoryCard } from './component/inventory-card'
 import { inventoryToInventoryCardDTO } from './dogma-utils'
 import { getAbyssModuleTypes } from './module-types'
 import { getCurrentUserDetails } from './auth'
+import { openBuyerToSellerDraftEVEMail } from './esi-api'
 
 let type
 let allResults
@@ -209,8 +210,8 @@ const triggerSearch = async () => {
       console.log('currentUserDetails', currentUserDetails)
       const appConfig = await getAppConfig()
       console.log('getAppConfig', appConfig)
-      const discordText = `<p>This seller is known on the <a href="${appConfig.discordUrl}">Abyssal Trade Discord Board</a> as <code>TBC</code></p>`
-      const inGameText = currentUserDetails ? '<p>Click below to open an EVE mail to communicate with the seller</p>' : '<p>If you login we can help by create an EVE mail draft with a link to the item</p>'
+      const discordText = result.discordName ? `<p>This seller is known on the <a href="${appConfig.discordUrl}" target="_blank">Abyssal Trade Discord Board</a> as <code>${result.discordName}</code></p>` : ''
+      const inGameText = currentUserDetails ? '<p>Click below to open an EVE mail to communicate with the seller</p>' : '<p>If you login we can help by creating an EVE mail draft with a link to the seller and item</p>'
       const actions = []
       if (currentUserDetails) {
         actions.push({
@@ -218,6 +219,9 @@ const triggerSearch = async () => {
           style: 'btn-primary',
           cb: async () => {
             console.log('callback')
+            await openBuyerToSellerDraftEVEMail(result.typeID, result.itemID, result.typeName, formatToISKString(result.listingPrice), result.characterName, result.characterId)
+            console.log('opened')
+            document.querySelector('.btn-close').click()
           }
         })
       }

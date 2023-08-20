@@ -1,5 +1,5 @@
 import { doesCurrentCharacterHaveSellerScope, getCurrentUserDetails, triggerLoginFlow } from './auth'
-import { amendListing, cancelListing, getAppConfig, getCurrentSellerInventory, getCurrentSellerPayments } from './board-api'
+import { amendListing, cancelListing, getAppConfig, getCurrentSellerInventory, getCurrentSellerPayments, getCurrentSellerData, setCurrentSellerData } from './board-api'
 import { renderInventoryCard } from './component/inventory-card'
 import { inventoryToInventoryCardDTO } from './dogma-utils'
 import { formatToISKString, listingPriceStringToInt, showModalAlert } from './utils'
@@ -30,8 +30,7 @@ const askForSellerScopePermission = () => {
                     </ul>
 
                     <p><i>Note: No information is sent or used by Abyssal Board other than identifying and validating the items for sale.
-                    This includes refresh tokens. They are all persisted in your browser and not on any Abyss Board servers. We have no way of refreshing your tokens ourselves.
-                    All source code is available.</a></p>
+                    This includes refresh tokens. They are all persisted in your browser and not on any Abyss Board servers. We have no way of refreshing your tokens ourselves.</i></p>
                 </div>
             </div>
         </div>
@@ -54,6 +53,8 @@ const renderSellerPlaceholder = (userDetails) => {
                     <a href="/sell/inventory" class="btn btn-primary align-self-center" type="button"><i class="bi bi-plus-lg"></i> Add new mod listings</a>
                 </div>
             </div>
+        </div>
+        <div class="settings-content">
         </div>
         <div class="payment-content">
         </div>
@@ -266,7 +267,7 @@ const renderPaymentsListing = (payments, appConfig) => {
         <div class="col-12">
             <h4>Outstanding Payments</h4>
             <p>Payments should be made in game to <code>${appConfig.corpName}</code>. Right click, give ISK. Always pay into the <code>${appConfig.corpDivisionName}</code> account with the reason shown below.</p>
-            <p>Any issues? Contact us on discord. <i><b>Note:</b> Payments take up to 1 hour to be registered</i></p>
+            <p>Any issues? Contact us on <a href="${appConfig.discordUrl}" target="_blank">discord</a>. <i><b>Note:</b> Payments take up to 1 hour to be registered</i></p>
         </div>
     </div>`
 
@@ -388,12 +389,49 @@ const displayInventory = async () => {
   console.log('listedItems', listedItems)
   renderSellerListing(listedItems)
 }
+const renderSellerSettings = async (sellerData) => {
+  const appConfig = await getAppConfig()
+  let html = ''
+  html += `
+    <div class="row">
+      <div class="col-12">
+          <h4>Seller Settings</h4>
+          <p>Buyers will be shown your EVE details, but to make it even easier and quicker, join <a href="${appConfig.discordUrl}" target="_blank">Abyss Trading Discord</a>. By adding your username below, buyers can negotiate with you more directly</p>
+      </div>
+    </div>
+    <form class="seller-settings mb-4">
+    <div class="row mb-3">
+      <label for="discord-name" class="col-sm-2 col-form-label">Discord Name</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control discord-name" id="discord-name" value="${sellerData.discordName}">
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary text-end">Save Settings</button>
+  </form>
+`
+  document.querySelector('.settings-content').innerHTML = html
+
+  document.querySelector('.seller-settings').addEventListener('submit', async (event) => {
+    event.preventDefault()
+    const discordName = document.querySelector('.discord-name').value
+    console.log('discordName', discordName)
+    await setCurrentSellerData({ discordName })
+    showModalAlert('Success', 'Settings saved')
+  })
+}
+const displaySellerSettings = async () => {
+  const sellerData = await getCurrentSellerData()
+  if (sellerData.discordName === undefined) sellerData.discordName = ''
+  console.log('sellerData', sellerData)
+  renderSellerSettings(sellerData)
+}
 export const initSellFlow = async () => {
   if (doesCurrentCharacterHaveSellerScope()) {
     const userDetails = getCurrentUserDetails()
     renderSellerPlaceholder(userDetails)
     console.log('Seller logged in, show sell page')
-    await Promise.all([displayPayments(), displayInventory()])
+    await getAppConfig()
+    await Promise.all([displaySellerSettings(), displayPayments(), displayInventory()])
   } else {
     console.log('No seller scope')
     askForSellerScopePermission()

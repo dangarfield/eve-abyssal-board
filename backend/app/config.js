@@ -6,7 +6,7 @@ const ID_APP_AUTH = 'authConfig'
 const appConfigDefault = {
   _id: ID_APP_CONFIG,
   listingPrice: 30000000,
-  discordUrl: 'http://discord/asfdsadsad',
+  discordUrl: 'https://discord.gg/PfecDHkBRP',
   corpDivisionId: 2, // Private
   corpDivisionName: 'Abyss Board Payments'
 }

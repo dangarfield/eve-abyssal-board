@@ -5,12 +5,12 @@ const API_ROOT = ''
 let appConfig
 
 export const getCurrentSellerInventory = async () => {
-  const { characterId } = getCurrentUserAccessToken()
+  const { characterId } = await getCurrentUserAccessToken()
   return getSellerInventory(characterId)
 }
 export const getSellerInventory = async (characterId) => {
-  const { accessToken } = getCurrentUserAccessToken()
-  const url = `${API_ROOT}/api/seller/${characterId}/inventory`
+  const { accessToken } = await getCurrentUserAccessToken()
+  const url = `${API_ROOT}/api/sellers/${characterId}/inventory`
 
   const res = await fetchWithRetry(url, {
     method: 'GET',
@@ -24,8 +24,8 @@ export const getSellerInventory = async (characterId) => {
   return res
 }
 export const getCurrentSellerPayments = async () => {
-  const { accessToken } = getCurrentUserAccessToken()
-  const url = `${API_ROOT}/api/seller/@me/payments`
+  const { accessToken } = await getCurrentUserAccessToken()
+  const url = `${API_ROOT}/api/sellers/@me/payments`
   const res = await fetchWithRetry(url, {
     method: 'GET',
     headers: {
@@ -40,7 +40,33 @@ export const getCurrentSellerPayments = async () => {
   res.sort((a, b) => b.creationDate - a.creationDate)
   return res
 }
-
+export const getCurrentSellerData = async () => {
+  const { accessToken } = await getCurrentUserAccessToken()
+  const url = `${API_ROOT}/api/sellers/@me`
+  const res = await fetchWithRetry(url, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+  return res
+}
+export const setCurrentSellerData = async (data) => {
+  const { accessToken } = await getCurrentUserAccessToken()
+  const url = `${API_ROOT}/api/sellers/@me`
+  const res = await fetchWithRetry(url, {
+    method: 'PATCH',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(data)
+  })
+  return res
+}
 export const getAppConfig = async (forceRefresh) => {
   if (appConfig !== undefined && !forceRefresh) return appConfig
   const req = await window.fetch(`${API_ROOT}/api/app-config`)
@@ -51,7 +77,7 @@ export const getAppConfig = async (forceRefresh) => {
 }
 
 export const initiateListingFlow = async (inventoryItems) => {
-  const { accessToken } = getCurrentUserAccessToken()
+  const { accessToken } = await getCurrentUserAccessToken()
   const url = `${API_ROOT}/api/listing`
   const res = await fetchWithRetry(url, {
     method: 'POST',
@@ -66,7 +92,7 @@ export const initiateListingFlow = async (inventoryItems) => {
   return res
 }
 export const cancelListing = async (itemID) => {
-  const { accessToken } = getCurrentUserAccessToken()
+  const { accessToken } = await getCurrentUserAccessToken()
   const url = `${API_ROOT}/api/listing/${itemID}`
 
   const res = await fetchWithRetry(url, {
@@ -81,7 +107,7 @@ export const cancelListing = async (itemID) => {
   return res
 }
 export const amendListing = async (itemID, amend) => {
-  const { accessToken } = getCurrentUserAccessToken()
+  const { accessToken } = await getCurrentUserAccessToken()
   const url = `${API_ROOT}/api/listing/${itemID}`
 
   const res = await fetchWithRetry(url, {

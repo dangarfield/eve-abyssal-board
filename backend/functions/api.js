@@ -12,13 +12,21 @@ import { setSellerData, getSellerData } from '../app/sellers'
 const app = API()
 
 // Seller Pages
-app.get('/api/seller/:characterId/inventory', verifyToken, async function (req, res) {
+app.get('/api/sellers/:characterId/inventory', verifyToken, async function (req, res) {
   console.log('/api/seller/:characterId/inventory', req.params.characterId, 'auth', req.auth.characterId, req.auth.characterName)
   res.json(await getSellerInventory(parseInt(req.auth.characterId), parseInt(req.params.characterId)))
 })
-app.get('/api/seller/@me/payments', verifyToken, async function (req, res) {
+app.get('/api/sellers/@me/payments', verifyToken, async function (req, res) {
   console.log('/api/seller/@me/payments', req.params.characterId, 'auth', req.auth.characterId, req.auth.characterName)
   res.json(await getSellerPayments(parseInt(req.auth.characterId)))
+})
+app.get('/api/sellers/@me', verifyToken, async function (req, res) {
+  console.log('/api/seller/@me', req.params.characterId, 'auth', req.auth.characterId, req.auth.characterName)
+  res.json(await getSellerData(parseInt(req.auth.characterId)))
+})
+app.patch('/api/sellers/@me', verifyToken, async function (req, res) {
+  console.log('/api/seller/@me', req.params.characterId, 'auth', req.auth.characterId, req.auth.characterName)
+  res.json(await setSellerData(parseInt(req.auth.characterId), req.body))
 })
 
 // App Config
@@ -51,10 +59,10 @@ app.post('/api/search/:typeID', async function (req, res) {
 })
 
 // Sellers
-app.get('/api/seller/:sellerID', async function (req, res) {
+app.get('/api/sellers/:sellerID', async function (req, res) {
   res.json(await getSellerData(parseInt(req.params.sellerID)))
 })
-app.post('/api/seller/:sellerID', async function (req, res) {
+app.post('/api/sellers/:sellerID', async function (req, res) {
   res.json(await setSellerData(parseInt(req.params.sellerID), req.body))
 })
 

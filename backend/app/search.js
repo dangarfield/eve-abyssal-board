@@ -17,12 +17,23 @@ export const searchForModulesOfType = async (typeID, query) => {
   }
   console.log('transformedArray', andQuery)
 
-  const results = await inventoryCollection.find({
-    $and: andQuery
-  }).toArray()
+  const results = await inventoryCollection.aggregate([
+    { $match: { $and: andQuery } },
+    {
+      $lookup: {
+        from: 'sellers',
+        localField: 'characterId',
+        foreignField: '_id',
+        as: 'sellerInfo'
+      }
+    },
+    { $unwind: { path: '$sellerInfo', preserveNullAndEmptyArrays: true } },
+    { $addFields: { discordName: '$sellerInfo.discordName' } }
+  ]).toArray()
+
   for (const result of results) {
     delete result._id
   }
-  console.log('results', results.length)
+  console.log('results', results, results.length)
   return results
 }

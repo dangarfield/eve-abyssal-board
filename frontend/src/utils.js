@@ -27,6 +27,9 @@ export const clearData = (key) => {
   const newDataString = JSON.stringify(existingData)
   window.localStorage.setItem('abyssal-board', newDataString)
 }
+export const clearAllData = () => {
+  window.localStorage.removeItem('abyssal-board')
+}
 
 export const listingPriceStringToInt = (inputValue) => {
   const digitsString = inputValue.match(/[\d.]+/g)

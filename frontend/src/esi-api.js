@@ -9,7 +9,7 @@ const esi = new Api()
 
 // TODO - Move a lot of this to dogma-utils.js etc
 export const getCurrentUserModInventory = async () => {
-  let { characterId, accessToken } = getCurrentUserAccessToken()
+  let { characterId, accessToken } = await getCurrentUserAccessToken()
 
   let maxPage = 1
   let pagesFetched = 0
@@ -33,7 +33,7 @@ export const getCurrentUserModInventory = async () => {
     } catch (error) {
       console.log('res.error', error)
       await refreshTokenAndGetNewUserAccessToken()
-      const userDetails = getCurrentUserAccessToken()
+      const userDetails = await getCurrentUserAccessToken()
       accessToken = userDetails.accessToken
     }
   } while (pagesFetched < maxPage)
@@ -92,3 +92,19 @@ export const getCorpForChar = async (characterId, accessToken) => {
 }
 // List of modules
 // https://github.com/stephenswat/eve-abyssal-market/blob/master/abyssal_modules/models/modules.py
+
+export const openBuyerToSellerDraftEVEMail = async (moduleTypeID, moduleID, moduleName, price, sellerName, sellerID) => {
+  const { accessToken } = await getCurrentUserAccessToken()
+  console.log('openBuyerToSellerDraftEVEMail', moduleID, moduleName, price, sellerName, sellerID)
+  const result = await esi.ui.postUiOpenwindowNewmail({
+    // body: `body - ID ${moduleID} - Name ${moduleName} - Price ${price} -> Buyer: ${sellerName} ${sellerID}`,
+    body: `<font size="14" color="#bfffffff">Hi <font size="14" color="#ffd98d00"><a href="showinfo:1376//${sellerID}">${sellerName}</a></font>,<br><br>
+I saw your module on Abyss Board: <font size="14" color="#ffd98d00"><a href="showinfo:${moduleTypeID}//${moduleID}">${moduleName}</a></font><br><br>
+I'm interested in making an offer, would you accept:<br><br>
+${price} <br><br>
+Thanks!</font>`.replace(/\n/g, ''),
+    recipients: [sellerID],
+    subject: `Abyss Board - Offer - ${moduleName}`
+  }, { token: accessToken })
+  console.log('openBuyerToSellerDraftEVEMail', result)
+}

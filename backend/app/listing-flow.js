@@ -57,7 +57,7 @@ Fill in the details as follows:<br><br>
 <b>Reason</b>: ${paymentItem._id}<br><br><br>
 Please be careful to fill this information in carefully.<br>
 It may take up to 1 hour for the transation to be registered and your items listed.<br><br>
-For any specific questions, contact us on </font><font size="14" color="#ffffe400"><loc><a href="${appConfig.discordUrl}">discord</a></loc></font><font size="14" color="#bfffffff">.<br><br>
+For any specific questions, contact us on </font><font size="14" color="#ffffe400"><loc><a href="${appConfig.discordUrl}" target="_blank">discord</a></loc></font><font size="14" color="#bfffffff">.<br><br>
 Thanks</font>`.replace(/\n/g, '')
   await sendMail(auth.characterId, 'Abyss Board Listing Fee', body)
 

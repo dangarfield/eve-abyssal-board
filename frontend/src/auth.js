@@ -1,7 +1,8 @@
-import { loadData, saveData, clearData } from './utils'
+import { loadData, saveData, clearData, showModalAlert } from './utils'
 import { createSSO } from 'eve-sso-pkce'
 
-const SELLER_SCOPES = 'publicData esi-assets.read_assets.v1'.split(' ')
+const SELLER_SCOPES = 'publicData esi-assets.read_assets.v1 esi-ui.open_window.v1'.split(' ')
+const BUYER_SCOPES = ['esi-ui.open_window.v1']// .split(' ')
 
 const ssoConfig = window.location.href.includes('localhost')
   ? {
@@ -18,6 +19,14 @@ const sso = createSSO(ssoConfig)
 
 export const triggerLoginFlow = async (useScopes) => {
   console.log('triggerLoginFlow useScopes', useScopes)
+  await showModalAlert('EVE Online SSO', `
+  <p>We only ask for one permission when signing in as a buyer:</p>
+  <ul>
+    <li><code>esi-ui.open_window.v1</code> - We can quickly create an EVE mail draft for you with your an in game link to your chosen module and the sellers' contact details</li>
+  </ul>
+  <p><i>Note: No information is sent or used by Abyssal Board.
+    This includes refresh tokens. They are all persisted in your browser and not on any Abyss Board servers. We have no way of refreshing your tokens ourselves.</i></p>
+  `)
   saveData('returnUrl', window.location.href)
   clearData('codeVerifier')
 
@@ -25,7 +34,7 @@ export const triggerLoginFlow = async (useScopes) => {
   if (useScopes) {
     ssoUri = await sso.getUri(SELLER_SCOPES)
   } else {
-    ssoUri = await sso.getUri()
+    ssoUri = await sso.getUri(BUYER_SCOPES)
   }
   saveData('codeVerifier', ssoUri.codeVerifier)
   console.log('ssoUri', ssoUri)
@@ -65,12 +74,20 @@ export const getCurrentUserDetails = () => {
   const characterName = tokenData.payload.name
   return { characterId, characterName }
 }
-export const getCurrentUserAccessToken = () => {
-  const data = loadData()
+export const getCurrentUserAccessToken = async () => {
+  let data = loadData()
+
   const characterId = data.selectedCharacter
+
+  if ((new Date().getTime() / 1000) > data[`token-${characterId}`].payload.exp) {
+    console.log('Need to refresh')
+    await refreshTokenAndGetNewUserAccessToken()
+    data = loadData()
+  }
+
   const accessToken = data[`token-${characterId}`].access_token
   const jwt = data[`token-${characterId}`].payload
-  // console.log('getCurrentUserAccessToken', characterId)
+  console.log('getCurrentUserAccessToken', accessToken)
   return { characterId, accessToken, jwt }
 }
 export const refreshTokenAndGetNewUserAccessToken = async () => {
@@ -130,7 +147,7 @@ export const fetchWithRetry = async (url, fetchOptions, maxRetries = 3) => {
         console.log('Token expired')
         await refreshTokenAndGetNewUserAccessToken()
         // TODO - load token
-        const { accessToken } = getCurrentUserAccessToken()
+        const { accessToken } = await getCurrentUserAccessToken()
         fetchOptions.headers.Authorization = `Bearer ${accessToken}`
       } else {
         return response

@@ -1,5 +1,5 @@
 import { switchUser, triggerLoginFlow, getCurrentUserDetails } from './auth'
-import { loadData } from './utils'
+import { clearAllData, loadData } from './utils'
 
 export const initNav = () => {
 //   console.log('initNav')
@@ -32,13 +32,18 @@ export const initNav = () => {
         </li>`
     }
     html += `
-        <li>
-            <button class="dropdown-item login" type="button">
-                <span class="align-middle" id="current_character_name">Add character</span><br/>
-                <img src="https://web.ccpgamescdn.com/eveonlineassets/developers/eve-sso-login-white-small.png"
-                    alt="EVE SSO Login Buttons Small Black">
-            </button>
-        </li>
+      <li>
+          <button class="dropdown-item login" type="button">
+              <span class="align-middle" id="current_character_name">Add character</span><br/>
+              <img src="https://web.ccpgamescdn.com/eveonlineassets/developers/eve-sso-login-white-small.png"
+                  alt="EVE SSO Login Buttons Small Black">
+          </button>
+      </li>
+      <li>
+        <button class="dropdown-item logout" type="button">
+            <span class="align-middle">Log out</span>
+        </button>
+      </li>
     </ul>`
 
     document.querySelector('.nav-dropdown-holder').innerHTML = html
@@ -53,6 +58,11 @@ export const initNav = () => {
         switchUser(characterId)
       })
     }
+    document.querySelector('.logout').addEventListener('click', () => {
+      console.log('logout')
+      clearAllData()
+      window.location.reload()
+    })
   }
 
   document.querySelector('.login').addEventListener('click', () => {

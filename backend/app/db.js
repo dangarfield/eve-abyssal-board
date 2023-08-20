@@ -13,5 +13,6 @@ const db = client.db('abyssboard')
 export const configCollection = db.collection('config')
 export const inventoryCollection = db.collection('inventory')
 export const paymentCollection = db.collection('payment')
+export const sellersCollection = db.collection('sellers')
 
 // TODO - Ensure indexes

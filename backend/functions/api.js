@@ -7,6 +7,7 @@ import { ssoAdminLoginStart, ssoAdminReturn } from '../app/sso'
 import { findAndUpdateCompletedPayments, getPendingPayments, getCompletePayments, getSellerPayments, deletePayment, amendPayment } from '../app/payments'
 import { getEvePaymentJournal } from '../app/eve-api'
 import { searchForModulesOfType } from '../app/search'
+import { setSellerData, getSellerData } from '../app/sellers'
 
 const app = API()
 
@@ -47,6 +48,14 @@ app.patch('/api/listing/:itemID', verifyToken, async function (req, res) {
 })
 app.post('/api/search/:typeID', async function (req, res) {
   res.json(await searchForModulesOfType(parseInt(req.params.typeID), req.body))
+})
+
+// Sellers
+app.get('/api/seller/:sellerID', async function (req, res) {
+  res.json(await getSellerData(parseInt(req.params.sellerID)))
+})
+app.post('/api/seller/:sellerID', async function (req, res) {
+  res.json(await setSellerData(parseInt(req.params.sellerID), req.body))
 })
 
 // Payments

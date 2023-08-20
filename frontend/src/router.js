@@ -111,6 +111,8 @@ export const handleRouteChange = () => {
   console.log('handleRouteChange')
   let route = window.location.pathname
   if (route[0] === '#') route = route.substring(1)
+  if (route.endsWith('/')) route = route.slice(0, -1)
+
   console.log('handleRouteChange', route)
   updateContent(route)
 }

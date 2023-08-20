@@ -74,7 +74,8 @@ export const getAbyssModuleTypes = () => {
       categories: [
         {
           categoryName: '5MN',
-          typeID: 47740
+          typeID: 47740,
+          defaultItem: 19349 // 5MN Microwarpdrive II
         },
         {
           categoryName: '50MN',

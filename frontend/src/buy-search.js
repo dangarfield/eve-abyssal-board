@@ -1,16 +1,20 @@
 import sde from './generated-data/sde.json'
 import { renderSearchCard } from './component/search-card'
-import { calcValueForDisplay, formatForUnit } from './utils'
-import { searchForModulesOfType } from './board-api'
+import { calcValueForDisplay, formatForUnit, showModalAlert } from './utils'
+import { getAppConfig, searchForModulesOfType } from './board-api'
 import { renderInventoryCard } from './component/inventory-card'
 import { inventoryToInventoryCardDTO } from './dogma-utils'
+import { getAbyssModuleTypes } from './module-types'
+import { getCurrentUserDetails } from './auth'
 
 let type
 let allResults
 
+const moduleTypes = getAbyssModuleTypes()
+
 const renderSearchPlaceholder = () => {
   const placeholderResultHtml = Array.from({ length: 7 }).map(a => `
-    <div class="col-3 result mb-4">
+    <div class="col-3 item mb-4">
         <div class="card" aria-hidden="true">
             <div class="card-body">
             ${Array.from({ length: 5 }).map(b => `
@@ -91,6 +95,7 @@ const bindSearchInteractions = () => {
       rangeEle.style.left = 'inherit'
       rangeEle.style.right = `${percentage}%`
     }
+    rangeEle.style.display = 'block'
     searchAttrEle.addEventListener('mousedown', event => {
       const sliderRect = searchAttrEle.getBoundingClientRect()
       const sliderWidth = sliderRect.width
@@ -182,28 +187,68 @@ const triggerSearch = async () => {
   //   console.log('results', results)
 
   //   // Remove results
-  document.querySelectorAll('.search-results .result').forEach(element => {
+  document.querySelectorAll('.search-results .item').forEach(element => {
     element.remove()
   })
   const searchResults = document.querySelector('.search-results')
   let resultHtml = results.map(r => {
-    return `<div class="col-3 mb-4 result">${renderInventoryCard(r)}</div>`
+    return `<div class="col-3 mb-4 item result">${renderInventoryCard(r)}</div>`
   }).join('')
 
   if (results.length === 0) {
-    resultHtml = '<div class="col-9 mt-5 mb-4 result text-center"><h3>No results, please use the filter to find more modules for sale</h3></div>'
+    resultHtml = '<div class="col-9 mt-5 mb-4 item text-center"><h3>No results, please use the filter to find more modules for sale</h3></div>'
   }
-  //   const htmlToAppend = '<div class="col-3">New Element 1</div><div class="col-3">New Element 2</div>'
   searchResults.insertAdjacentHTML('beforeend', resultHtml)
+
+  for (const resultCard of [...document.querySelectorAll('.search-results .result')]) {
+    resultCard.addEventListener('click', async () => {
+      const itemID = parseInt(resultCard.querySelector('.inventory-item').getAttribute('data-item-id'))
+      const result = allResults.find(r => r.itemID === itemID)
+      console.log('result', result)
+      const currentUserDetails = getCurrentUserDetails()
+      console.log('currentUserDetails', currentUserDetails)
+      const appConfig = await getAppConfig()
+      console.log('getAppConfig', appConfig)
+      const discordText = `<p>This seller is known on the <a href="${appConfig.discordUrl}">Abyssal Trade Discord Board</a> as <code>TBC</code></p>`
+      const inGameText = currentUserDetails ? '<p>Click below to open an EVE mail to communicate with the seller</p>' : '<p>If you login we can help by create an EVE mail draft with a link to the item</p>'
+      const actions = []
+      if (currentUserDetails) {
+        actions.push({
+          buttonText: 'Create EVE mail draft',
+          style: 'btn-primary',
+          cb: async () => {
+            console.log('callback')
+          }
+        })
+      }
+      const content = `
+        <p>Contact the seller in EVE Online: <code>${result.characterName}</code></p>
+        ${discordText}
+        ${inGameText}
+        `
+      showModalAlert('Interested?', content, actions)
+    })
+  }
+}
+const getDefaultItem = (typeID) => {
+  const itemID = moduleTypes.flatMap(group => group.categories).find(category => category.typeID === typeID)?.defaultItem || null
+  if (itemID === null) return null
+  return sde.abyssalTypes[typeID].sources[itemID]
 }
 export const displayTypeSearch = async (typeID) => {
   type = sde.abyssalTypes[typeID]
   console.log('type', type)
   if (type === undefined) window.location.assign('/buy')
+  const defaultItem = getDefaultItem(parseInt(typeID))
+  console.log('defaultItem', defaultItem)
   for (const attr of type.attributes) {
     attr.range = 20
-    attr.searchValue = ((attr.allMax - attr.allMin) / 2) + attr.allMin
-    // console.log(attr.searchValue)
+    if (defaultItem) {
+      attr.searchValue = defaultItem.attributes[attr.id]
+    } else {
+      attr.searchValue = ((attr.allMax - attr.allMin) / 2) + attr.allMin
+    }
+    console.log('searchValue', attr.id, attr.searchValue)
   }
   type.attributes.sort((a, b) => {
     const typeOrder = ['mutation', 'base-module', 'derived']

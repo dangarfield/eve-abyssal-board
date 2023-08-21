@@ -128,16 +128,18 @@ export const showModalAlert = async (title, contentHtml, footerConfig) => {
     const html = `<div class="modal fade" id="${id}" tabindex="-1" role="dialog">
       <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header">
+          <div class="modal-header d-none">
             <h5 class="modal-title fs-5">${title}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-          <div class="modal-body">
+          <div class="modal-body text-center pb-0">
+            <i class="bi bi-info-circle fs-1 text-info"></i>
+            <h5 class="modal-title fs-5 mb-3 lead">${title}</h5>
             ${contentHtml}
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer justify-content-center border-top-0">
             ${footerConfig ? footerConfig.map((f, i) => `<button type="button" class="btn ${f.style} modal-footer-btn-${i}">${f.buttonText}</button>`).join('') : ''}
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-info" data-bs-dismiss="modal">Close</button>
           </div>
         </div>
       </div>

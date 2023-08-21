@@ -8,3 +8,4 @@ node_modules
 .netlify
 .env.local
 uptime-robot*
+niceadmin

@@ -136,3 +136,26 @@
     z-index:3;
     position:inherit;
 }
+
+/* General styling */
+
+.text-bg-warning-subtle {
+    color: #000!important;
+    background-color: #fff3cd !important;
+}
+.text-bg-info-subtle {
+    color: #000!important;
+    background-color: #cff4fc !important;
+}
+.text-bg-danger-subtle {
+    color: #000!important;
+    background-color: #f8d7da !important;
+}
+.text-bg-success-subtle {
+    color: #000!important;
+    background-color: #cff4fc !important;
+}
+.btn-info,
+.btn-info:hover {
+    color: #fff;
+}

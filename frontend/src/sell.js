@@ -5,37 +5,44 @@ import { inventoryToInventoryCardDTO } from './dogma-utils'
 import { formatToISKString, listingPriceStringToInt, showModalAlert } from './utils'
 
 const askForSellerScopePermission = () => {
+  // <div class="alert alert-warning h-100" role="alert">
   const html = `
-    <div class="container">
-        <div class="row">
-            <div class="col text-center my-2">
-                <h1>Abyssal Board</h1>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="alert alert-warning" role="alert">
-                    <p>In order to sell with us, we need to ask for permission to view your assets.</p>
-                    <p>Click below to log in with EVE Online Single Sign On and it will ask for these specfic permissions</p>
-                    <button class="btn p-0 border-0 login-seller">
-                        <img src="https://web.ccpgamescdn.com/eveonlineassets/developers/eve-sso-login-white-small.png"
-                            alt="EVE SSO Login Buttons Small Black">
-                    </button>
-                </div>
-                <div class="alert alert-info" role="alert">
-                    <p>Scopes used:</p>
-                    <ul>
-                        <li><b>esi-assets.read_assets.v1</b> - Identifies the assets in your characters.
-                        These are filtered by abyssal types and presented to you for you to automatically create a listing</li>
-                    </ul>
-
-                    <p><i>Note: No information is sent or used by Abyssal Board other than identifying and validating the items for sale.
-                    This includes refresh tokens. They are all persisted in your browser and not on any Abyss Board servers. We have no way of refreshing your tokens ourselves.</i></p>
-                </div>
-            </div>
-        </div>
+<div class="container">
+  <div class="row">
+    <div class="col my-5 pagetitle">
+      <h2>Become a seller</h2>
     </div>
-    `
+  </div>
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Sell with us</h5>
+          <p>In order to sell with us, we need to ask for permission to view your assets.</p>
+          <p>Click below to log in with EVE Online Single Sign On and it will ask for these specfic permissions</p>
+          <div class="text-center">
+            <button class="btn p-0 border-0 login-seller">
+              <img src="https://web.ccpgamescdn.com/eveonlineassets/developers/eve-sso-login-white-small.png" alt="EVE SSO Login Buttons Small Black">
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card h-100 text-bg-info-subtle">
+        <div class="card-body">
+          <h5 class="card-title">Scopes used:</h5>
+          <ul>
+            <li><b>esi-assets.read_assets.v1</b> - Identifies the assets in your characters.
+            These are filtered by abyssal types and presented to you for you to automatically create a listing</li>
+          </ul>
+          <p class="card-text"><i>Note: No information is sent or used by Abyssal Board other than identifying and validating the items for sale.
+          This includes refresh tokens. They are all persisted in your browser and not on any Abyss Board servers. We have no way of refreshing your tokens ourselves.</i></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>`
   document.querySelector('.content').innerHTML = html
 
   document.querySelector('.login-seller').addEventListener('click', () => {
@@ -48,9 +55,9 @@ const renderSellerPlaceholder = (userDetails) => {
     <div class="container">
         <div class="row">
             <div class="col">
-                <div class="d-grid gap-2 d-md-flex justify-content-between my-2">
-                    <h1>Hi ${userDetails.characterName}! Here are your mod listings!</h1>
-                    <a href="/sell/inventory" class="btn btn-primary align-self-center" type="button"><i class="bi bi-plus-lg"></i> Add new mod listings</a>
+                <div class="d-grid gap-2 d-md-flex justify-content-between my-5 pagetitle">
+                  <h2 class="">Hi ${userDetails.characterName}! Here are your mod listings!</h2>
+                  <a href="/sell/inventory" class="btn btn-primary align-self-center" type="button"><i class="bi bi-plus-lg"></i> Add new mod listings</a>
                 </div>
             </div>
         </div>
@@ -150,7 +157,7 @@ const renderSellerListing = (listedItems) => {
             </div>
         </div>
         `
-    html += '<div class="row mb-3">'
+    html += '<div class="row mb-4">'
     for (const listedItem of listedItems) {
       html += `
         <div class="col-3 mt-4">
@@ -263,58 +270,61 @@ const renderPaymentsListing = (payments, appConfig) => {
           </div>
           `
   } else {
-    html += `<div class="row">
-        <div class="col-12">
-            <h4>Outstanding Payments</h4>
-            <p>Payments should be made in game to <code>${appConfig.corpName}</code>. Right click, give ISK. Always pay into the <code>${appConfig.corpDivisionName}</code> account with the reason shown below.</p>
-            <p>Any issues? Contact us on <a href="${appConfig.discordUrl}" target="_blank">discord</a>. <i><b>Note:</b> Payments take up to 1 hour to be registered</i></p>
-        </div>
-    </div>`
-
     html += `
-        <div class="row row-cols-lg-auto g-3 align-items-center flex-row-reverse px-2 mb-3">
-          <div class="col-12">
-            <div class="form-check form-switch ms-2">
-              <input class="form-check-input show-completed-payments" type="checkbox" role="switch" id="show-completed-payments">
-              <label class="form-check-label" for="show-completed-payments">Show completed payments</label>
-            </div>
-          </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Outstanding Payments</h5>
+          <p>Payments should be made in game to <code>${appConfig.corpName}</code>. Right click then 'Give ISK'. Always pay into the <code>${appConfig.corpDivisionName}</code> account with the reason shown below.</p>
+          <p>Any issues? Contact us on <a href="${appConfig.discordUrl}" target="_blank">discord</a>. <i><b>Note:</b> Payments take up to 1 hour to be registered</i></p>
         </div>
-        <div class="row mb-3">
+      </div>
+    </div>
+  </div>`
+    html += `
+  <div class="row row-cols-lg-auto align-items-center flex-row-reverse mb-4">
+    <div class="col-12">
+      <div class="form-check form-switch">
+        <input class="form-check-input show-completed-payments" type="checkbox" role="switch" id="show-completed-payments">
+        <label class="form-check-label" for="show-completed-payments">Show completed payments</label>
+      </div>
+    </div>
+  </div>
+  <div class="row">
     `
     for (const payment of payments) {
       html += `
-          <div class="col-3 mb-3"${payment.paid ? ' style="display:none;"' : ''}>
-              <div class="card ${payment.paid ? 'border-success' : 'border-danger'} h-100 payment" role="button"${payment.inventory ? ` data-paid="${payment.paid}" data-inventory="${payment.inventory.join(',')}"` : ''}>
-                <div class="card-body">
-                    <div class="d-flex">
-                        <div class="flex-grow-1">
-                            <h5 class="">${payment.paid ? 'PAID' : 'Amount Due'}: </h5>
-                        </div>
-                        <div class="text-end">
-                            <h5 class="">${formatToISKString(payment.amount)}</h5>
-                        </div>
-                    </div>
-                    <div class="d-flex">
-                        <div class="flex-grow-1">
-                            <h6 class="">Reason / Ref: </h6>
-                        </div>
-                        <div class="text-end">
-                            <code class="fs-6">${payment.id}</code>
-                        </div>
-                    </div>
-                    <div class="d-flex">
-                        <div class="flex-grow-1">
-                            <h6 class="">Type: </h6>
-                        </div>
-                        <div class="text-end">
-                            <span class="">${payment.type} of ${payment.inventory.length} mod${payment.inventory.length > 1 ? 's' : ''}</span>
-                        </div>
-                    </div>
-                </div>
+    <div class="col-3"${payment.paid ? ' style="display:none;"' : ''}>
+      <div class="card payment" role="button"${payment.inventory ? ` data-paid="${payment.paid}" data-inventory="${payment.inventory.join(',')}"` : ''}>
+        <div class="card-body border ${payment.paid ? 'border-success' : 'border-danger'} rounded pt-4">
+          <div class="d-flex">
+            <div class="flex-grow-1">
+              <h5 class="">${payment.paid ? 'PAID' : 'Amount Due'}: </h5>
             </div>
-        
-          </div>`
+            <div class="text-end">
+              <h5 class="">${formatToISKString(payment.amount)}</h5>
+            </div>
+          </div>
+          <div class="d-flex">
+            <div class="flex-grow-1">
+              <h6 class="">Reason / Ref: </h6>
+            </div>
+            <div class="text-end">
+              <code class="fs-6">${payment.id}</code>
+            </div>
+          </div>
+          <div class="d-flex">
+            <div class="flex-grow-1">
+              <h6 class="">Type: </h6>
+            </div>
+            <div class="text-end">
+              <span class="">${payment.type} of ${payment.inventory.length} mod${payment.inventory.length > 1 ? 's' : ''}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`
     }
     html += '</div>'
   }
@@ -393,21 +403,35 @@ const renderSellerSettings = async (sellerData) => {
   const appConfig = await getAppConfig()
   let html = ''
   html += `
-    <div class="row">
-      <div class="col-12">
-          <h4>Seller Settings</h4>
-          <p>Buyers will be shown your EVE details, but to make it even easier and quicker, join <a href="${appConfig.discordUrl}" target="_blank">Abyss Trading Discord</a>. By adding your username below, buyers can negotiate with you more directly</p>
+  <div class="row mb-4">
+    <div class="col-lg-8">
+      <div class="card h-100">
+        <div class="card-body pb-0">
+          <h5 class="card-title">Seller Settings</h5>
+          <p>Buyers will be shown your EVE details, but to make it even easier and quicker, join <a href="${appConfig.discordUrl}" target="_blank">Abyss Trading Discord</a>. By adding your username, buyers can negotiate with you more directly</p>
+          <p>Don't forget to update any sold or no longer available modules here, so that you get get any unwanted offers and PMs</p>
+        </div>
       </div>
     </div>
-    <form class="seller-settings mb-4">
-    <div class="row mb-3">
-      <label for="discord-name" class="col-sm-2 col-form-label">Discord Name</label>
-      <div class="col-sm-10">
-        <input type="text" class="form-control discord-name" id="discord-name" value="${sellerData.discordName}">
+    <div class="col-lg-4">
+      <div class="card h-100">
+        <div class="card-body pb-0">
+          <h5 class="card-title">Discord Settings</h5>
+          <form class="seller-settings row g-3">
+            <div class="col-md-12">
+              <div class="form-floating">
+                <input type="text" class="form-control discord-name" id="discord-name" value="${sellerData.discordName}">
+                <label for="discord-name">Discord Name</label>
+              </div>
+            </div>
+            <div class="text-end">
+              <button type="submit" class="btn btn-primary">Save Settings</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
-    <button type="submit" class="btn btn-primary text-end">Save Settings</button>
-  </form>
+  </div>
 `
   document.querySelector('.settings-content').innerHTML = html
 

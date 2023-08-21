@@ -22,9 +22,9 @@ export const triggerLoginFlow = async (useScopes) => {
   if (!useScopes) {
     await showModalAlert('EVE Online SSO', `
     <p>We only ask for one permission when signing in as a buyer:</p>
-    <ul>
-      <li><code>esi-ui.open_window.v1</code> - We can quickly create an EVE mail draft for you with your an in game link to your chosen module and the sellers' contact details</li>
-    </ul>
+    <div class="alert alert-info fade show" role="alert">
+      <code>esi-ui.open_window.v1</code> - We can quickly create an EVE mail draft for you with your an in game link to your chosen module and the sellers' contact details
+    </div>
     <p><i>Note: No information is sent or used by Abyssal Board.
       This includes refresh tokens. They are all persisted in your browser and not on any Abyss Board servers. We have no way of refreshing your tokens ourselves.</i></p>
     `)

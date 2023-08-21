@@ -5,7 +5,6 @@ import { inventoryToInventoryCardDTO } from './dogma-utils'
 import { formatToISKString, listingPriceStringToInt, showModalAlert } from './utils'
 
 const askForSellerScopePermission = () => {
-  // <div class="alert alert-warning h-100" role="alert">
   const html = `
 <div class="container">
   <div class="row">
@@ -71,16 +70,16 @@ const renderSellerPlaceholder = (userDetails) => {
 
             <div class="row mt-4">
                 <div class="col placeholder-glow">
-                    <span class="placeholder col-3"></span>
-                    <span class="placeholder col-6"></span>
-                    <span class="placeholder col-2"></span>
+                    <span class="placeholder col-lg-3"></span>
+                    <span class="placeholder col-lg-6"></span>
+                    <span class="placeholder col-lg-2"></span>
                 </div>
             </div>
             <div class="row">
         `
   for (let i = 0; i < 8; i++) {
     html += `
-                <div class="col-3 mt-4">
+                <div class="col-lg-3 mt-4">
                     <div class="card" aria-hidden="true">
                         <svg class="bd-placeholder-img card-img-top" width="100%" height="180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false">
                             <title>Placeholder</title>
@@ -88,16 +87,16 @@ const renderSellerPlaceholder = (userDetails) => {
                         </svg>
                         <div class="card-body">
                             <h5 class="card-title placeholder-glow">
-                            <span class="placeholder col-6"></span>
+                            <span class="placeholder col-lg-6"></span>
                             </h5>
                             <p class="card-text placeholder-glow">
-                            <span class="placeholder col-7"></span>
-                            <span class="placeholder col-4"></span>
-                            <span class="placeholder col-4"></span>
-                            <span class="placeholder col-6"></span>
-                            <span class="placeholder col-8"></span>
+                            <span class="placeholder col-lg-7"></span>
+                            <span class="placeholder col-lg-4"></span>
+                            <span class="placeholder col-lg-4"></span>
+                            <span class="placeholder col-lg-6"></span>
+                            <span class="placeholder col-lg-8"></span>
                             </p>
-                            <a class="btn btn-secondary disabled placeholder col-6 float-end" aria-disabled="true"></a>
+                            <a class="btn btn-secondary disabled placeholder col-lg-6 float-end" aria-disabled="true"></a>
                         </div>
                     </div>
                 </div>
@@ -108,9 +107,9 @@ const renderSellerPlaceholder = (userDetails) => {
             </div>
             <div class="row mt-4">
                 <div class="col placeholder-glow">
-                    <span class="placeholder col-6"></span>
-                    <span class="placeholder col-3"></span>
-                    <span class="placeholder col-2"></span>
+                    <span class="placeholder col-lg-6"></span>
+                    <span class="placeholder col-lg-3"></span>
+                    <span class="placeholder col-lg-2"></span>
                 </div>
             </div>
         </div>
@@ -125,8 +124,13 @@ const renderSellerListing = (listedItems) => {
     html = `
         <div class="row mt-4">
             <div class="col">
-                <div class="alert alert-info" role="alert">
-                    <p class="m-0">No items listed - Click on the <code>Add new mod listings</code> button to select one to sell</p>
+                <div class="card text-bg-info-subtle">
+                  <div class="card-body text-center">
+                    <div class="pt-3">
+                      <i class="bi bi-info-circle fs-1 text-info card-title"></i>
+                    </div>
+                    <h5 class="card-title">No items listed - Click on the <code>Add new mod listings</code> button to select one to sell</h5>
+                  </div>
                 </div>
             </div>
         </div>
@@ -134,10 +138,10 @@ const renderSellerListing = (listedItems) => {
   } else {
     html += `
     <div class="row row-cols-lg-auto g-3 align-items-center flex-row-reverse px-2">
-      <div class="col-12">
+      <div class="col">
         <input class="form-control ms-2 data-search" type="search" placeholder="Search listings">
       </div>
-      <div class="col-12">
+      <div class="col">
         <select class="form-select filter-status">
             <option value="AWAITING_PAYMENT,ON_SALE" selected>Filter: Active</option>
             <option value="AWAITING_PAYMENT,ON_SALE,COMPLETE">Filter: All</option>
@@ -150,17 +154,23 @@ const renderSellerListing = (listedItems) => {
 `
     html += `
         <div class="row mt-4 all-items-filtered" style="display:none;">
-            <div class="col">
-                <div class="alert alert-info" role="alert">
-                    <p class="m-0">Some listed mods are hidden - Use <code>Filter: All</code> to see all item</p>
+          <div class="col">
+            <div class="card text-bg-info-subtle">
+              <div class="card-body text-center">
+                <div class="pt-3">
+                  <i class="bi bi-info-circle fs-1 text-info card-title"></i>
                 </div>
+                <h5 class="card-title">Some listed mods are hidden - Use <code>Filter: All</code> to see all item</h5>
+              </div>
             </div>
+          </div>
+
         </div>
         `
     html += '<div class="row mb-4">'
     for (const listedItem of listedItems) {
       html += `
-        <div class="col-3 mt-4">
+        <div class="col-lg-3 mt-4">
             ${renderInventoryCard(listedItem)}
         </div>`
     }
@@ -263,9 +273,14 @@ const renderPaymentsListing = (payments, appConfig) => {
     html = `
           <div class="row mt-4">
               <div class="col">
-                  <div class="alert alert-info" role="alert">
-                      <p class="m-0">You don't have any payments awaiting settling</p>
+                <div class="card text-bg-info-subtle">
+                  <div class="card-body text-center">
+                    <div class="pt-3">
+                      <i class="bi bi-info-circle fs-1 text-info card-title"></i>
+                    </div>
+                    <h5 class="card-title">You don't have any payments awaiting settlement</h5>
                   </div>
+                </div>
               </div>
           </div>
           `
@@ -292,10 +307,20 @@ const renderPaymentsListing = (payments, appConfig) => {
     </div>
   </div>
   <div class="row">
+    <div class="col-lg-12 payments-filtered">
+      <div class="card text-bg-info-subtle">
+        <div class="card-body text-center">
+          <div class="pt-3">
+            <i class="bi bi-info-circle fs-1 text-info card-title"></i>
+          </div>
+          <h5 class="card-title">You don't have any unpaid bills but some payments are hidden - Use <code>Show completed payments</code> to see all payments</h5>
+        </div>
+      </div>
+    </div>
     `
     for (const payment of payments) {
       html += `
-    <div class="col-3"${payment.paid ? ' style="display:none;"' : ''}>
+    <div class="col-lg-3"${payment.paid ? ' style="display:none;"' : ''}>
       <div class="card payment" role="button"${payment.inventory ? ` data-paid="${payment.paid}" data-inventory="${payment.inventory.join(',')}"` : ''}>
         <div class="card-body border ${payment.paid ? 'border-success' : 'border-danger'} rounded pt-4">
           <div class="d-flex">
@@ -335,15 +360,21 @@ const renderPaymentsListing = (payments, appConfig) => {
   if (showCompletedPaymentsEle) {
     showCompletedPaymentsEle.addEventListener('change', () => {
       const showAll = showCompletedPaymentsEle.checked
+      let somePaymentsAreHidden = false
       document.querySelectorAll('.payment').forEach((element) => {
         const isPaid = element.getAttribute('data-paid') === 'true'
         if (isPaid && !showAll) {
           element.parentElement.style.display = 'none'
         } else {
           element.parentElement.style.display = 'block'
+          somePaymentsAreHidden = true
         }
       })
+      document.querySelector('.payments-filtered').style.display = somePaymentsAreHidden ? 'none' : 'block'
     })
+    const visiblePaymentCount = Array.from(document.querySelectorAll('.payment')).filter(element => element.getAttribute('data-paid') === 'false').length
+    console.log('visiblePaymentCount', visiblePaymentCount)
+    if (visiblePaymentCount > 0) document.querySelector('.payments-filtered').style.display = 'none'
   }
   for (const paymentEle of [...document.querySelectorAll('.payment')]) {
     paymentEle.addEventListener('mouseenter', () => {

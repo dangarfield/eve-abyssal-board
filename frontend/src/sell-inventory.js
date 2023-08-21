@@ -7,94 +7,105 @@ import { renderInventoryCard } from './component/inventory-card'
 
 const renderInventoryPlaceholder = (userDetails) => {
   let html = `
-      <div class="container">
-          <div class="row">
-              <div class="col">
-                  <div class="d-grid gap-2 d-md-flex justify-content-between my-2">
-                      <h1>Mods are in your hangers - Available to be listed</h1>
-                  </div>
-                  <p>EVE Online servers cache this data and it is made available to us up to 60 minutes after requesting.</p>
-                  <p class="refresh-time-inventory">This text will update with the next refresh time.</p>
-                  <p>Select the mods that you wish to sell and add your listing price. You can update the listing price at any time after it is listed.</p>
-                  <p><i><b>Note:</b> Once you send a listing fee payment and you cancel after the mod is on sale or sell the item elsewhere, the listing fee will not be returned.</i></p>
-              </div>
+<div class="container">
+  <div class="row">
+    <div class="col-lg-12 my-5 pagetitle">
+      <h2>Mods are in your hangers - Available to be listed</h2>
+    </div>
+  </div>
+  <div class="row mb-4">
+    <div class="col-lg-8">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Find your asset</h5>
+          <p class="card-text">EVE Online servers cache this data and it is made available to us up to 60 minutes after requesting.</p>
+          <p class="card-text">Select the mods that you wish to sell and add your listing price. You can update the listing price at any time after it is listed.</p>
+          <p class="card-text"><i><b>Note:</b> Once you send a listing fee payment and you cancel after the mod is on sale or sell the item elsewhere, the listing fee will not be returned.</i></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card h-100 text-bg-info-subtle">
+        <div class="card-body text-center">
+          <div class="pt-3">
+            <i class="bi bi-info-circle fs-1 text-info card-title"></i>
           </div>
-          <div class="inner-content">
-  
-              <div class="row mt-4">
-                  <div class="col placeholder-glow">
-                      <span class="placeholder col-3"></span>
-                      <span class="placeholder col-6"></span>
-                      <span class="placeholder col-2"></span>
-                  </div>
-              </div>
-              <div class="row">
-          `
+          <h5 class="card-title">Next inventory refresh time</h5>
+          <p class="card-text refresh-time-inventory">This text will update with the next refresh time.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="inner-content">
+    <div class="row mt-4">
+      <div class="col placeholder-glow">
+        <span class="placeholder col-lg-3"></span>
+        <span class="placeholder col-lg-6"></span>
+        <span class="placeholder col-lg-2"></span>
+      </div>
+    </div>
+    <div class="row">`
   for (let i = 0; i < 8; i++) {
     html += `
-                  <div class="col-3 mt-4">
-                      <div class="card" aria-hidden="true">
-                          <svg class="bd-placeholder-img card-img-top" width="100%" height="180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false">
-                              <title>Placeholder</title>
-                              <rect width="100%" height="100%" fill="#868e96"></rect>
-                          </svg>
-                          <div class="card-body">
-                              <h5 class="card-title placeholder-glow">
-                              <span class="placeholder col-6"></span>
-                              </h5>
-                              <p class="card-text placeholder-glow">
-                              <span class="placeholder col-7"></span>
-                              <span class="placeholder col-4"></span>
-                              <span class="placeholder col-4"></span>
-                              <span class="placeholder col-6"></span>
-                              <span class="placeholder col-8"></span>
-                              </p>
-                              <a class="btn btn-secondary disabled placeholder col-6 float-end" aria-disabled="true"></a>
-                          </div>
-                      </div>
-                  </div>
-      `
+      <div class="col-lg-3 mt-4">
+        <div class="card" aria-hidden="true">
+          <svg class="bd-placeholder-img card-img-top" width="100%" height="180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false">
+            <title>Placeholder</title>
+            <rect width="100%" height="100%" fill="#868e96"></rect>
+          </svg>
+          <div class="card-body">
+            <h5 class="card-title placeholder-glow">
+              <span class="placeholder col-lg-6"></span>
+            </h5>
+            <p class="card-text placeholder-glow">
+              <span class="placeholder col-lg-7"></span>
+              <span class="placeholder col-lg-4"></span>
+              <span class="placeholder col-lg-4"></span>
+              <span class="placeholder col-lg-6"></span>
+              <span class="placeholder col-lg-8"></span>
+            </p>
+            <a class="btn btn-secondary disabled placeholder col-lg-6 float-end" aria-disabled="true"></a>
+          </div>
+        </div>
+      </div>`
   }
 
   html += `
-              </div>
-              <div class="row mt-4">
-                  <div class="col placeholder-glow">
-                      <span class="placeholder col-6"></span>
-                      <span class="placeholder col-3"></span>
-                      <span class="placeholder col-2"></span>
-                  </div>
-              </div>
-          </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col placeholder-glow">
+        <span class="placeholder col-lg-6"></span>
+        <span class="placeholder col-lg-3"></span>
+        <span class="placeholder col-lg-2"></span>
       </div>
-      <div class="selected-inventory-holder">
-        <nav class="fixed-bottom bg-secondary pb-0 pt-2">
-          <div class="container-fluid">
-            <div class="row">
-              <div class="col-10">
-                <ul class="row my-0 px-0 gx-2 selected-inventory-item-holder">
-                </ul>
+    </div>
+  </div>
+</div>
+<div class="selected-inventory-holder">
+  <nav class="fixed-bottom bg-secondary-subtle pb-0 pt-2">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-10">
+          <ul class="row my-0 px-0 gx-2 selected-inventory-item-holder"></ul>
+        </div>
+        <div class="col-lg-2">
+          <ul class="navbar-nav ms-auto h-100 pb-2">
+            <button class="btn btn-primary w-100 h-100 confirm-inventory" type="submit">
+              <div class="d-flex flex-row justify-content-center">
+                <i class="bi bi-plus-circle-fill"></i>
+                <span class="text-start ps-3">
+                  List <span class="count">0</span> mods<br/>
+                  <i class="price">0 ISK</i>
+                </span>
               </div>
-              <div class="col-2">
-                <ul class="navbar-nav ms-auto h-100 pb-2">
-                  <button class="btn btn-primary w-100 h-100 confirm-inventory" type="submit">
-                    <div class="d-flex flex-row justify-content-center">
-                      <i class="bi bi-plus-circle-fill"></i>
-                      <span class="text-start ps-3">
-                        List <span class="count">0</span> mods<br/>
-                        <i class="price">0 ISK</i>
-                      </span>
-                    </div>
-                  </button>
-                </ul>
-              </div>
-            </div>
-            
-          </div>
-        </nav>
-  
+            </button>
+          </ul>
+        </div>
       </div>
-      `
+    </div>
+  </nav>
+</div>`
   document.querySelector('.content').innerHTML = html
 }
 const renderAvailableInventory = (availableInventory, cacheExpires, lastModified) => {
@@ -103,7 +114,7 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
   if (availableInventory.length === 0) {
     html = `
           <div class="row mt-4">
-              <div class="col">
+              <div class="col-lg-12">
                   <div class="alert alert-info" role="alert">
                       <p class="m-0">No abyss mods found in your hanger or cargo</p>
                   </div>
@@ -130,9 +141,20 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
       </div>
     </div>
 `
-    html += '<div class="row">'
+    html += `<div class="row">
+      
+      <div class="col-lg-12 mt-4 inventory-filtered">
+        <div class="card text-bg-info-subtle">
+          <div class="card-body text-center">
+            <div class="pt-3">
+              <i class="bi bi-info-circle fs-1 text-info card-title"></i>
+            </div>
+            <h5 class="card-title">Some listed mods are hidden - Use <code>Show already listed</code> to see all item</h5>
+          </div>
+        </div>
+      </div>`
     for (const item of availableInventory) {
-      html += '<div class="col-3 mt-4">'
+      html += '<div class="col-lg-3 mt-4">'
       html += renderInventoryCard(item)
       html += '</div>'
     }
@@ -144,7 +166,7 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
 const filterCards = () => {
   const searchQuery = document.querySelector('.data-search').value.toLowerCase()
   const hideListed = !document.querySelector('.toggle-show-all').checked
-
+  let allItemsHidden = true
   document.querySelectorAll('.inventory-item').forEach((element) => {
     const text = element.querySelector('.type-name').textContent.toLowerCase()
     const isListed = element.classList.contains('listed')
@@ -153,7 +175,10 @@ const filterCards = () => {
     const shouldHide = (searchQuery && !text.includes(searchQuery)) || (hideListed && isListed)
     // element.style.display = shouldHide ? 'none' : 'block'
     element.parentElement.style.display = shouldHide ? 'none' : 'block'
+    if (!shouldHide) allItemsHidden = false
   })
+
+  document.querySelector('.inventory-filtered').style.display = allItemsHidden ? 'block' : 'none'
 }
 const bindInventoryActions = (availableInventory, cacheExpires, lastModified) => {
   triggerRefreshTime('.refresh-time-inventory', 'Inventory data', cacheExpires, lastModified)
@@ -204,8 +229,8 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
 
         let html = ''
         html += `
-            <div class="col-2" data-item-id="${itemID}">
-              <span class="selected-inventory-item">
+            <div class="col-lg-2" data-item-id="${itemID}">
+              <span class="selected-inventory-item position-relative">
                 <button class="btn btn-success btn-sm w-100 mb-2" type="submit">
                   <img src="https://images.evetech.net/types/${item.typeID}/icon?size=32">
                   <span class="title">${item.typeName}</span>
@@ -281,11 +306,15 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
     const paymentDetails = await initiateListingFlow(selectedInventoryToList)
     console.log('paymentDetails', paymentDetails)
     await showModalAlert('Listing Payment Details', `
-        <p class="mb-3">You will receive an ingame mail containing the payment information. It will also be available no your <a href="/sell">seller</a> page<p>
+        <p class="mb-3">You will receive an ingame mail containing the payment information. It will also be available on your <a href="/sell">seller</a> page<p>
         <p class="mb-3">In game, search for and right click on the <code>${paymentDetails.corpName}</code> corporation, then click 'Give Money'. Fill in the details as follows</p>
-        <p class="ps-3 mb-0"><b>Account:</b> <code>${paymentDetails.account}</code></p>
-        <p class="ps-3 mb-0"><b>Amount:</b> <code>${paymentDetails.amount}</code></p>
-        <p class="ps-3 mb-3"><b>Reason:</b> <code>${paymentDetails.reason}</code></p>
+
+        <div class="alert alert-info fade show col-lg-8 offset-lg-2" role="alert">
+          <p class="mb-0 d-flex justify-content-between"><b class="text-">Account:</b> <code>${paymentDetails.account}</code></p>
+          <p class="mb-0 d-flex justify-content-between"><b>Amount:</b> <code>${paymentDetails.amount}</code></p>
+          <p class="mb-0 d-flex justify-content-between"><b>Reason:</b> <code>${paymentDetails.reason}</code></p>
+        </div>
+
         <p>Please be careful to fill this information in carefully.</p>
         <p>It may take up to 1 hour for the transation to be registered and your items listed.</p>
         `)

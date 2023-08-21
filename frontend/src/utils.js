@@ -112,7 +112,7 @@ export const triggerRefreshTime = (elementSelector, typeMessage, expireTime, las
       clearInterval(refreshTimeInterval)
     } else {
       try {
-        ele.innerHTML = `${typeMessage} correct and cached by EVE API as of ${lastModified.toLocaleTimeString()}. Next update available in <span class="text-primary">${(formatMilliseconds(timeDiff))}</span>`
+        ele.innerHTML = `${typeMessage} correct and cached by EVE API as of ${lastModified.toLocaleTimeString()}. Next update available in<br/><span class="badge bg-primary fs-5 mt-2">${(formatMilliseconds(timeDiff))}</span>`
       } catch (error) {
         // It's gone, oh well...
       }

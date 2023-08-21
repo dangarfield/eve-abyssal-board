@@ -171,3 +171,21 @@ export const deepCopy = (obj) => {
 export const cloneSimpleList = (originalList) => {
   return originalList.map(obj => ({ ...obj }))
 }
+export const initBackToTop = () => {
+  const backToTopElement = document.querySelector('.back-to-top')
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 0) {
+      backToTopElement.classList.remove('hidden')
+      backToTopElement.classList.add('visible')
+    } else {
+      backToTopElement.classList.remove('visible')
+      backToTopElement.classList.add('hidden')
+    }
+  })
+
+  backToTopElement.addEventListener('click', (e) => {
+    e.preventDefault()
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  })
+}

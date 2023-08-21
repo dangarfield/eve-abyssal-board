@@ -20,45 +20,105 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">Abyssal Board</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/buy">Buy Modules</a>
+    <header id="header" class="header d-flex align-items-center">
+        <div class="d-flex align-items-center justify-content-between">
+            <a href="/" class="logo d-flex align-items-center">
+                <img src="/logo.png" alt="">
+                <span class="">Abyssal Board</span>
+            </a>
+        </div>
+        <nav class="header-nav">
+            <ul class="d-flex align-items-center">
+                <li class="nav-item d-none d-lg-block pe-3">
+                    <a class="nav-link" href="/buy">
+                        Buy Modules
+                    </a>
+                </li>
+                <li class="nav-item d-none d-lg-block">
+                    <a class="nav-link" href="/sell">
+                        Sell Modules
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <nav class="header-nav ms-auto">
+            <ul class="d-flex align-items-center">
+    
+               
+                <div class="asds">
+                    <li class="nav-item d-block d-lg-none">
+                        <button class="nav-link nav-icon search-bar-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="bi bi-list"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/buy">Buy Modules</a></li>
+                            <li><a class="dropdown-item" href="/sell">Sell Modules</a></li>
+                          </ul>
+                        
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/sell">Sell Modules</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav nav-dropdown-holder">
-                    <li class="login nav-link" type="button">
+                </div>
+        
+                <li class="nav-item dropdown pe-3 not-logged-in">
+                    <button class="login nav-link nav-profile d-flex align-items-center" type="button">
                         <img src="https://web.ccpgamescdn.com/eveonlineassets/developers/eve-sso-login-white-small.png"
                             alt="EVE SSO Login Buttons Small Black">
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+                    </button>
+                </li>
+                <li class="nav-item dropdown pe-3 logged-in" style="display: none;">
+        
+                    
+                    <button class="nav-link nav-profile d-flex align-items-center pe-0" data-bs-toggle="dropdown">
+                        <img src="https://image.eveonline.com/Character/123456789_32.jpg" class="rounded logged-in-user-img">
+                        <span class="d-none d-md-block dropdown-toggle ps-2 logged-in-user-name">EVE Online User</span>
+                    </button>
+        
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                        <div class="logged-in-users">
+                            <li>
+                                <button class="dropdown-item d-flex align-items-center">
+                                    <img src="https://image.eveonline.com/Character/123456789_32.jpg" class="rounded-circle">
+                                    <span class="d-none d-md-block ps-2">EVE Online User</span>
+                                </button>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                        </div>
+                        <li>
+                            <button class="dropdown-item d-flex align-items-center login">
+                                <i class="bi bi-plus-circle"></i>
+                                <img src="https://web.ccpgamescdn.com/eveonlineassets/developers/eve-sso-login-white-small.png"
+                                    alt="EVE SSO Login Buttons Small Black">
+                            </button>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <button class="dropdown-item d-flex align-items-center logout">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Log Out</span>
+                            </button>
+                        </li>
+        
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
 
     <div class="content pb-2">
     </div>
 
-
     <footer>
-        <nav class="navbar sticky-bottom bg-body-tertiary bg-light">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">Footer</a>
-                <!-- v0.1.1 -->
-            </div>
+        <nav class="navbarasd sticky-bottom text-center border-top">
+            <div class="d-flex justify-content-center flex-row">
+                <div class="p-3">© Copyright <strong><span>Abyssal Board</span></strong>. All Rights Reserved</div>
+            </div>   
         </nav>
     </footer>
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center active hidden"><i class="bi bi-arrow-up-short"></i></a>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"

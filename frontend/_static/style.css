@@ -159,3 +159,16 @@
 .btn-info:hover {
     color: #fff;
 }
+.back-to-top {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+.visible {
+    opacity: 1 !important;
+}
+  
+.hidden {
+    opacity: 0 !important;
+}
+  
+/* TODO - Change all of the primary links and buttons to the purple colour */

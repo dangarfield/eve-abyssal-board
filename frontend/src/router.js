@@ -7,6 +7,7 @@ import { initListModInventory } from './sell-inventory'
 import { initAdminJournal } from './admin-journal'
 import { displayBuyHome } from './buy'
 import { displayTypeSearch } from './buy-search'
+import { renderHome } from './home'
 
 const tempRender = (text) => {
   let html = ''
@@ -56,9 +57,9 @@ const render404 = () => {
   document.querySelector('.content').innerHTML = html
 }
 const routes = [
-  { path: '', handler: () => tempRender('home') },
-  { path: '/', handler: () => tempRender('home') },
-  { path: 'home', handler: () => tempRender('home') },
+  { path: '', handler: () => renderHome() },
+  { path: '/', handler: () => renderHome() },
+  { path: 'home', handler: () => renderHome() },
   { path: '/login', handler: () => triggerLoginFlow() },
   { path: '/login/return', handler: () => triggerLoginReturnFlow() },
   { path: '/sell', handler: () => initSellFlow() },

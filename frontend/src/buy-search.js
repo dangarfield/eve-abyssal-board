@@ -250,7 +250,7 @@ const triggerSearch = async () => {
     })
   }
 }
-const getDefaultItem = (typeID) => {
+export const getDefaultItem = (typeID) => {
   const itemID = moduleTypes.flatMap(group => group.categories).find(category => category.typeID === typeID)?.defaultItem || null
   if (itemID === null) return null
   return sde.abyssalTypes[typeID].sources[itemID]

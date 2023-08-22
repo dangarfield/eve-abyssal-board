@@ -58,7 +58,7 @@ export const renderSearchCard = (type, defaultItem) => {
         </div>
         <hr class="my-2"/>
 
-        <div class="d-flex flex-row gap-2 align-items-center px-1">
+        <div class="d-flex flex-row gap-2 align-items-center px-1 remove-on-home-page">
             <div class="p-0"><img class="search-source-img" src="https://images.evetech.net/types/${type.typeID}/icon?size=32" style="opacity:0;"></div>
             <div class="p-0">
             <select class="form-select search-source my-1">
@@ -71,10 +71,10 @@ export const renderSearchCard = (type, defaultItem) => {
             </div>
         </div>
 
-        <hr class="my-2">
+        <hr class="my-2 remove-on-home-page">
         ${dogmaHtml}
         <hr class="my-2">
-        <div class="d-flex flex-row gap-2 align-items-center px-1">
+        <div class="d-flex flex-row gap-2 align-items-center px-1 remove-on-home-page">
             <div class="p-0">Compare:</div>
             <div class="p-0">
             <select class="form-select compare-source my-1">

@@ -118,7 +118,7 @@ export const renderHome = () => {
                     </p>
                     <ol class="text-light mb-4">
                         <li>Log in with EVE Single-Sign-On</li>
-                        <li>Quickly and easiely select the abyss modules that you have in your inventory and list</li>
+                        <li>Quickly and easily select the abyss modules that you have in your inventory and list</li>
                         <li>Pay the 6m ISK listing fee and voila!</li>
                     </ol>
 

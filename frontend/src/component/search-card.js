@@ -12,7 +12,7 @@ export const renderSearchCard = (type, defaultItem) => {
     return `
         <div class="d-flex flex-row gap-2 align-items-center px-1">
             <div class="p-0"><img src="/icons/${attr.iconID}.png" width="32" height="32"></div>
-            <div class="p-0">
+            <div class="p-0 w-100">
                 <p class="m-0">
                     ${attr.name}
                     <!--
@@ -26,12 +26,20 @@ export const renderSearchCard = (type, defaultItem) => {
                     zeroDiff ${attr.allZeroDiff}<br/>
                     perc ${attr.allPerc}
                     -->
-                </p>                    
+                </p>        
+                          
+                <!--
                 <p class="m-0">
-                    <b class=""><span class="search-attr-${attr.id}-display">${formatForUnit(calcValueForDisplay(attr.searchValue, attr.unitID), attr.unitID)}</span></b>
+                    <b class="" style="min-width: 300px;"><span style="min-width: 300px;" class="search-attr-${attr.id}-display">${formatForUnit(calcValueForDisplay(attr.searchValue, attr.unitID), attr.unitID)}</span></b>
                     <b class="px-2"><span class="search-attr-${attr.id}-range-display text-primary">± ${plusMinusDisplayValue}</span></b>
                 </p>
-
+                -->
+                
+                <div class="d-flex flex-row m-0 justify-content-start">
+                    <div class="p-0 dogma-value"><b class=""><span class="search-attr-${attr.id}-display">${formatForUnit(calcValueForDisplay(attr.searchValue, attr.unitID), attr.unitID)}</span></b></div>
+                    <div class="p-0"><b class="px-2"><span class="search-attr-${attr.id}-range-display text-primary">± ${plusMinusDisplayValue}</span></b></div>
+                </div>
+                
             </div>
         </div>
         <div class="row gx-0 mb-0">

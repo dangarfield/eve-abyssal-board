@@ -116,13 +116,22 @@ export const renderHome = () => {
                     <p class="fs-5 text-light">
                         The process is simple:
                     </p>
-                    <ol class="text-light mb-4">
-                        <li>Log in with EVE Single-Sign-On</li>
-                        <li>Quickly and easily select the abyss modules that you have in your inventory and list</li>
-                        <li>Pay the 6m ISK listing fee and voila!</li>
-                    </ol>
+                    <div class="d-flex flex-row align-items-center text-light">
+                        <div class="px-2"><i class="bi bi-1-circle-fill fs-4"></i></div>
+                        <div class="p-2">Log in with EVE Single Sign-On</div>
+                    </div>
+                    <div class="d-flex flex-row align-items-center text-light">
+                        <div class="px-2"><i class="bi bi-2-circle-fill fs-4"></i></div>
+                        <div class="p-2">One click select the abyss modules from your inventory</div>
+                    </div>
+                    <div class="d-flex flex-row mb-3 align-items-center text-light">
+                        <div class="px-2"><i class="bi bi-3-circle-fill fs-4"></i></div>
+                        <div class="p-2">Pay the 6m ISK listing fee and voila!</div>
+                    </div>
+                  
 
-                    <a href="/buy" class="btn btn-success">Buy Modules</a>
+
+                    <a href="/buy" class="btn btn-success me-2">Buy Modules</a>
                     <a href="/sell" class="btn btn-success">Sell Modules</a>
                 </div>
             </div>
@@ -154,7 +163,7 @@ export const renderHome = () => {
                 <div class="text-center p-3">
                     <div class="avatar-sm m-auto">
                         <span class="badge bg-primary rounded-pill">
-                            <i class="bi bi-infinity fs-2"></i>
+                            <i class="bi bi-cart2 fs-2 p-2"></i>
                         </span>
                     </div>
                     <h4 class="mt-3">Buy Modules</h4>
@@ -168,7 +177,7 @@ export const renderHome = () => {
                 <div class="text-center p-3">
                     <div class="avatar-sm m-auto">
                         <span class="badge bg-primary rounded-pill">
-                            <i class="bi bi-infinity fs-2"></i>
+                            <i class="bi bi-cash-stack fs-2 p-2"></i>
                         </span>
                     </div>
                     <h4 class="mt-3">Sell Modules</h4>
@@ -182,7 +191,7 @@ export const renderHome = () => {
                 <div class="text-center p-3">
                     <div class="avatar-sm m-auto">
                         <span class="badge bg-primary rounded-pill">
-                            <i class="bi bi-infinity fs-2"></i>
+                            <i class="bi bi-star fs-2 p-2"></i>
                         </span>
                     </div>
                     <h4 class="mt-3">Module Valuation <span class="badge bg-primary">Coming soon</span></h4>

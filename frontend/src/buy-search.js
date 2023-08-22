@@ -16,19 +16,19 @@ const moduleTypes = getAbyssModuleTypes()
 
 const renderSearchPlaceholder = () => {
   const placeholderResultHtml = Array.from({ length: 7 }).map(a => `
-    <div class="col-3 item mb-4">
+    <div class="col-lg-3 item mb-4">
         <div class="card" aria-hidden="true">
             <div class="card-body">
             ${Array.from({ length: 5 }).map(b => `
                 <h5 class="card-title placeholder-glow">
-                <span class="placeholder col-6"></span>
+                <span class="placeholder col-lg-6"></span>
                 </h5>
                 <p class="card-text placeholder-glow">
-                <span class="placeholder col-7"></span>
-                <span class="placeholder col-4"></span>
-                <span class="placeholder col-4"></span>
-                <span class="placeholder col-6"></span>
-                <span class="placeholder col-8"></span>
+                <span class="placeholder col-lg-7"></span>
+                <span class="placeholder col-lg-4"></span>
+                <span class="placeholder col-lg-4"></span>
+                <span class="placeholder col-lg-6"></span>
+                <span class="placeholder col-lg-8"></span>
                 </p>
             `).join('')}
             </div>
@@ -42,7 +42,7 @@ const renderSearchPlaceholder = () => {
             </div>
         </div>
         <div class="row search-results">
-            <div class="col-3 mb-4 search-card-holder">
+            <div class="col-lg-3 mb-4 search-card-holder">
                 ${renderSearchCard(type, defaultItem)}
             </div>
             ${placeholderResultHtml}
@@ -209,11 +209,11 @@ const triggerSearch = async () => {
   })
   const searchResults = document.querySelector('.search-results')
   let resultHtml = results.map(r => {
-    return `<div class="col-3 mb-4 item result">${renderInventoryCard(r)}</div>`
+    return `<div class="col-lg-3 mb-4 item result">${renderInventoryCard(r)}</div>`
   }).join('')
 
   if (results.length === 0) {
-    resultHtml = '<div class="col-9 mt-5 mb-4 item text-center"><h3>No results, please use the filter to find more modules for sale</h3></div>'
+    resultHtml = '<div class="col-lg-9 mt-5 mb-4 item text-center"><h3>No results, please use the filter to find more modules for sale</h3></div>'
   }
   searchResults.insertAdjacentHTML('beforeend', resultHtml)
 

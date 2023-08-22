@@ -17,7 +17,7 @@ const renderInventoryPlaceholder = (userDetails) => {
     <div class="col-lg-8">
       <div class="card h-100">
         <div class="card-body">
-          <h5 class="card-title">Find your asset</h5>
+          <h5 class="card-title">Find your assets</h5>
           <p class="card-text">EVE Online servers cache this data and it is made available to us up to 60 minutes after requesting.</p>
           <p class="card-text">Select the mods that you wish to sell and add your listing price. You can update the listing price at any time after it is listed.</p>
           <p class="card-text"><i><b>Note:</b> Once you send a listing fee payment and you cancel after the mod is on sale or sell the item elsewhere, the listing fee will not be returned.</i></p>

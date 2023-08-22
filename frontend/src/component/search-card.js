@@ -36,7 +36,7 @@ export const renderSearchCard = (type) => {
             <div class="col-12">
                 <div class="search-attr-holder">
                     <span class="bg-track"></span>
-                    <span class="bg-selected search-attr-${attr.id}-range" style="display:none;"></span>
+                    <span class="bg-selected bg-primary-subtle search-attr-${attr.id}-range" style="display:none;"></span>
                     <input type="range" class="form-range search-attr${attr.highIsGood ? '' : ' reverse'}" data-search-attr-id="${attr.id}" min="${attr.allMin}" max="${attr.allMax}" step="any" value="${attr.searchValue}">    
                 </div>
             </div>

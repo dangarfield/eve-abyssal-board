@@ -141,7 +141,7 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
       </div>
     </div>
 `
-    html += `<div class="row">
+    html += `<div class="row inventory-row">
       
       <div class="col-lg-12 mt-4 inventory-filtered">
         <div class="card text-bg-info-subtle">

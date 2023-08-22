@@ -164,9 +164,19 @@ export const renderInventoryCard = (item) => {
   const listingPriceHtml = item.listingPrice !== undefined ? `<div class="listing-price px-2"><p>Listing price: <b>${formatToISKString(item.listingPrice)}</b></p></div>` : ''
 
   let itemDisplayClass = ''
-  if (item.status !== 'NONE') itemDisplayClass = ' listed'
-  if (item.status === 'ON_SALE') itemDisplayClass = ' listed on-sale'
-  if (item.status === 'AWAITING_PAYMENT') itemDisplayClass = ' listed awaiting-payment'
+  let statusBG = 'bg-dark'
+  if (item.status !== 'NONE') {
+    itemDisplayClass = ' listed'
+    statusBG = 'bg-dark'
+  }
+  if (item.status === 'ON_SALE') {
+    itemDisplayClass = ' listed on-sale'
+    statusBG = 'bg-primary'
+  }
+  if (item.status === 'AWAITING_PAYMENT') {
+    itemDisplayClass = ' listed awaiting-payment'
+    statusBG = 'bg-danger'
+  }
   html += `
         <div class="card-container inventory-item${itemDisplayClass}" data-item-id="${item.itemID}" data-status="${item.status}" role="button">
             <div class="card">
@@ -177,12 +187,13 @@ export const renderInventoryCard = (item) => {
                             <p class="lead mb-0 type-name">
                                 <b>
                                     ${item.typeName}
-                                    ${item.qualityScore !== undefined ? `<span class="badge bg-primary"><i class="bi bi-hand-thumbs-up-fill"></i> ${Math.round(item.qualityScore)}%</span>` : ''}
+                                    
                                 </b>
                             </p>
+                            ${item.qualityScore !== undefined ? `<span class="badge bg-primary"><i class="bi bi-hand-thumbs-up-fill"></i> ${Math.round(item.qualityScore)}%</span>` : ''}
                             <span class="badge bg-secondary">${item.group}</span>
                             <span class="badge bg-secondary">${item.category}</span>
-                            ${item.status !== 'NONE' ? `<span class="badge bg-primary">${getFriendlyStatus(item.status)}</span>` : ''}
+                            ${item.status !== 'NONE' ? `<span class="badge ${statusBG}">${getFriendlyStatus(item.status)}</span>` : ''}
                         </div>
                     </div>
                     <hr class="my-2"/>

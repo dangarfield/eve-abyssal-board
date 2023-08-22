@@ -344,7 +344,7 @@ const renderPaymentsListing = (payments, appConfig) => {
               <h6 class="">Type: </h6>
             </div>
             <div class="text-end">
-              <span class="">${payment.type} of ${payment.inventory.length} mod${payment.inventory.length > 1 ? 's' : ''}</span>
+              <span class="">${payment.type.replace('_', ' ')} (${payment.inventory.length} mod${payment.inventory.length > 1 ? 's' : ''})</span>
             </div>
           </div>
         </div>

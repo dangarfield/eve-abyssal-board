@@ -20,19 +20,22 @@
     transform: scale(1.02);
     box-shadow: 0 10px 20px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.06);
 }
-.inventory-item .card:hover {
+
+.inventory-row .inventory-item .card:hover {
     background-color: aliceblue;
 }
-.inventory-item.selected .card {
-    background-color: lightblue;
+.inventory-row .inventory-item.selected .card {
+    background-color: #c5b3e6;
+    /* background-color: #cff4fc; */
 }
-.inventory-item.listed .card {
+.inventory-row .inventory-item.listed .card {
     background-color: lightgray;
 }
-.inventory-item.listed.on-sale .card {
-    background-color: lightgreen;
+.inventory-row .inventory-item.listed.on-sale .card {
+    background-color: lightgray;
 }
-/* .selected-inventory-item, */
+
+
 .inventory-item {
     position: relative;
 }
@@ -110,6 +113,10 @@
 .search-attr-holder .form-range::-webkit-slider-runnable-track {
     background-color: transparent !important;
 }
+.search-attr-holder .form-range::-webkit-slider-thumb{
+/* .search-attr-holder .form-range::-moz-range-thumb { */
+    background-color: #6776f4 !important;
+}
 .search-attr-holder .form-range.reverse {
     direction: rtl;
     /* transform: scaleX(-1); */
@@ -170,5 +177,28 @@
 .hidden {
     opacity: 0 !important;
 }
-  
+.text-primary,
+.text-purple {
+    color: #4154f1 !important;
+}
+.card-title {
+    color: #4154f1 !important;
+}
+.btn-primary {
+    background-color: #4154f1 !important;
+    border-color: #4154f1 !important;
+}
+.bg-primary {
+    background-color: #4154f1 !important;
+}
+.btn-primary:hover {
+    background-color: #6776f4 !important;
+    border-color: #6776f4 !important;
+}
+.logo span {
+    color: #444444;
+}
+.bg-primary-subtle {
+    background-color: #c5b3e6 !important;
+}
 /* TODO - Change all of the primary links and buttons to the purple colour */

@@ -10,6 +10,7 @@ import { openBuyerToSellerDraftEVEMail } from './esi-api'
 
 let type
 let allResults
+let defaultItem
 
 const moduleTypes = getAbyssModuleTypes()
 
@@ -36,13 +37,13 @@ const renderSearchPlaceholder = () => {
   const html = `
     <div class="container">
         <div class="row">
-            <div class="col text-center my-2">
-                <h1>${type.name}</h1>
+            <div class="col my-5 pagetitle">
+                <h2>${type.name}</h2>
             </div>
         </div>
         <div class="row search-results">
             <div class="col-3 mb-4 search-card-holder">
-                ${renderSearchCard(type)}
+                ${renderSearchCard(type, defaultItem)}
             </div>
             ${placeholderResultHtml}
         </div>
@@ -50,6 +51,21 @@ const renderSearchPlaceholder = () => {
   document.querySelector('.content').innerHTML = html
 }
 const bindSearchInteractions = () => {
+  document.querySelector('.compare-source').addEventListener('change', (event) => {
+    const value = parseInt(event.target.value)
+    // const itemID = moduleTypes.flatMap(group => group.categories).find(category => category.typeID === type.typeID)?.defaultItem || null
+    // if (itemID === null) {
+    //   defaultItem = null
+    // } else {
+    defaultItem = sde.abyssalTypes[type.typeID].sources[value]
+    // }
+    // console.log('compare-source', value, defaultItem)
+    if (defaultItem) console.log(`defaultItem: ${value} // ${defaultItem.name}`)
+    setComparisonAttributes()
+    document.querySelector('.search-card-holder').innerHTML = renderSearchCard(type, defaultItem)
+    bindSearchInteractions()
+    triggerSearch()
+  })
   document.querySelector('.search-source').addEventListener('change', (event) => {
     const value = parseInt(event.target.value)
     // console.log('value', value)
@@ -239,12 +255,7 @@ const getDefaultItem = (typeID) => {
   if (itemID === null) return null
   return sde.abyssalTypes[typeID].sources[itemID]
 }
-export const displayTypeSearch = async (typeID) => {
-  type = sde.abyssalTypes[typeID]
-  console.log('type', type)
-  if (type === undefined) window.location.assign('/buy')
-  const defaultItem = getDefaultItem(parseInt(typeID))
-  console.log('defaultItem', defaultItem)
+export const setComparisonAttributes = () => {
   for (const attr of type.attributes) {
     attr.range = 20
     if (defaultItem) {
@@ -252,8 +263,16 @@ export const displayTypeSearch = async (typeID) => {
     } else {
       attr.searchValue = ((attr.allMax - attr.allMin) / 2) + attr.allMin
     }
-    console.log('searchValue', attr.id, attr.searchValue)
+    // console.log('searchValue', defaultItem, attr.id, attr.searchValue)
   }
+}
+export const displayTypeSearch = async (typeID) => {
+  type = sde.abyssalTypes[typeID]
+  console.log('type', type)
+  if (type === undefined) window.location.assign('/buy')
+  defaultItem = getDefaultItem(parseInt(typeID))
+  console.log('defaultItem', defaultItem)
+  setComparisonAttributes()
   type.attributes.sort((a, b) => {
     const typeOrder = ['mutation', 'base-module', 'derived']
     if (typeOrder.indexOf(a.type) < typeOrder.indexOf(b.type)) {

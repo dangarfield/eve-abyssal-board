@@ -249,9 +249,16 @@ const getMutatorsAndSourcesForAbyssItem = (mutatorAttributes, types, typeDogmas,
         if (!sources[sourceTypeId]) {
           const sourceValues = {}
           // TODO add non-mutation attributes in here too. Should be working though
-          for (const attribute of attributes.filter(a => a.type !== 'derived')) {
+          for (const attribute of attributes) {
             // console.log('attribute', attribute)
-            sourceValues[attribute.id] = typeDogmas[sourceTypeId].dogmaAttributes.find(a => a.attributeID === attribute.id).value
+            if (attribute.type === 'derived') {
+              const dogmaAttributes = typeDogmas[sourceTypeId].dogmaAttributes.reduce((acc, obj) => ({ ...acc, [obj.attributeID]: obj.value }), {})
+              const value = evaluate(attribute.valueExpression, { getValue: valueID => dogmaAttributes[valueID] })
+              // console.log('attribute', attribute, attribute.valueExpression, dogmaAttributes, dogmaAttributes[68], dogmaAttributes[6], value)
+              sourceValues[attribute.id] = value
+            } else {
+              sourceValues[attribute.id] = typeDogmas[sourceTypeId].dogmaAttributes.find(a => a.attributeID === attribute.id).value
+            }
           }
 
           const metaGroup = metaGroups[types[sourceTypeId].metaGroupID]

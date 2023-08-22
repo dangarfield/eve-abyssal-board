@@ -34,7 +34,12 @@
 .inventory-row .inventory-item.listed.on-sale .card {
     background-color: lightgray;
 }
-
+.card-link-wide {
+    margin-bottom: 10px;
+}
+.card-link-wide:last-child {
+    margin-bottom: 0;
+}
 
 .inventory-item {
     position: relative;

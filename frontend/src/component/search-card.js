@@ -1,12 +1,14 @@
 import { calcValueForDisplay, formatForUnit } from '../utils'
 
-export const renderSearchCard = (type) => {
+export const renderSearchCard = (type, defaultItem) => {
   const dogmaHtml = type.attributes.map(attr => {
     const plusMinusValue = ((calcValueForDisplay(attr.allMax, attr.unitID) - calcValueForDisplay(attr.allMin, attr.unitID)) / 100) * attr.range
     const plusMinusDisplayValue = formatForUnit(plusMinusValue, attr.unitID)
     // console.log('plusMinusDisplayValue', plusMinusValue, plusMinusDisplayValue, attr.allMax, attr.allMin)
 
-    // TODO - Ensure the slider direction is correct with highIsGood
+    // TODO - Something wrong with Capacitor Warfare Resistance Bonus slider - Cap Batteries
+    // TODO - Something wrong with Maximum Velocity Bonus slider - Stasis Webifier
+
     return `
         <div class="d-flex flex-row gap-2 align-items-center px-1">
             <div class="p-0"><img src="/icons/${attr.iconID}.png" width="32" height="32"></div>
@@ -72,6 +74,18 @@ export const renderSearchCard = (type) => {
         <hr class="my-2">
         ${dogmaHtml}
         <hr class="my-2">
+        <div class="d-flex flex-row gap-2 align-items-center px-1">
+            <div class="p-0">Compare:</div>
+            <div class="p-0">
+            <select class="form-select compare-source my-1">
+                <option value="0"${defaultItem === null ? ' selected' : ''}>Average value</option>
+                ${Object.keys(type.sources).map(sourceTypeID => {
+                    const source = type.sources[sourceTypeID]
+                    return `<option value="${sourceTypeID}"${defaultItem && defaultItem.name === source.name ? ' selected' : ''}>${source.name}</option>`
+                }).join('')}
+            </select>
+            </div>
+        </div>
         <p class="px-1 text-center results-text lead">Waiting for results to load</p>
     </div>
 </div>`

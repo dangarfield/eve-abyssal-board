@@ -59,7 +59,7 @@ export const calcValueForDisplay = (value, unitID) => {
   switch (unitID) {
     case 101: return (value / 1000)
     case 109: return (value * 100) - 100
-    case 111: return 100 - (value * 100)
+    case 108: case 111: return 100 - (value * 100)
     default: return value
   }
 }

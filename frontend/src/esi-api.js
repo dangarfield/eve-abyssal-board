@@ -77,7 +77,7 @@ export const getCurrentUserModInventory = async () => {
         inventoryItem.status = currentInventoryItem.status
         inventoryItem.appraisal = currentInventoryItem.appraisal
         inventoryItem.listingPrice = currentInventoryItem.listingPrice
-        console.log('currentInventoryItem', inventoryItem, currentInventoryItem)
+        // console.log('currentInventoryItem', inventoryItem, currentInventoryItem)
       }
     }
   }

@@ -8,6 +8,7 @@ import { initAdminJournal } from './admin-journal'
 import { displayBuyHome } from './buy'
 import { displayTypeSearch } from './buy-search'
 import { renderHome } from './home'
+import { generateAppraisalModels } from './admin-appraisal-training'
 
 const renderError = () => {
   let html = ''
@@ -56,6 +57,7 @@ const routes = [
   { path: '/admin/payments-pending', handler: () => initAdminPendingPayments() },
   { path: '/admin/payments-complete', handler: () => initAdminCompletePayments() },
   { path: '/admin/journal', handler: () => initAdminJournal() },
+  { path: '/admin/appraisal-models', handler: () => generateAppraisalModels() },
   { path: '*', handler: () => render404() }
 ]
 

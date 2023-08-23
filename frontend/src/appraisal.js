@@ -1,3 +1,7 @@
+// import trainingData from './generated-data/appraisal-training.json'
+// import sde from './generated-data/sde.json'
+// const brain = window.brain
+
 const predictionConfidence = (conf) => {
   if (conf > 0.98) {
     return 'Extremely high'
@@ -17,24 +21,55 @@ const predictionConfidence = (conf) => {
     return 'Completely garbage'
   }
 }
+const normaliseValue = (value, min, max) => {
+  //   if (min === max) {
+  //     throw new Error('Min and max cannot be the same.')
+  //   }
 
-export const getAppraisalForItemId = async (itemID, batchID) => {
+  //   if (value < min || value > max) {
+  //     throw new Error('Value is outside the range defined by min and max.')
+  //   }
+
+  return (value - min) / (max - min)
+}
+export const getAppraisalForItem = async (item, batchID) => {
   try {
     const urls = [
-      `https://thingproxy.freeboard.io/fetch/https://mutaplasmid.space/api/modules/${itemID}/appraisal/`,
-      `https://api.allorigins.win/raw?url=https://mutaplasmid.space/api/modules/${itemID}/appraisal/`,
-      `https://corsproxy.io/?https://mutaplasmid.space/api/modules/${itemID}/appraisal/`
+      `https://thingproxy.freeboard.io/fetch/https://mutaplasmid.space/api/modules/${item.itemID}/appraisal/`,
+      `https://api.allorigins.win/raw?url=https://mutaplasmid.space/api/modules/${item.itemID}/appraisal/`,
+      `https://corsproxy.io/?https://mutaplasmid.space/api/modules/${item.itemID}/appraisal/`
     ]
     // For now, just use mutaplasmid.space appraisal
     const url = urls[batchID % urls.length]
     const req = await fetch(url)
 
     const res = await req.json()
-    // console.log('appraisal', itemID, batchID, url, res)
+    // console.log('appraisal', item, batchID, url, res)
     // TODO - Cache appraisals in localstorage etc
 
+    // console.log('trainingData', trainingData[item.typeID])
+    // const net = new brain.NeuralNetwork() // Should really load this in once per type
+    // console.log('training')
+    // net.train(trainingData[item.typeID], { activation: 'leaky-relu' })
+    // console.log('ready')
+    // const type = sde.abyssalTypes[item.typeID]
+    // console.log('type', type)
+    // const input = type.attributeIds.map(attrID => {
+    //   const attr = type.attributes.find(a => a.id === attrID)
+    //   const value = item.attributesRaw[attrID]
+    //   const min = attr.allMin
+    //   const max = attr.allMax
+    //   const norm = normaliseValue(value, min, max)
+    //   console.log('attrID', value, min, max, norm)
+    //   return norm
+    // })
+    // console.log('input', input)
+    // let predictedPrice = Math.abs(Math.round(net.run(input) * 1000000000))
+    // if (isNaN(predictedPrice)) predictedPrice = 0
+    // console.log('predictedPrice', predictedPrice) // This is incredibly inaccurate. Wait until we have more appraisal data increases then retrain, I'll leave the code here
     return { price: res.price, confidence: predictionConfidence(res.confidence) }
   } catch (error) {
+    // console.log('getAppraisalForItem error', item, error)
     return { price: 'Unavailable', confidence: 'Unavailable' }
   }
 }

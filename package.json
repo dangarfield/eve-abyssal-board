@@ -19,6 +19,7 @@
     "jsonwebtoken": "^9.0.1",
     "lambda-api": "^1.0.3",
     "mathjs": "^11.9.1",
+    "ml-regression-multivariate-linear": "^2.0.4",
     "mongodb": "^5.7.0",
     "nanoid": "^4.0.2",
     "saslprep": "^1.0.3"

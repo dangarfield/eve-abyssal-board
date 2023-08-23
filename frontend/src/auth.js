@@ -90,7 +90,7 @@ export const getCurrentUserAccessToken = async () => {
 
   const accessToken = data[`token-${characterId}`].access_token
   const jwt = data[`token-${characterId}`].payload
-  console.log('getCurrentUserAccessToken', accessToken)
+  // console.log('getCurrentUserAccessToken', accessToken)
   return { characterId, accessToken, jwt }
 }
 export const refreshTokenAndGetNewUserAccessToken = async () => {

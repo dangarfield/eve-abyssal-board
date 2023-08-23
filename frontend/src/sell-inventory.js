@@ -2,7 +2,7 @@ import { doesCurrentCharacterHaveSellerScope, getCurrentUserDetails } from './au
 import { getAppConfig, initiateListingFlow } from './board-api'
 import { getCurrentUserModInventory } from './esi-api'
 import { listingPriceStringToInt, formatToISKString, triggerRefreshTime, showModalAlert, deepCopy } from './utils'
-import { getAppraisalForItemId } from './appraisal'
+import { getAppraisalForItem } from './appraisal'
 import { renderInventoryCard } from './component/inventory-card'
 
 const renderInventoryPlaceholder = (userDetails) => {
@@ -330,13 +330,14 @@ const runBatches = async (promises, batchSize) => {
   }
 }
 
-const updateAppraisals = async () => {
+const updateAppraisals = async (inventory) => {
   await getAppConfig() // Preloading appConfig
   const appraisalElements = [...document.querySelectorAll('.appraisal:not(.appraisal-complete)')]
   const appraisalPromises = appraisalElements.map(appraisalEle => async (batchID) => {
-    const itemID = appraisalEle.getAttribute('data-item-id')
+    const itemID = parseInt(appraisalEle.getAttribute('data-item-id'))
     // console.log('itemID START', itemID, batchID)
-    const appraisal = await getAppraisalForItemId(itemID, batchID)
+    const item = inventory.find(i => i.itemID === itemID)
+    const appraisal = await getAppraisalForItem(item, batchID)
     appraisalEle.innerHTML = `<p>Value: ${typeof appraisal.price === 'string' ? appraisal.price : formatToISKString(appraisal.price)} <i>(Confidence: ${appraisal.confidence})</></p>`
     appraisalEle.parentNode.querySelector('.listing-price').value = typeof appraisal.price === 'string' ? 0 : formatToISKString(appraisal.price).replace(' ISK', '')
     // console.log('itemID END', itemID)
@@ -373,7 +374,7 @@ export const initListModInventory = async () => {
       bindInventoryActions(inventory, cacheExpires, lastModified)
     }
 
-    await updateAppraisals()
+    await updateAppraisals(inventory)
   } else {
     window.location.assign('/sell')
   }

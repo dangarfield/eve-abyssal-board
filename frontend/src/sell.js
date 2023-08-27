@@ -35,7 +35,7 @@ const askForSellerScopePermission = () => {
             <li><b>esi-assets.read_assets.v1</b> - Identifies the assets in your characters.
             These are filtered by abyssal types and presented to you for you to automatically create a listing</li>
           </ul>
-          <p class="card-text"><i>Note: No information is sent or used by Abyssal Board other than identifying and validating the items for sale.
+          <p class="card-text"><i>Note: No information is sent or used by Abyss Board other than identifying and validating the items for sale.
           This includes refresh tokens. They are all persisted in your browser and not on any Abyss Board servers. We have no way of refreshing your tokens ourselves.</i></p>
         </div>
       </div>
@@ -439,7 +439,7 @@ const renderSellerSettings = async (sellerData) => {
       <div class="card h-100">
         <div class="card-body pb-0">
           <h5 class="card-title">Seller Settings</h5>
-          <p>Buyers will be shown your EVE details, but to make it even easier and quicker, join <a href="${appConfig.discordUrl}" target="_blank">Abyss Trading Discord</a>. By adding your username, buyers can negotiate with you more directly</p>
+          <p>Buyers will be shown your EVE details, but to make it even easier and quicker, join <a href="${appConfig.discordUrl}" target="_blank">Abyssal Trading Discord</a>. By adding your username, buyers can negotiate with you more directly</p>
           <p>Don't forget to update any sold or no longer available modules here, so that you get get any unwanted offers and PMs</p>
         </div>
       </div>

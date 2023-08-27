@@ -1,4 +1,4 @@
-# EVE Abyssal Board
-> Abyssal Market Place
+# EVE Abyss Board
+> Abyss Market Place
 
 TBC

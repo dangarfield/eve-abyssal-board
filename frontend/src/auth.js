@@ -11,7 +11,7 @@ const ssoConfig = window.location.href.includes('localhost')
     }
   : {
       clientId: '63adc68f3b214e63a79b2b612e4c4a10',
-      redirectUri: 'https://abyssalboard.netlify.app/login/return/'
+      redirectUri: 'https://abyssboard.netlify.app/login/return/'
     }
 
 // console.log('ssoConfig', ssoConfig)
@@ -25,7 +25,7 @@ export const triggerLoginFlow = async (useScopes) => {
     <div class="alert alert-info fade show" role="alert">
       <code>esi-ui.open_window.v1</code> - We can quickly create an EVE mail draft for you with your an in game link to your chosen module and the sellers' contact details
     </div>
-    <p><i>Note: No information is sent or used by Abyssal Board.
+    <p><i>Note: No information is sent or used by Abyss Board.
       This includes refresh tokens. They are all persisted in your browser and not on any Abyss Board servers. We have no way of refreshing your tokens ourselves.</i></p>
     `)
   }

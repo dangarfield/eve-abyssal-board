@@ -145,7 +145,7 @@ export const renderInventoryCard = (item) => {
 
   const appraisalHtml = item.appraisal
     ? `<div class="appraisal px-2 appraisal-complete" data-item-id="${item.itemID}">
-        <p>Appraisal: ${item.appraisal.value === undefined ? 'UNKNOWN' : item.appraisal.value} <i>Type: ${item.appraisal.type === undefined ? 'AUTO' : item.appraisal.type}</i></p>
+        <p>Appraisal: ${item.appraisal.value === undefined ? 'Unavailable' : item.appraisal.value} <i>Type: ${item.appraisal.type === undefined ? 'AUTO' : item.appraisal.type}</i></p>
     </div>`
     : `
     <div class="appraisal px-2" data-item-id="${item.itemID}">

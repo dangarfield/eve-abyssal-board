@@ -1,11 +1,17 @@
 [build]
   command = "npm run build:frontend"
   functions = "backend/functions"
+  edge_functions = "backend/edge-functions"
   publish = "./frontend/_static"
 
 [[redirects]]
   from = "/api*"
   to = "/.netlify/functions/api"
+  status = 200
+
+[[redirects]]
+  from = "/edge-api*"
+  to = "/.netlify/edge-functions/edge-api"
   status = 200
 
 [[redirects]]

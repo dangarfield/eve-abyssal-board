@@ -8,6 +8,7 @@ import { findAndUpdateCompletedPayments, getPendingPayments, getCompletePayments
 import { getEvePaymentJournal } from '../app/eve-api'
 import { searchForModulesOfType } from '../app/search'
 import { setSellerData, getSellerData } from '../app/sellers'
+import { updateInventoryFromPublicContracts } from '../app/contracts'
 
 const app = API()
 
@@ -95,6 +96,7 @@ app.get('/api/sso/return', async function (req, res) {
 app.any('/api/admin-task', verifyAdmin, async function (req, res) {
   console.log('/api/admin-task', 'SUCCESS')
   await findAndUpdateCompletedPayments()
+  await updateInventoryFromPublicContracts()
   res.json({})
 })
 

@@ -108,3 +108,8 @@ Thanks!</font>`.replace(/\n/g, ''),
   }, { token: accessToken })
   console.log('openBuyerToSellerDraftEVEMail', result)
 }
+export const openContractInEVEOnline = async (contractID) => {
+  console.log('openContractInEVEOnline', contractID)
+  const { accessToken } = await getCurrentUserAccessToken()
+  await esi.ui.postUiOpenwindowContract({ contract_id: contractID, token: accessToken })
+}

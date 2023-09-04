@@ -61,3 +61,31 @@ export const getEvePaymentJournal = async () => {
   }
   return []
 }
+
+export const getAllPublicContracts = async () => {
+  // const { accessToken } = await ensureAccessTokenIsValid()
+  let maxPage = 1
+  let pagesFetched = 0
+  const contracts = []
+  do {
+    const res = await esi.contracts.getContractsPublicRegionId('10000002', { page: pagesFetched + 1 })
+    const maxPagesHeader = res.headers.get('X-Pages')
+    //   console.log('maxPagesHeader', maxPagesHeader)
+    if (maxPagesHeader !== undefined) { maxPage = parseInt(maxPagesHeader) }
+    contracts.push(...res.data.filter(c => c.type === 'item_exchange'))
+    pagesFetched++
+  } while (pagesFetched < maxPage)
+  console.log('contracts', contracts, pagesFetched, contracts.length)
+  return contracts.map(c => { return { id: c.contract_id, price: c.price } })
+}
+export const getContractItems = async (contractID) => {
+  const res = await esi.contracts.getContractsPublicItemsContractId(contractID)
+  if (res.status === 404) return []
+  if (res.status === 403) return []
+  if (res.error) return []
+  if (res.data === null) return []
+  return res.data
+}
+export const getDogmaAttributes = async (itemID, typeID) => {
+  return (await esi.dogma.getDogmaDynamicItemsTypeIdItemId(itemID, typeID)).data
+}

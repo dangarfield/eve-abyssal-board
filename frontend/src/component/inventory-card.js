@@ -27,7 +27,7 @@ export const renderInventoryCard = (item) => {
                 -->
             </p>
                 
-            <p class="m-0"><b>${formatForUnit(attr.valueDisplay, attr.unitID)}  <span class="${attr.isGood ? 'text-success' : 'text-danger'}">(${formatForUnit(attr.diffDisplay, attr.unitID, true)})</span></b> ${attr.unitID}</p>
+            <p class="m-0"><b>${formatForUnit(attr.valueDisplay, attr.unitID)}  <span class="${attr.isGood ? 'text-success' : 'text-danger'}">(${formatForUnit(attr.diffDisplay, attr.unitID, true)})</span></b></p>
         </div>
     </div>
     <div class="row gx-0 mb-2">
@@ -145,7 +145,7 @@ export const renderInventoryCard = (item) => {
 
   const appraisalHtml = item.appraisal
     ? `<div class="appraisal px-2 appraisal-complete" data-item-id="${item.itemID}">
-        <p>Appraisal: ${item.appraisal.value} <i>Type: ${item.appraisal.type}</i></p>
+        <p>Appraisal: ${item.appraisal.value === undefined ? 'UNKNOWN' : item.appraisal.value} <i>Type: ${item.appraisal.type === undefined ? 'AUTO' : item.appraisal.type}</i></p>
     </div>`
     : `
     <div class="appraisal px-2" data-item-id="${item.itemID}">
@@ -162,6 +162,7 @@ export const renderInventoryCard = (item) => {
         </div>
     </div>`
   const listingPriceHtml = item.listingPrice !== undefined ? `<div class="listing-price px-2"><p>Listing price: <b>${formatToISKString(item.listingPrice)}</b></p></div>` : ''
+  const contractPriceHtml = item.contractPrice !== undefined ? `<div class="listing-price px-2"><p>Contract price: <b>${formatToISKString(item.contractPrice)}</b></p></div>` : ''
 
   let itemDisplayClass = ''
   let statusBG = 'bg-dark'
@@ -176,6 +177,10 @@ export const renderInventoryCard = (item) => {
   if (item.status === 'AWAITING_PAYMENT') {
     itemDisplayClass = ' listed awaiting-payment'
     statusBG = 'bg-danger'
+  }
+  if (item.status === 'CONTRACT') {
+    itemDisplayClass = ' contract'
+    statusBG = 'bg-warning text-dark'
   }
   html += `
         <div class="card-container inventory-item${itemDisplayClass}" data-item-id="${item.itemID}" data-status="${item.status}" role="button">
@@ -216,6 +221,7 @@ export const renderInventoryCard = (item) => {
                     <hr class="my-2" />
                     ${appraisalHtml}
                     ${listingPriceHtml}
+                    ${contractPriceHtml}
                 </div>
             </div>
             <span class="interaction-button">

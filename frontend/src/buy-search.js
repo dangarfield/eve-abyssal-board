@@ -6,7 +6,7 @@ import { renderInventoryCard } from './component/inventory-card'
 import { inventoryToInventoryCardDTO } from './dogma-utils'
 import { getAbyssModuleTypes } from './module-types'
 import { getCurrentUserDetails } from './auth'
-import { openBuyerToSellerDraftEVEMail } from './esi-api'
+import { openBuyerToSellerDraftEVEMail, openContractInEVEOnline } from './esi-api'
 
 let type
 let allResults
@@ -75,6 +75,9 @@ const bindSearchInteractions = () => {
       document.querySelector('.search-source-img').setAttribute('src', `https://images.evetech.net/types/${value}/icon?size=32`)
       document.querySelector('.search-source-img').style.opacity = 1
     }
+    triggerSearch()
+  })
+  document.querySelector('.show-contracts').addEventListener('change', (event) => {
     triggerSearch()
   })
 
@@ -180,6 +183,8 @@ const triggerSearch = async () => {
 
   const query = { attributes: [] }
   const sourceValue = parseInt(document.querySelector('.search-source').value)
+  const showContracts = document.querySelector('.show-contracts').checked
+  console.log('showContracts', showContracts, allResults)
   //   if (sourceValue > 0) query.source = sourceValue
 
   for (const attr of type.attributes) {
@@ -194,13 +199,13 @@ const triggerSearch = async () => {
 
   let results = filterResults(allResults, query.attributes)
   if (sourceValue > 0) results = results.filter(r => r.sourceTypeID === sourceValue)
-
+  if (!showContracts) results = results.filter(r => r.status !== 'CONTRACT')
   results.sort((a, b) => b.qualityScore - a.qualityScore) // TODO - Add different sort options
 
   console.log('triggerSearch', query, results)
 
   //   const results = await searchForModulesOfType(type.typeID, query)
-  updateResultsText(`<b>${results.length}</b> of <b>${allResults.length}</b> listed module${results.length === 1 ? '' : 's'}`)
+  updateResultsText(`<b>${results.length}</b> of <b>${allResults.length}</b> module${results.length === 1 ? '' : 's'}`)
   //   console.log('results', results)
 
   //   // Remove results
@@ -226,27 +231,45 @@ const triggerSearch = async () => {
       console.log('currentUserDetails', currentUserDetails)
       const appConfig = await getAppConfig()
       console.log('getAppConfig', appConfig)
-      const discordText = result.discordName ? `<p>This seller is known on the <a href="${appConfig.discordUrl}" target="_blank">Abyssal Trade Discord Board</a> as <code>${result.discordName}</code></p>` : ''
-      const inGameText = currentUserDetails ? '<p>Click below to open an EVE mail to communicate with the seller</p>' : '<p>If you login we can help by creating an EVE mail draft with a link to the seller and item</p>'
-      const actions = []
-      if (currentUserDetails) {
-        actions.push({
-          buttonText: 'Create EVE mail draft',
-          style: 'btn-primary',
-          cb: async () => {
-            console.log('callback')
-            await openBuyerToSellerDraftEVEMail(result.typeID, result.itemID, result.typeName, formatToISKString(result.listingPrice), result.characterName, result.characterId)
-            console.log('opened')
-            document.querySelector('.btn-close').click()
-          }
-        })
+      if (result.status !== 'CONTRACT') {
+        const discordText = result.discordName ? `<p>This seller is known on the <a href="${appConfig.discordUrl}" target="_blank">Abyssal Trade Discord Board</a> as <code>${result.discordName}</code></p>` : ''
+        const inGameText = currentUserDetails ? '<p>Click below to open an EVE mail to communicate with the seller</p>' : '<p>If you login we can help by creating an EVE mail draft with a link to the seller and item</p>'
+        const actions = []
+        if (currentUserDetails) {
+          actions.push({
+            buttonText: 'Create EVE mail draft',
+            style: 'btn-primary',
+            cb: async () => {
+              console.log('callback')
+              await openBuyerToSellerDraftEVEMail(result.typeID, result.itemID, result.typeName, formatToISKString(result.listingPrice), result.characterName, result.characterId)
+              console.log('opened')
+              document.querySelector('.btn-close').click()
+            }
+          })
+        }
+        const content = `
+          <p>Contact the seller in EVE Online: <code>${result.characterName}</code></p>
+          ${discordText}
+          ${inGameText}
+          `
+        showModalAlert('Interested?', content, actions)
+      } else {
+        const content = currentUserDetails ? '<p>Click below to view this contract in EVE online</p>' : '<p>If you login we can help by opening the contract directly in EVE online</p>'
+        const actions = []
+        if (currentUserDetails) {
+          actions.push({
+            buttonText: 'Open contract',
+            style: 'btn-primary',
+            cb: async () => {
+              console.log('callback')
+              await openContractInEVEOnline(result.contract.id)
+              console.log('opened')
+              document.querySelector('.btn-close').click()
+            }
+          })
+        }
+        showModalAlert('Interested?', content, actions)
       }
-      const content = `
-        <p>Contact the seller in EVE Online: <code>${result.characterName}</code></p>
-        ${discordText}
-        ${inGameText}
-        `
-      showModalAlert('Interested?', content, actions)
     })
   }
 }

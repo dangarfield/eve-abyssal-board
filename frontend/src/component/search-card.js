@@ -82,16 +82,26 @@ export const renderSearchCard = (type, defaultItem) => {
         <hr class="my-2 remove-on-home-page">
         ${dogmaHtml}
         <hr class="my-2">
-        <div class="d-flex flex-row gap-2 align-items-center px-1 remove-on-home-page">
+        <div class="d-flex flex-row gap-2 align-items-center px-1 mb-2 remove-on-home-page">
             <div class="p-0">Compare:</div>
             <div class="p-0">
-            <select class="form-select compare-source my-1">
-                <option value="0"${defaultItem === null ? ' selected' : ''}>Average value</option>
-                ${Object.keys(type.sources).map(sourceTypeID => {
-                    const source = type.sources[sourceTypeID]
-                    return `<option value="${sourceTypeID}"${defaultItem && defaultItem.name === source.name ? ' selected' : ''}>${source.name}</option>`
-                }).join('')}
-            </select>
+                <select class="form-select compare-source my-1">
+                    <option value="0"${defaultItem === null ? ' selected' : ''}>Average value</option>
+                    ${Object.keys(type.sources).map(sourceTypeID => {
+                        const source = type.sources[sourceTypeID]
+                        return `<option value="${sourceTypeID}"${defaultItem && defaultItem.name === source.name ? ' selected' : ''}>${source.name}</option>`
+                    }).join('')}
+                </select>
+            </div>
+        </div>
+        <div class="d-flex flex-row gap-2 align-items-center justify-content-between px-1 mb-2 remove-on-home-page">
+            <div class="p-0">
+                <label class="form-check-label" for="show-contracts">Show public contracts</label>
+            </div>
+            <div class="p-0 align-end">
+                <div class="form-check form-switch">
+                    <input class="form-check-input show-contracts" type="checkbox" role="switch" id="show-contracts">
+                </div>
             </div>
         </div>
         <p class="px-1 text-center results-text lead">Waiting for results to load</p>

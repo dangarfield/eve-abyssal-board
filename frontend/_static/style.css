@@ -34,6 +34,12 @@
 .inventory-row .inventory-item.listed.on-sale .card {
     background-color: lightgray;
 }
+.search-results .inventory-item.contract .card {
+    background-color: #ddd;
+}
+.search-results .form-switch {
+    margin-right: -8px;
+}
 .card-link-wide {
     margin-bottom: 10px;
 }

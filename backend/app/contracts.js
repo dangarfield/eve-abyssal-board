@@ -3,6 +3,7 @@ import { inventoryCollection, contractsCollection } from '../app/db.js'
 import sde from '../../frontend/src/generated-data/sde.json'
 import { evaluate } from 'mathjs'
 import { getAppraisalForItem } from '../../frontend/src/appraisal'
+import { INVENTORY_STATUS } from './listing-flow'
 
 export const dogmaToAttributesRaw = (typeID, dogmaAttributes) => {
   const relevantAttributes = sde.abyssalTypes[typeID].attributes.map(a => a.id)
@@ -94,6 +95,18 @@ export const updateInventoryFromPublicContracts = async () => {
     // }
     })
     await runBatches(missingContractPromises, 10)
+
+    const inventoryWithContracts = await inventoryCollection.distinct('contract.id')
+    console.log('inventoryWithContracts', inventoryWithContracts)
+    const currentActiveContracts = contracts.map(c => c.id)
+    console.log('currentActiveContracts', currentActiveContracts)
+
+    const inventoryWithUnavailableContracts = inventoryWithContracts.filter(c => !currentActiveContracts.includes(c))
+    console.log('inventoryWithUnavailableContracts', inventoryWithUnavailableContracts)
+    await inventoryCollection.updateMany(
+      { 'contract.id': { $in: inventoryWithUnavailableContracts } },
+      { $set: { status: INVENTORY_STATUS.UNAVAILABLE } }
+    )
 
     const timeTaken = new Date() - startTime
     console.log('updateInventoryFromPublicContracts END', timeTaken)

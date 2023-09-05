@@ -9,6 +9,7 @@ import { getEvePaymentJournal } from '../app/eve-api.js'
 import { searchForModulesOfType } from '../app/search.js'
 import { setSellerData, getSellerData } from '../app/sellers.js'
 import { updateInventoryFromPublicContracts } from '../app/contracts.js'
+import sde from '../../frontend/src/generated-data/sde.json' // assert {type:'json'} // assert breaks netlify prod, but is required in heroku
 
 const app = API()
 
@@ -96,7 +97,7 @@ app.get('/api/sso/return', async function (req, res) {
 app.any('/api/admin-task', verifyAdmin, async function (req, res) {
   console.log('/api/admin-task', 'SUCCESS')
   await findAndUpdateCompletedPayments()
-  await updateInventoryFromPublicContracts() // Moved to background task
+  await updateInventoryFromPublicContracts(sde) // Moved to background task
   res.json({})
 })
 

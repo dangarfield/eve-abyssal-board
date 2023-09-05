@@ -1,17 +1,14 @@
 import { getAllPublicContracts, getContractItems, getDogmaAttributes } from './eve-api.js'
 import { inventoryCollection, contractsCollection } from '../app/db.js'
-import sde from '../../frontend/src/generated-data/sde.json' // assert {type:'json'} // assert breaks netlify prod, but is required in heroku
 
 import { evaluate } from 'mathjs'
 import { getAppraisalForItem } from '../../frontend/src/appraisal.js'
 import { INVENTORY_STATUS } from './listing-flow.js'
 
-import fs from 'fs'
-
 // const loadJSON = (path) => JSON.parse(fs.readFileSync(new URL(path, import.meta.url)))
 // const sde = loadJSON('../../frontend/src/generated-data/sde.json')
 
-export const dogmaToAttributesRaw = (typeID, dogmaAttributes) => {
+const dogmaToAttributesRaw = (typeID, dogmaAttributes, sde) => {
   const relevantAttributes = sde.abyssalTypes[typeID].attributes.map(a => a.id)
   // console.log('relevantAttributes', relevantAttributes)
   const filteredAttributes = dogmaAttributes.filter(attr => relevantAttributes.includes(attr.attribute_id))// .map(a => { return { id: a.attribute_id, value: a.value } })
@@ -45,7 +42,7 @@ const runBatches = async (promises, batchSize) => {
   }
 }
 
-export const updateInventoryFromPublicContracts = async () => {
+export const updateInventoryFromPublicContracts = async (sde) => {
   try {
     const startTime = new Date()
     console.log('updateInventoryFromPublicContracts START')
@@ -77,7 +74,7 @@ export const updateInventoryFromPublicContracts = async () => {
       for (const item of abyssalItems) {
         const dogma = await getDogmaAttributes(item.item_id, item.type_id)
         // console.log('i.dogma', i, i.itemID, i.typeID, i.dogma)
-        const filteredAttributesObject = await dogmaToAttributesRaw(item.type_id, dogma.dogma_attributes)
+        const filteredAttributesObject = await dogmaToAttributesRaw(item.type_id, dogma.dogma_attributes, sde)
 
         const appraisal = await getAppraisalForItem({ itemID: item.item_id }, batchID)
 

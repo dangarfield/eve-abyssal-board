@@ -53,7 +53,7 @@ export const getEvePaymentJournal = async () => {
   try {
     const result = (await esi.corporations.getCorporationsCorporationIdWalletsDivisionJournal(appAuth.corpId, appConfig.corpDivisionId, { token: accessToken }))
     const lastModified = new Date(result.headers.get('last-modified'))
-    console.log('result', result, lastModified, lastModified.toLocaleString())
+    console.log('result', result.data, lastModified, lastModified.toLocaleString())
     return { journal: result.data, lastModified }
   } catch (error) {
     console.log('getEvePaymentJournal ERROR', error)

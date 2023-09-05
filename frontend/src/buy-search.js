@@ -116,7 +116,8 @@ const bindSearchInteractions = () => {
       rangeEle.style.right = `${percentage}%`
     }
     rangeEle.style.display = 'block'
-    searchAttrEle.addEventListener('mousedown', event => {
+
+    const handleInputInteraction = (event) => {
       const sliderRect = searchAttrEle.getBoundingClientRect()
       const sliderWidth = sliderRect.width
       let offsetX = event.clientX - sliderRect.left
@@ -154,7 +155,9 @@ const bindSearchInteractions = () => {
         rangeDisplayEle.innerHTML = `± ${plusMinusDisplayValue}`
         triggerSearch()
       }
-    })
+    }
+    searchAttrEle.addEventListener('mousedown', handleInputInteraction)
+    searchAttrEle.addEventListener('touchstart', handleInputInteraction)
   }
 }
 const updateResultsText = (text) => {

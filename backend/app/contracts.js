@@ -1,9 +1,15 @@
 import { getAllPublicContracts, getContractItems, getDogmaAttributes } from './eve-api.js'
 import { inventoryCollection, contractsCollection } from '../app/db.js'
-import sde from '../../frontend/src/generated-data/sde.json'// assert {type:'json'}
+import sde from '../../frontend/src/generated-data/sde.json' assert {type:'json'} // assert breaks netlify prod, but is required in heroku
+
 import { evaluate } from 'mathjs'
 import { getAppraisalForItem } from '../../frontend/src/appraisal.js'
 import { INVENTORY_STATUS } from './listing-flow.js'
+
+import fs from 'fs'
+
+// const loadJSON = (path) => JSON.parse(fs.readFileSync(new URL(path, import.meta.url)))
+// const sde = loadJSON('../../frontend/src/generated-data/sde.json')
 
 export const dogmaToAttributesRaw = (typeID, dogmaAttributes) => {
   const relevantAttributes = sde.abyssalTypes[typeID].attributes.map(a => a.id)

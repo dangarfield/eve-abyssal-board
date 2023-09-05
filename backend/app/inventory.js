@@ -1,4 +1,4 @@
-import { inventoryCollection } from './db.js'
+import { inventoryCollection } from './db'
 
 export const getSellerInventory = async (authCharacterId, characterId) => {
   const q = {

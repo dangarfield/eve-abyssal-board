@@ -1,7 +1,7 @@
-import { inventoryCollection, paymentCollection } from '../app/db.js'
-import { getAppAuth, getAppConfig } from './config.js'
+import { inventoryCollection, paymentCollection } from '../app/db'
+import { getAppAuth, getAppConfig } from './config'
 import { nanoid } from 'nanoid'
-import { sendMail } from './eve-api.js'
+import { sendMail } from './eve-api'
 
 export const INVENTORY_STATUS = { AWAITING_PAYMENT: 'AWAITING_PAYMENT', ON_SALE: 'ON_SALE', CANCELLED: 'CANCELLED', COMPLETE: 'COMPLETE', CONTRACT: 'CONTRACT', UNAVAILABLE: 'UNAVAILABLE' }
 // CONST APPRAISAL_STATUS = {AWAITING_APPRAISAL: 'AWAITING_APPRAISAL', COMPLETE:'COMPLETE'}

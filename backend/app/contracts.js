@@ -1,9 +1,9 @@
-import { getAllPublicContracts, getContractItems, getDogmaAttributes } from './eve-api.js'
-import { inventoryCollection, contractsCollection } from '../app/db.js'
+import { getAllPublicContracts, getContractItems, getDogmaAttributes } from './eve-api'
+import { inventoryCollection, contractsCollection } from '../app/db'
 import sde from '../../frontend/src/generated-data/sde.json' assert {type:'json'}
 import { evaluate } from 'mathjs'
-import { getAppraisalForItem } from '../../frontend/src/appraisal.js'
-import { INVENTORY_STATUS } from './listing-flow.js'
+import { getAppraisalForItem } from '../../frontend/src/appraisal'
+import { INVENTORY_STATUS } from './listing-flow'
 
 export const dogmaToAttributesRaw = (typeID, dogmaAttributes) => {
   const relevantAttributes = sde.abyssalTypes[typeID].attributes.map(a => a.id)

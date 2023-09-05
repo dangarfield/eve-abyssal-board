@@ -1,4 +1,4 @@
-import { configCollection } from './db.js'
+import { configCollection } from './db'
 
 const ID_APP_CONFIG = 'appConfig'
 const ID_APP_AUTH = 'authConfig'

@@ -1,6 +1,6 @@
-import { inventoryCollection, paymentCollection } from './db.js'
-import { getEvePaymentJournal } from './eve-api.js'
-import { PAYMENT_TYPES, receivePaymentAndPutInventoryOnSale } from './listing-flow.js'
+import { inventoryCollection, paymentCollection } from './db'
+import { getEvePaymentJournal } from './eve-api'
+import { PAYMENT_TYPES, receivePaymentAndPutInventoryOnSale } from './listing-flow'
 
 function groupByAttribute (objects, attribute) {
   const grouped = {}
@@ -27,7 +27,7 @@ export const getSellerPayments = async (characterId) => {
 }
 export const findAndUpdateCompletedPayments = async () => {
   const unpaidPayments = await paymentCollection.find({ paid: false }).toArray()
-  const { journal, lastModified } = await getEvePaymentJournal()
+  const { journal } = await getEvePaymentJournal()
   // console.log('journalItemsAll', journal, lastModified)
   const journalItems = journal.filter(j => j.ref_type === 'player_donation')
   // console.log('journalItems', journalItems)

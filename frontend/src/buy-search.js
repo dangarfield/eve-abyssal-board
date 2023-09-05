@@ -118,9 +118,11 @@ const bindSearchInteractions = () => {
     rangeEle.style.display = 'block'
 
     const handleInputInteraction = (event) => {
+      console.log('handleInputInteraction', event)
       const sliderRect = searchAttrEle.getBoundingClientRect()
       const sliderWidth = sliderRect.width
-      let offsetX = event.clientX - sliderRect.left
+      const clientX = event.clientX ? event.clientX : event.touches[0].clientX
+      let offsetX = clientX - sliderRect.left
       if (!attr.highIsGood) offsetX = sliderWidth - offsetX
       const min = parseFloat(searchAttrEle.min)
       const max = parseFloat(searchAttrEle.max)

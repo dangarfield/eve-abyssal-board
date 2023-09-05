@@ -41,10 +41,12 @@ const bindSearchInteractions = () => {
       rangeEle.style.right = `${percentage}%`
     }
     rangeEle.style.display = 'block'
-    searchAttrEle.addEventListener('mousedown', event => {
+    const handleInputInteraction = (event) => {
+      console.log('handleInputInteraction', event)
       const sliderRect = searchAttrEle.getBoundingClientRect()
       const sliderWidth = sliderRect.width
-      let offsetX = event.clientX - sliderRect.left
+      const clientX = event.clientX ? event.clientX : event.touches[0].clientX
+      let offsetX = clientX - sliderRect.left
       if (!attr.highIsGood) offsetX = sliderWidth - offsetX
       const min = parseFloat(searchAttrEle.min)
       const max = parseFloat(searchAttrEle.max)
@@ -79,7 +81,9 @@ const bindSearchInteractions = () => {
         rangeDisplayEle.innerHTML = `± ${plusMinusDisplayValue}`
         // triggerSearch()
       }
-    })
+    }
+    searchAttrEle.addEventListener('mousedown', handleInputInteraction)
+    searchAttrEle.addEventListener('touchstart', handleInputInteraction)
   }
 }
 const setComparisonAttributes = () => {

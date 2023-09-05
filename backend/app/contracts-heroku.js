@@ -1,6 +1,6 @@
 import { getAllPublicContracts, getContractItems, getDogmaAttributes } from './eve-api.js'
-import { inventoryCollection, contractsCollection } from '../app/db.js'
-import sde from '../../frontend/src/generated-data/sde.json' // assert {type:'json'} // assert breaks netlify prod, but is required in heroku
+import { inventoryCollection, contractsCollection } from './db.js'
+import sde from '../../frontend/src/generated-data/sde.json' assert {type:'json'} // assert breaks netlify prod, but is required in heroku
 
 import { evaluate } from 'mathjs'
 import { getAppraisalForItem } from '../../frontend/src/appraisal.js'

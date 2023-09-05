@@ -1,4 +1,4 @@
-import { updateInventoryFromPublicContracts } from '../app/contracts.js'
+import { updateInventoryFromPublicContracts } from '../app/contracts-heroku.js'
 import { findAndUpdateCompletedPayments } from '../app/payments.js'
 
 const executeJob = async () => {

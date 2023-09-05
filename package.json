@@ -50,5 +50,8 @@
       ".env.local",
       ".env.local.example"
     ]
+  },
+  "engines": {
+    "node": "18.x"
   }
 }

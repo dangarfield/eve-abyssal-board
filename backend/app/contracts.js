@@ -109,7 +109,7 @@ export const updateInventoryFromPublicContracts = async () => {
     )
 
     const timeTaken = new Date() - startTime
-    console.log('updateInventoryFromPublicContracts END', timeTaken)
+    console.log('updateInventoryFromPublicContracts END', timeTaken, new Date())
   } catch (error) {
     console.log('updateInventoryFromPublicContracts error', error)
   }

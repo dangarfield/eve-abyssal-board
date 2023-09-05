@@ -1,5 +1,5 @@
-import { updateInventoryFromPublicContracts } from '../app/contracts'
-import { findAndUpdateCompletedPayments } from '../app/payments'
+import { updateInventoryFromPublicContracts } from '../app/contracts.js'
+import { findAndUpdateCompletedPayments } from '../app/payments.js'
 
 const executeJob = async () => {
   await findAndUpdateCompletedPayments()

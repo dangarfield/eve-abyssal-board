@@ -1,6 +1,6 @@
-import { inventoryCollection, paymentCollection } from './db'
-import { getEvePaymentJournal } from './eve-api'
-import { PAYMENT_TYPES, receivePaymentAndPutInventoryOnSale } from './listing-flow'
+import { inventoryCollection, paymentCollection } from './db.js'
+import { getEvePaymentJournal } from './eve-api.js'
+import { PAYMENT_TYPES, receivePaymentAndPutInventoryOnSale } from './listing-flow.js'
 
 function groupByAttribute (objects, attribute) {
   const grouped = {}

@@ -1,6 +1,6 @@
 import { getAllPublicContracts, getContractItems, getDogmaAttributes } from './eve-api'
 import { inventoryCollection, contractsCollection } from '../app/db'
-import sde from '../../frontend/src/generated-data/sde.json' assert {type:'json'}
+import sde from '../../frontend/src/generated-data/sde.json'// assert {type:'json'}
 import { evaluate } from 'mathjs'
 import { getAppraisalForItem } from '../../frontend/src/appraisal'
 import { INVENTORY_STATUS } from './listing-flow'

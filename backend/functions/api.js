@@ -96,7 +96,7 @@ app.get('/api/sso/return', async function (req, res) {
 app.any('/api/admin-task', verifyAdmin, async function (req, res) {
   console.log('/api/admin-task', 'SUCCESS')
   await findAndUpdateCompletedPayments()
-  // await updateInventoryFromPublicContracts() // Moved to background task
+  await updateInventoryFromPublicContracts() // Moved to background task
   res.json({})
 })
 

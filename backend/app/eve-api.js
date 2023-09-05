@@ -1,6 +1,6 @@
 import { Api } from 'eve-esi-swaggerts'
-import { getAppAuth, getAppConfig } from './config'
-import { updateAndPersistRefreshToken } from './sso'
+import { getAppAuth, getAppConfig } from './config.js'
+import { updateAndPersistRefreshToken } from './sso.js'
 
 const esi = new Api()
 

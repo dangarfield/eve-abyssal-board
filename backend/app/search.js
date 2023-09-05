@@ -1,4 +1,4 @@
-import { inventoryCollection } from './db'
+import { inventoryCollection } from './db.js'
 
 export const searchForModulesOfType = async (typeID, query) => {
   console.log('searchForModulesOfType', typeID, query)

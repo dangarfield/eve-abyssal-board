@@ -1,4 +1,4 @@
-import { sellersCollection } from './db'
+import { sellersCollection } from './db.js'
 
 export const getSellerContactDetails = (sellerIDs) => {
   return [sellerIDs.map(sellerID => { return { sellerID } })]

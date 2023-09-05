@@ -1,9 +1,9 @@
 import crypto from 'crypto'
 import url from 'url'
-import { configCollection } from './db'
+import { configCollection } from './db.js'
 import jsonwebtoken from 'jsonwebtoken'
 import { Api } from 'eve-esi-swaggerts'
-import { setAppAuth, getAppAuth } from './config'
+import { setAppAuth, getAppAuth } from './config.js'
 
 const esi = new Api()
 const CLIENT_ID = process.env.CLIENT_ID

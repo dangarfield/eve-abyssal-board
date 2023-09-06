@@ -114,7 +114,7 @@ export const renderHome = () => {
                     </div>
                     -->
                     <h2 class="text-white fw-normal mb-4 mt-3 hero-title">
-                        Buy and seller your EVE online abyssal modules easily
+                        Buy and sell EVE online abyssal modules easily
                     </h2>
 
                     <p class="fs-5 text-light">

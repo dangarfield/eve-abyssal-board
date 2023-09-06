@@ -203,6 +203,9 @@ const triggerSearch = async () => {
   }
 
   let results = filterResults(allResults, query.attributes)
+  for (const result of results) {
+    if (result.appraisal === undefined) result.appraisal = [{ type: 'AUTO', price: 'Unavailable', confidence: 'Unavailable' }]
+  }
   if (sourceValue > 0) results = results.filter(r => r.sourceTypeID === sourceValue)
   if (!showContracts) results = results.filter(r => r.status !== 'CONTRACT')
   results.sort((a, b) => b.qualityScore - a.qualityScore) // TODO - Add different sort options

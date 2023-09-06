@@ -79,17 +79,12 @@ export const getAllPublicContracts = async () => {
   return contracts.map(c => { return { id: c.contract_id, price: c.price } })
 }
 export const getContractItems = async (contractID) => {
-  try {
-    const res = await esi.contracts.getContractsPublicItemsContractId(contractID)
-    if (res.status === 404) return []
-    if (res.status === 403) return []
-    if (res.error) return []
-    if (res.data === null) return []
-    return res.data
-  } catch (error) {
-    console.log('getContractItems error', error)
-    return []
-  }
+  const res = await esi.contracts.getContractsPublicItemsContractId(contractID)
+  if (res.status === 404) return []
+  if (res.status === 403) return []
+  if (res.error) return []
+  if (res.data === null) return []
+  return res.data
 }
 export const getDogmaAttributes = async (itemID, typeID) => {
   return (await esi.dogma.getDogmaDynamicItemsTypeIdItemId(itemID, typeID)).data

@@ -37,7 +37,7 @@ export const updateMissingAppraisals = async () => {
   for (let i = 0; i < itemIDsToAddAppraisals.length; i++) {
     const itemID = itemIDsToAddAppraisals[i]
     if (itemID !== null) {
-      const appraisal = await getAppraisalForItem({ itemID }, itemID)
+      const appraisal = await getAppraisalForItem({ itemID }, itemID, false)
       console.log('appraisal', i + 1, 'of', itemIDsToAddAppraisals.length, '-', itemID, appraisal)
       await inventoryCollection.updateOne(
         { _id: itemID },

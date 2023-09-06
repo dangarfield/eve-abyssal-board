@@ -341,7 +341,7 @@ const updateAppraisals = async (inventory) => {
     const itemID = parseInt(appraisalEle.getAttribute('data-item-id'))
     // console.log('itemID START', itemID, batchID)
     const item = inventory.find(i => i.itemID === itemID)
-    const appraisal = await getAppraisalForItem(item, batchID)
+    const appraisal = await getAppraisalForItem(item, batchID, true)
     appraisalEle.innerHTML = `<div class="d-flex flex-row gap-2 align-items-center justify-content-between px-0" data-appraisal-value="${appraisal.price}" data-appraisal-confidence="${appraisal.confidence}">
       <span class="p-0"><p>Appraisal:</p></span>
       <span class="p-0 text-end">

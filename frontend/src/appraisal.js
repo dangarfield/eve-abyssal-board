@@ -32,13 +32,15 @@ const predictionConfidence = (conf) => {
 
 //   return (value - min) / (max - min)
 // }
-export const getAppraisalForItem = async (item, batchID) => {
+export const getAppraisalForItem = async (item, batchID, useProxy) => {
   try {
-    const urls = [
+    const urls = useProxy
+      ? [
       `https://thingproxy.freeboard.io/fetch/https://mutaplasmid.space/api/modules/${item.itemID}/appraisal/`,
       `https://api.allorigins.win/raw?url=https://mutaplasmid.space/api/modules/${item.itemID}/appraisal/`,
       `https://corsproxy.io/?https://mutaplasmid.space/api/modules/${item.itemID}/appraisal/`
-    ]
+        ]
+      : [`https://mutaplasmid.space/api/modules/${item.itemID}/appraisal/`]
     // For now, just use mutaplasmid.space appraisal
     const url = urls[batchID % urls.length]
     const req = await fetch(url)
@@ -69,7 +71,7 @@ export const getAppraisalForItem = async (item, batchID) => {
     // console.log('predictedPrice', predictedPrice) // This is incredibly inaccurate. Wait until we have more appraisal data increases then retrain, I'll leave the code here
 
     let confidence = predictionConfidence(res.confidence)
-    console.log('res.price', res)
+    // console.log('res.price', res)
     if (res.error && res.error === 'No prediction available') {
       console.log('no prediction available')
       res.price = 'Unavailable'

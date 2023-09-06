@@ -1,7 +1,7 @@
 import API from 'lambda-api'
 import { getAppAuth, getAppConfig, setAppConfig } from '../app/config.js'
 import { verifyAdmin, verifyToken } from '../app/auth.js'
-import { getSellerInventory, getTypeIDCounts } from '../app/inventory.js'
+import { getSellerInventory, getTypeIDCounts, updateMissingAppraisals } from '../app/inventory.js'
 import { cancelListing, initiateListingFlow, amendListing } from '../app/listing-flow.js'
 import { ssoAdminLoginStart, ssoAdminReturn } from '../app/sso.js'
 import { findAndUpdateCompletedPayments, getPendingPayments, getCompletePayments, getSellerPayments, deletePayment, amendPayment } from '../app/payments.js'
@@ -101,6 +101,7 @@ app.any('/api/admin-task', verifyAdmin, async function (req, res) {
   console.log('/api/admin-task', 'SUCCESS')
   await findAndUpdateCompletedPayments()
   await updateInventoryFromPublicContracts(sde) // Moved to background task
+  await updateMissingAppraisals()
   res.json({})
 })
 

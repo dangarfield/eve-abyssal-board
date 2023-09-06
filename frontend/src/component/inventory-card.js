@@ -145,12 +145,17 @@ export const renderInventoryCard = (item) => {
 
   const appraisalHtml = item.appraisal
     ? `<div class="appraisal px-2 appraisal-complete" data-item-id="${item.itemID}">
-        <p>Appraisal: ${item.appraisal.value === undefined ? 'Unavailable' : item.appraisal.value} <i>Type: ${item.appraisal.type === undefined ? 'AUTO' : item.appraisal.type}</i></p>
+        <div class="d-flex flex-row gap-2 align-items-center justify-content-between px-0">
+            <span class="p-0"><p>Appraisal:</p></span>
+            <span class="p-0 text-end">
+            ${item.appraisal.map(appraisal => `<p><b>${formatToISKString(appraisal.price)}</b> <i>(${appraisal.type})</i></p>`).join('')}
+            </span>
+        </div>
     </div>`
     : `
     <div class="appraisal px-2" data-item-id="${item.itemID}">
         <div class="col placeholder-glow">
-            <span class="col-3">Value:</span>
+            <span class="col-3">Appraisal:</span>
             <span class="placeholder col-6"></span>
             <span class="placeholder col-2"></span>
         </div>
@@ -161,8 +166,30 @@ export const renderInventoryCard = (item) => {
             <span class="input-group-text no-click-close">eg, 13m 1.9b</span>
         </div>
     </div>`
-  const listingPriceHtml = item.listingPrice !== undefined ? `<div class="listing-price px-2"><p>Listing price: <b>${formatToISKString(item.listingPrice)}</b></p></div>` : ''
-  const contractPriceHtml = item.contractPrice !== undefined ? `<div class="listing-price px-2"><p>Contract price: <b>${formatToISKString(item.contractPrice)}</b></p></div>` : ''
+  const listingPriceHtml = item.listingPrice !== undefined
+    ? `
+    <div class="listing-price px-2">
+        <div class="d-flex flex-row gap-2 align-items-center justify-content-between px-0">
+            <span class="p-0"><p>List price:</p></span>
+            <span class="p-0 text-end">
+                <p><b>${formatToISKString(item.listingPrice)}</b>
+            </span>
+        </div>
+    </div>
+  `
+    : ''
+  const contractPriceHtml = item.contractPrice !== undefined
+    ? `
+    <div class="listing-price px-2">
+        <div class="d-flex flex-row gap-2 align-items-center justify-content-between px-0">
+            <span class="p-0"><p>Contract price:</p></span>
+            <span class="p-0 text-end">
+                <p><b>${formatToISKString(item.contractPrice)}</b>
+            </span>
+        </div>
+    </div>
+    `
+    : ''
 
   let itemDisplayClass = ''
   let statusBG = 'bg-dark'

@@ -44,6 +44,9 @@ export const listingPriceStringToInt = (inputValue) => {
   return value
 }
 export const formatToISKString = (number) => {
+  if (typeof number !== 'number' || isNaN(number)) {
+    return number
+  }
   const suffixes = ['', 'k', 'm', 'b', 't']
   let absNumber = Math.abs(number)
   let suffixIndex = 0

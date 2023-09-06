@@ -1,3 +1,4 @@
+import { getAppraisalForItem } from '../../frontend/src/appraisal.js'
 import { inventoryCollection } from './db.js'
 
 export const getSellerInventory = async (authCharacterId, characterId) => {
@@ -19,4 +20,41 @@ export const getTypeIDCounts = async () => {
   ]).toArray()
   const countByTypeID = result.reduce((obj, item) => ({ ...obj, [item._id]: item.count }), {})
   return countByTypeID
+}
+export const updateMissingAppraisals = async () => {
+  // await inventoryCollection.updateMany({}, { $unset: { appraisal: '' } })
+
+  const itemIDsToAddAppraisals = await inventoryCollection.distinct('_id',
+    {
+      $or: [
+        { appraisal: { $exists: false } },
+        { appraisal: { $not: { $elemMatch: { type: 'AUTO' } } } },
+        { appraisal: { $elemMatch: { type: 'AUTO', price: 'Error' } } }
+      ]
+    }
+  )
+  for (let i = 0; i < itemIDsToAddAppraisals.length; i++) {
+    const itemID = itemIDsToAddAppraisals[i]
+    if (itemID !== null) {
+      const appraisal = await getAppraisalForItem({ itemID }, itemID)
+      console.log('appraisal', i + 1, 'of', itemIDsToAddAppraisals.length, '-', itemID, appraisal)
+      await inventoryCollection.updateOne(
+        { _id: itemID },
+        {
+          $pull: {
+            appraisal: { type: 'AUTO', price: 'Error' }
+          }
+        }
+      )
+      await inventoryCollection.updateOne(
+        { _id: itemID },
+        {
+          $push: {
+            appraisal: { $each: [appraisal] }
+          }
+        }
+      )
+    }
+  }
+  console.log('updateMissingAppraisals results', itemIDsToAddAppraisals.length)
 }

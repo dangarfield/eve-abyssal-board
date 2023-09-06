@@ -279,7 +279,11 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
       const data = deepCopy(inventory.data)
       // data.listingPriceString = a.querySelector('.listing-price').value
       data.listingPrice = listingPriceStringToInt(a.querySelector('.listing-price').value)
-      data.appraisal = { type: 'AUTO', value: a.querySelector('.appraisal p').textContent.replace('Value: ', '') }
+      data.appraisal = [{
+        type: 'AUTO',
+        price: parseInt(a.querySelector('.appraisal div').getAttribute('data-appraisal-value')),
+        confidence: a.querySelector('.appraisal div').getAttribute('data-appraisal-confidence')
+      }]
       // TODO - Appraisal value seems to have floating point issues
       return data
     })
@@ -338,7 +342,12 @@ const updateAppraisals = async (inventory) => {
     // console.log('itemID START', itemID, batchID)
     const item = inventory.find(i => i.itemID === itemID)
     const appraisal = await getAppraisalForItem(item, batchID)
-    appraisalEle.innerHTML = `<p>Value: ${typeof appraisal.price === 'string' ? appraisal.price : formatToISKString(appraisal.price)} <i>(Confidence: ${appraisal.confidence})</></p>`
+    appraisalEle.innerHTML = `<div class="d-flex flex-row gap-2 align-items-center justify-content-between px-0" data-appraisal-value="${appraisal.price}" data-appraisal-confidence="${appraisal.confidence}">
+      <span class="p-0"><p>Appraisal:</p></span>
+      <span class="p-0 text-end">
+        <p><b>${formatToISKString(appraisal.price)}</b> <i>(${appraisal.type})</i></p>
+      </span>
+    </div>`
     appraisalEle.parentNode.querySelector('.listing-price').value = typeof appraisal.price === 'string' ? 0 : formatToISKString(appraisal.price).replace(' ISK', '')
     // console.log('itemID END', itemID)
   })

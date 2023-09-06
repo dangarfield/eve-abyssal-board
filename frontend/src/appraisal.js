@@ -21,17 +21,17 @@ const predictionConfidence = (conf) => {
     return 'Completely garbage'
   }
 }
-const normaliseValue = (value, min, max) => {
-  //   if (min === max) {
-  //     throw new Error('Min and max cannot be the same.')
-  //   }
+// const normaliseValue = (value, min, max) => {
+//   //   if (min === max) {
+//   //     throw new Error('Min and max cannot be the same.')
+//   //   }
 
-  //   if (value < min || value > max) {
-  //     throw new Error('Value is outside the range defined by min and max.')
-  //   }
+//   //   if (value < min || value > max) {
+//   //     throw new Error('Value is outside the range defined by min and max.')
+//   //   }
 
-  return (value - min) / (max - min)
-}
+//   return (value - min) / (max - min)
+// }
 export const getAppraisalForItem = async (item, batchID) => {
   try {
     const urls = [
@@ -67,9 +67,22 @@ export const getAppraisalForItem = async (item, batchID) => {
     // let predictedPrice = Math.abs(Math.round(net.run(input) * 1000000000))
     // if (isNaN(predictedPrice)) predictedPrice = 0
     // console.log('predictedPrice', predictedPrice) // This is incredibly inaccurate. Wait until we have more appraisal data increases then retrain, I'll leave the code here
-    return { price: res.price, confidence: predictionConfidence(res.confidence) }
+
+    let confidence = predictionConfidence(res.confidence)
+    console.log('res.price', res)
+    if (res.error && res.error === 'No prediction available') {
+      console.log('no prediction available')
+      res.price = 'Unavailable'
+      confidence = 'Unavailable'
+    } else if (typeof res.price !== 'number' || isNaN(res.price)) {
+      res.price = 'Error'
+      confidence = 'Error'
+    } else {
+      res.price = Math.round(res.price)
+    }
+    return { type: 'AUTO', price: res.price, confidence }
   } catch (error) {
-    // console.log('getAppraisalForItem error', item, error)
-    return { price: 'Unavailable', confidence: 'Unavailable' }
+    console.log('getAppraisalForItem error', item, error)
+    return { type: 'AUTO', price: 'Error', confidence: 'Error' }
   }
 }

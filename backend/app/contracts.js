@@ -87,7 +87,7 @@ export const updateInventoryFromPublicContracts = async (sde) => {
           status: 'CONTRACT',
           contract: { id: missingContract.id },
           contractPrice: missingContract.price + (plex * 5000000),
-          appraisal
+          appraisal: [appraisal]
           // characterID: 'tbc',
           // characterName: 'tbc'
         }

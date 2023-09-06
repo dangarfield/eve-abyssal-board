@@ -1,7 +1,7 @@
 import API from 'lambda-api'
 import { getAppAuth, getAppConfig, setAppConfig } from '../app/config.js'
 import { verifyAdmin, verifyToken } from '../app/auth.js'
-import { getSellerInventory } from '../app/inventory.js'
+import { getSellerInventory, getTypeIDCounts } from '../app/inventory.js'
 import { cancelListing, initiateListingFlow, amendListing } from '../app/listing-flow.js'
 import { ssoAdminLoginStart, ssoAdminReturn } from '../app/sso.js'
 import { findAndUpdateCompletedPayments, getPendingPayments, getCompletePayments, getSellerPayments, deletePayment, amendPayment } from '../app/payments.js'
@@ -58,6 +58,9 @@ app.patch('/api/listing/:itemID', verifyToken, async function (req, res) {
 })
 app.post('/api/search/:typeID', async function (req, res) {
   res.json(await searchForModulesOfType(parseInt(req.params.typeID), req.body))
+})
+app.get('/api/stats', async function (req, res) {
+  res.json(await getTypeIDCounts())
 })
 
 // Sellers

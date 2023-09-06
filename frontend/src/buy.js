@@ -1,13 +1,15 @@
+import { getTypeIDCounts } from './board-api'
 import { getAbyssModuleTypes } from './module-types'
 
-const renderHome = (moduleTypes) => {
+const renderHome = (moduleTypes, typeCounts) => {
+  console.log('typeCounts', typeCounts)
   const html = `
     <div class="container">
         
         <div class="row pt-5" data-masonry='{"percentPosition": true }'>
         ${moduleTypes.map(m => {
             return `
-            <div class="col-lg-2">
+            ${m.group === 'Siege Module' ? '' : '<div class="col-lg-2">'}
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title fs-5 text-center">
@@ -15,11 +17,14 @@ const renderHome = (moduleTypes) => {
                             ${m.group}
                         </h5>
                         ${m.categories.map(c => {
-                            return `<a class="btn btn-sm btn-block btn-primary w-100 card-link-wide" href="/buy/category/${c.typeID}">${c.categoryName}</a>`
+                            return `<a class="btn btn-sm btn-block btn-primary w-100 card-link-wide" href="/buy/category/${c.typeID}">
+                                ${c.categoryName}
+                                <span class="fst-italic fw-lighter">(${typeCounts[c.typeID] !== undefined ? typeCounts[c.typeID] : 0})</span>
+                            </a>`
                         }).join('')}
                     </div>
                 </div>
-            </div>
+            ${m.group === 'Fighter Support Unit' ? '' : '</div>'}
             `
         }).join('')}
         </div>
@@ -29,5 +34,6 @@ const renderHome = (moduleTypes) => {
 }
 export const displayBuyHome = async () => {
   const moduleTypes = getAbyssModuleTypes()
-  renderHome(moduleTypes)
+  const typeCounts = await getTypeIDCounts()
+  renderHome(moduleTypes, typeCounts)
 }

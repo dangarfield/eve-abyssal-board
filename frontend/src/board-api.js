@@ -4,6 +4,12 @@ import { loadData } from './utils'
 const API_ROOT = ''
 let appConfig
 
+export const getTypeIDCounts = async () => {
+  const req = await window.fetch(`${API_ROOT}/api/stats`)
+  const res = await req.json()
+  return res
+}
+
 export const getCurrentSellerInventory = async () => {
   const { characterId } = await getCurrentUserAccessToken()
   return getSellerInventory(characterId)

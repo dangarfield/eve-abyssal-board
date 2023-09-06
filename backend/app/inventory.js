@@ -13,3 +13,10 @@ export const getSellerInventory = async (authCharacterId, characterId) => {
   }
   return results
 }
+export const getTypeIDCounts = async () => {
+  const result = await inventoryCollection.aggregate([
+    { $group: { _id: '$typeID', count: { $sum: 1 } } }
+  ]).toArray()
+  const countByTypeID = result.reduce((obj, item) => ({ ...obj, [item._id]: item.count }), {})
+  return countByTypeID
+}

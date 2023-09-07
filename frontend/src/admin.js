@@ -119,6 +119,9 @@ const renderAdminDetails = (appAuth, appConfig, adminToken) => {
                           <div class="col-sm-6">
                             <button type="submit" class="btn btn-primary save float-end">Save</button>
                           </div>
+                          <div class="col-sm-4">
+                            <button type="button" class="btn btn-primary trigger-admin-task">Trigger background admin task</button>
+                          </div>
                         </div>
                     </form>
                 </div>
@@ -156,6 +159,9 @@ const renderAdminDetails = (appAuth, appConfig, adminToken) => {
       document.querySelector('#refreshToken').value = document.querySelector('#refreshToken-sso').value
     })
   }
+  document.querySelector('.admin-form .trigger-admin-task').addEventListener('click', async function (event) {
+    await triggerPeriodicAdminTask()
+  })
 }
 export const initAdmin = async () => {
   console.log('initAdmin')
@@ -173,7 +179,6 @@ export const initAdmin = async () => {
       console.log('LOGGED IN!!! DATA', appAuth, appConfig)
       const data = loadData()
       renderAdminDetails(appAuth, appConfig, data['admin-token'])
-      await triggerPeriodicAdminTask()
     }
     // TODO is null, password is bad, clear password and reload page
   } else {

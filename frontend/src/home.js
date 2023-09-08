@@ -141,7 +141,7 @@ export const renderHome = () => {
                     </div>
                     <div class="d-flex flex-row align-items-center text-light mb-3">
                         <div class="px-2"><i class="bi bi-wallet-fill fs-4"></i></div>
-                        <div class="p-2"><b><span class="badge bg-danger">+500m ISK</span> ISK saving!</b></div>
+                        <div class="p-2"><b><span class="badge bg-danger">+500m ISK</span> saving!</b></div>
                     </div>
 
                     <p class="fs-5 text-light">
@@ -159,7 +159,7 @@ export const renderHome = () => {
                         <div class="px-2"><i class="bi bi-3-circle-fill fs-4"></i></div>
                         <div class="p-2">Pay the 1% ISK listing fee and voila!</div>
                     </div>
-                    
+
                     <a href="/buy" class="btn btn-success me-2 mb-3">Buy Modules</a>
                     <a href="/sell" class="btn btn-success mb-3">Sell Modules</a>
                 </div>

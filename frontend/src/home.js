@@ -114,7 +114,7 @@ export const renderHome = () => {
                     </div>
                     -->
                     <h2 class="text-white fw-normal mb-4 mt-3 hero-title">
-                        Buy and sell EVE online abyssal modules easily
+                        Buy and sell EVE online abyssal modules easily and cheaply
                     </h2>
 
                     <p class="fs-5 text-light">
@@ -130,8 +130,23 @@ export const renderHome = () => {
                     </div>
                     <div class="d-flex flex-row mb-3 align-items-center text-light">
                         <div class="px-2"><i class="bi bi-3-circle-fill fs-4"></i></div>
-                        <div class="p-2">Pay the 6m ISK listing fee and voila!</div>
+                        <div class="p-2">Pay the 1% ISK listing fee and voila!</div>
                     </div>
+
+                    <p class="fs-5 text-light">
+                        Why list with us? <b><span class="text-light">Max fees of 1%</span></b>
+                    </p>
+
+                    <p class="fs-6 text-light">
+                      Listing through EVE Online contracts with perfect skills and standings will cost 1.5% - 2% plus any additional relist fees.
+                    </p>
+
+                    <p class="fs-6 text-light">
+                      Listing 10x 10b abyssal mods?<br/>
+                      - EVE Contract costs - 1.5b PLUS relists<br/>
+                      - Abyss costs - 1b, NO relists<br/>
+                      - <b>A +500m ISK saving!</b>
+                    </p>
                   
 
 

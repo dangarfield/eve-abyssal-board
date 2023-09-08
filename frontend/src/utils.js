@@ -125,7 +125,7 @@ export const triggerRefreshTime = (elementSelector, typeMessage, expireTime, las
   refreshTime()
 }
 
-export const showModalAlert = async (title, contentHtml, footerConfig) => {
+export const showModalAlert = async (title, contentHtml, footerConfig, renderCallback) => {
   return new Promise((resolve, reject) => {
     const id = `modal-${nanoid(10)}`
     const html = `<div class="modal fade" id="${id}" tabindex="-1" role="dialog">
@@ -148,6 +148,9 @@ export const showModalAlert = async (title, contentHtml, footerConfig) => {
       </div>
     </div>`
     document.body.insertAdjacentHTML('beforeend', html)
+    if (renderCallback) {
+      renderCallback(document.querySelector(`#${id}`))
+    }
     if (footerConfig) {
       for (let i = 0; i < footerConfig.length; i++) {
         document.querySelector(`.modal .modal-footer-btn-${i}`).addEventListener('click', () => {

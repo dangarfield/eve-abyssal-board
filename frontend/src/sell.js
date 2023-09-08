@@ -2,6 +2,7 @@ import { doesCurrentCharacterHaveSellerScope, getCurrentUserDetails, triggerLogi
 import { amendListing, cancelListing, getAppConfig, getCurrentSellerInventory, getCurrentSellerPayments, getCurrentSellerData, setCurrentSellerData } from './board-api'
 import { renderInventoryCard } from './component/inventory-card'
 import { inventoryToInventoryCardDTO } from './dogma-utils'
+import { validateListingPrice } from './sell-inventory'
 import { formatToISKString, listingPriceStringToInt, showModalAlert } from './utils'
 
 const askForSellerScopePermission = () => {
@@ -219,16 +220,21 @@ const renderSellerListing = (listedItems) => {
     invOnSaleEle.addEventListener('click', async () => {
       const itemID = parseInt(invOnSaleEle.getAttribute('data-item-id'))
       const listingPrice = listedItems.find(i => i.itemID === itemID).listingPrice
+      const listingPercentage = (await getAppConfig()).listingPercentage
       console.log('on-sale', itemID, listedItems, listingPrice)
       await showModalAlert('Amend Listing', `
       <p>You've already paid the listing fee, if you want to cancel or have sold it elsewhere, the listing fee will not be returned.</p>
       <p>If you cancel this listing, it'll disappear from this screen along but the completed payments will remain visible. If you want to relist it, simply add a new mod listing as before.</p>
+      <p>Discounting your mod will be free, but increasing the price will be 1% of the difference.</p>
       <div class="row align-items-center">
         <div class="col-auto">
           <label for="list-price-modal" class="col-form-label">Listing Price</label>
         </div>
         <div class="col">
-          <input type="text" id="list-price-modal" class="form-control list-price-modal" value="${formatToISKString(listingPrice).replace(' ISK', '').trim()}">
+          <div class="input-group mb-3">
+            <input type="text" id="list-price-modal" class="form-control list-price-modal" value="${formatToISKString(listingPrice).replace(' ISK', '').trim()}">
+            <span class="input-group-text no-click-close list-price-fee">Fee: 0 ISK</span>
+          </div>
         </div>
       </div>
 
@@ -256,14 +262,29 @@ const renderSellerListing = (listedItems) => {
         cb: async () => {
           console.log('callback', invOnSaleEle, itemID)
           // await amendListing(itemID, { status: 'COMPLETE' })
-          const listingPriceString = document.querySelector('.list-price-modal').value
-          const listingPrice = listingPriceStringToInt(listingPriceString)
-          console.log('listing complete', listingPriceString, listingPrice)
-          await amendListing(itemID, { listingPrice })
-          invOnSaleEle.querySelector('.listing-price').innerHTML = `<p>Listing price: <b>${formatToISKString(listingPrice)}</b></p>`
-          document.querySelector('.modal .btn-close').click()
+          const newListingPriceString = document.querySelector('.list-price-modal').value
+          const newListingPrice = listingPriceStringToInt(newListingPriceString)
+          console.log('listing complete', newListingPriceString, newListingPrice)
+          window.alert('No yet implemented')
+          // await amendListing(itemID, { listingPrice })
+          // invOnSaleEle.querySelector('.listing-price').innerHTML = `<p>Listing price: <b>${formatToISKString(listingPrice)}</b></p>`
+          // document.querySelector('.modal .btn-close').click()
         }
-      }])
+      }],
+      async (modelEle) => {
+        console.log('modelEle', modelEle)
+        const newListingPriceEle = modelEle.querySelector('.list-price-modal')
+        const newListingFeeEle = modelEle.querySelector('.list-price-fee')
+        newListingPriceEle.addEventListener('blur', async () => {
+          newListingPriceEle.value = await validateListingPrice(newListingPriceEle.value)
+          const newListingPrice = listingPriceStringToInt(newListingPriceEle.value)
+          let listingFee = listingPercentage * (newListingPrice - listingPrice)
+          if (listingFee < 0) listingFee = 0
+          console.log('listingFee', listingPercentage, '-', listingPrice, newListingPrice, '-', listingFee, formatToISKString(listingFee))
+          newListingFeeEle.innerHTML = `Fee: ${formatToISKString(listingFee)}`
+        })
+        console.log('listingPrice', newListingPriceEle.value)
+      })
     })
   }
 }

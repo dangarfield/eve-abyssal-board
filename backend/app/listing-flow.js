@@ -31,7 +31,7 @@ export const initiateListingFlow = async (auth, inventoryItems) => {
     _id: nanoid(10),
     characterId: auth.characterId,
     characterName: auth.characterName,
-    amount: appConfig.listingPrice * inventoryItems.length,
+    amount: appConfig.listingPercentage * inventoryItems.map(i => i.listingPrice).reduce((sum, v) => sum + v, 0),
     inventory: inventoryItems.map(i => i._id),
     type: PAYMENT_TYPES.LISTING_FEE,
     creationDate: new Date(),

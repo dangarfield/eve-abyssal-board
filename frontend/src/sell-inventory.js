@@ -19,7 +19,7 @@ const renderInventoryPlaceholder = (userDetails) => {
         <div class="card-body">
           <h5 class="card-title">Find your assets</h5>
           <p class="card-text">EVE Online servers cache this data and it is made available to us up to 60 minutes after requesting.</p>
-          <p class="card-text">Select the mods that you wish to sell and add your listing price. You can update the listing price at any time after it is listed.</p>
+          <p class="card-text">Select the mods that you wish to sell and add your listing price. You can update the listing price at any time after it is listed. Discounting your mod will be free, but increasing the price will be 1% of the difference.</p>
           <p class="card-text"><i><b>Note:</b> Once you send a listing fee payment and you cancel after the mod is on sale or sell the item elsewhere, the listing fee will not be returned.</i></p>
         </div>
       </div>
@@ -180,6 +180,14 @@ const filterCards = () => {
 
   document.querySelector('.inventory-filtered').style.display = allItemsHidden ? 'block' : 'none'
 }
+const updateTotalListingPrice = async () => {
+  if (document.querySelectorAll('.inventory-item.selected .listing-price').length > 0) {
+    const totalListingPrice = Array.from(document.querySelectorAll('.inventory-item.selected .listing-price')).reduce((sum, element) => sum + listingPriceStringToInt(element.value || '0'), 0)
+    console.log('totalListingPrice', totalListingPrice)
+    const totalListingFee = (await getAppConfig()).listingPercentage * totalListingPrice
+    document.querySelector('.confirm-inventory .price').innerHTML = `<span class="badge text-bg-secondary">${formatToISKString(totalListingFee)}</span>`
+  }
+}
 const bindInventoryActions = (availableInventory, cacheExpires, lastModified) => {
   triggerRefreshTime('.refresh-time-inventory', 'Inventory data', cacheExpires, lastModified)
 
@@ -254,10 +262,10 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
         }
       }
       const selectedCount = document.querySelectorAll('.inventory-item.selected').length
-      const listingPrice = (await getAppConfig()).listingPrice * selectedCount
-      console.log('listingPrice', selectedCount, listingPrice)
+      console.log('selectedCount', selectedCount)
+
       document.querySelector('.confirm-inventory .count').innerHTML = `${selectedCount} mod${selectedCount === 1 ? '' : 's'}`
-      document.querySelector('.confirm-inventory .price').innerHTML = `<span class="badge text-bg-secondary">${formatToISKString(listingPrice)}</span>`
+      await updateTotalListingPrice()
 
       const selectedInventoryHolderEle = document.querySelector('.selected-inventory-holder')
       const backToTopEle = document.querySelector('.back-to-top')
@@ -271,8 +279,8 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
     })
   }
   for (const listingPriceEle of [...document.querySelectorAll('.listing-price')]) {
-    listingPriceEle.addEventListener('blur', () => {
-      listingPriceEle.value = validateListingPrice(listingPriceEle.value)
+    listingPriceEle.addEventListener('blur', async () => {
+      listingPriceEle.value = await validateListingPrice(listingPriceEle.value)
     })
   }
   document.querySelector('.confirm-inventory').addEventListener('click', async () => {
@@ -359,12 +367,12 @@ const updateAppraisals = async (inventory) => {
 
   // console.log('All appraisals have been processed.')
 }
-const validateListingPrice = (inputValue) => {
+export const validateListingPrice = async (inputValue) => {
   const digitsString = inputValue.match(/[\d.]+/g)
   const value = parseFloat(digitsString ? digitsString.join('') : '')
   // console.log('validateListingPrice', inputValue, value)
   if (isNaN(value)) return 0
-
+  await updateTotalListingPrice()
   const inputValueLower = inputValue.toLowerCase().replace('isk', '')
   let unit = ''
   if (inputValueLower.includes('k') || inputValueLower.includes('thou')) unit = 'k'

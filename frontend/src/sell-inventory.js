@@ -95,7 +95,7 @@ const renderInventoryPlaceholder = (userDetails) => {
               <div class="d-flex flex-row justify-content-center">
                 <i class="bi bi-plus-circle-fill"></i>
                 <span class="text-start ps-3">
-                  List <span class="count">0</span> mods<br/>
+                  List <span class="count">0 mods</span><br/>
                   <i class="price">0 ISK</i>
                 </span>
               </div>
@@ -256,14 +256,17 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
       const selectedCount = document.querySelectorAll('.inventory-item.selected').length
       const listingPrice = (await getAppConfig()).listingPrice * selectedCount
       console.log('listingPrice', selectedCount, listingPrice)
-      document.querySelector('.confirm-inventory .count').textContent = selectedCount
-      document.querySelector('.confirm-inventory .price').textContent = formatToISKString(listingPrice)
+      document.querySelector('.confirm-inventory .count').innerHTML = `${selectedCount} mod${selectedCount === 1 ? '' : 's'}`
+      document.querySelector('.confirm-inventory .price').innerHTML = `<span class="badge text-bg-secondary">${formatToISKString(listingPrice)}</span>`
 
       const selectedInventoryHolderEle = document.querySelector('.selected-inventory-holder')
+      const backToTopEle = document.querySelector('.back-to-top')
       if (selectedCount > 0) {
         selectedInventoryHolderEle.style.opacity = '1'
+        backToTopEle.classList.add('higher')
       } else {
         selectedInventoryHolderEle.style.opacity = '0'
+        backToTopEle.classList.remove('higher')
       }
     })
   }

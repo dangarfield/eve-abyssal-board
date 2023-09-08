@@ -181,6 +181,9 @@
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
 }
+.back-to-top.higher {
+    bottom: 175px;
+}
 .visible {
     opacity: 1 !important;
 }

@@ -232,6 +232,7 @@ const triggerSearch = async () => {
 
   for (const resultCard of [...document.querySelectorAll('.search-results .result')]) {
     resultCard.addEventListener('click', async () => {
+      const mutaplasmidSpaceText = `<p>View this mod on <a href="https://mutaplasmid.space/module/${resultCard.querySelector('.inventory-item').getAttribute('data-item-id')}/" target="_blank">mutaplasmid.space</a></p>`
       const itemID = parseInt(resultCard.querySelector('.inventory-item').getAttribute('data-item-id'))
       const result = allResults.find(r => r.itemID === itemID)
       console.log('result', result)
@@ -259,10 +260,11 @@ const triggerSearch = async () => {
           <p>Contact the seller in EVE Online: <code>${result.characterName}</code></p>
           ${discordText}
           ${inGameText}
+          ${mutaplasmidSpaceText}
           `
         showModalAlert('Interested?', content, actions)
       } else {
-        const content = currentUserDetails ? '<p>Click below to view this contract in EVE online</p>' : '<p>If you login we can help by opening the contract directly in EVE online</p>'
+        const content = (currentUserDetails ? '<p>Click below to view this contract in EVE online</p>' : '<p>If you login we can help by opening the contract directly in EVE online</p>') + mutaplasmidSpaceText
         const actions = []
         if (currentUserDetails) {
           actions.push({

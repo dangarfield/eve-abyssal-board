@@ -33,16 +33,16 @@ const renderCompletePayments = (payments) => {
 
   const paymentsCol = payments.map((p, i) => {
     const listingFee = p.types.find(t => t.type === 'LISTING_FEE')
-    const appraisalFee = p.types.find(t => t.type === 'APPRAISAL_FEE')
-    const total = (listingFee ? listingFee.totalAmount : 0) + (appraisalFee ? appraisalFee.totalAmount : 0)
+    const priceChangeFee = p.types.find(t => t.type === 'PRICE_CHANGE_FEE')
+    const total = (listingFee ? listingFee.totalAmount : 0) + (priceChangeFee ? priceChangeFee.totalAmount : 0)
     return [
       i,
       p._id.characterId,
       p._id.characterName,
       listingFee ? listingFee.inventoryCount : 0,
       listingFee ? listingFee.totalAmount : 0,
-      appraisalFee ? appraisalFee.inventoryCount : 0,
-      appraisalFee ? appraisalFee.totalAmount : 0,
+      priceChangeFee ? priceChangeFee.inventoryCount : 0,
+      priceChangeFee ? priceChangeFee.totalAmount : 0,
       total]
   })
 
@@ -61,8 +61,8 @@ const renderCompletePayments = (payments) => {
         ${renderButton('Customers', payments.length, 'btn-secondary')}
         ${renderButton('Listing No.', totals[0], 'btn-primary')}
         ${renderButton('Listing Ƶ', formatToISKString(totals[1]), 'btn-primary')}
-        ${renderButton('Appraisal No.', totals[2], 'btn-secondary')}
-        ${renderButton('Appraisal Ƶ', formatToISKString(totals[3]), 'btn-secondary')}
+        ${renderButton('Price Change No.', totals[2], 'btn-secondary')}
+        ${renderButton('Price Change Ƶ', formatToISKString(totals[3]), 'btn-secondary')}
         ${renderButton('Total Ƶ', formatToISKString(totals[4]), 'btn-success')}
         </p>
       </div>
@@ -82,8 +82,8 @@ const renderCompletePayments = (payments) => {
       { name: 'Character Name', sort: true },
       { name: 'LIST No.', sort: true },
       { name: 'LIST Ƶ', sort: true, formatter: (cell) => cell.toLocaleString() },
-      { name: 'APPRAISAL No.', sort: true },
-      { name: 'APPRAISAL Ƶ', sort: true, formatter: (cell) => cell.toLocaleString() },
+      { name: 'PRICE CHANGE No.', sort: true },
+      { name: 'PRICE CHANGE Ƶ', sort: true, formatter: (cell) => cell.toLocaleString() },
       { name: 'Total Ƶ', sort: true, formatter: (cell) => cell.toLocaleString() }
     ],
     data: paymentsCol,

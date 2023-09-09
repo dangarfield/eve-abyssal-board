@@ -222,6 +222,7 @@ const renderSellerListing = (listedItems) => {
       const listingPrice = listedItems.find(i => i.itemID === itemID).listingPrice
       const listingPercentage = (await getAppConfig()).listingPercentage
       console.log('on-sale', itemID, listedItems, listingPrice)
+      let reloadPageOnClose = false
       await showModalAlert('Amend Listing', `
       <p>You've already paid the listing fee, if you want to cancel or have sold it elsewhere, the listing fee will not be returned.</p>
       <p>If you cancel this listing, it'll disappear from this screen along but the completed payments will remain visible. If you want to relist it, simply add a new mod listing as before.</p>
@@ -265,8 +266,32 @@ const renderSellerListing = (listedItems) => {
           const newListingPriceString = document.querySelector('.list-price-modal').value
           const newListingPrice = listingPriceStringToInt(newListingPriceString)
           console.log('listing complete', newListingPriceString, newListingPrice)
-          window.alert('No yet implemented')
-          // await amendListing(itemID, { listingPrice })
+          const amendResult = await amendListing(itemID, { listingPrice: newListingPrice })
+          console.log('amendResult', amendResult)
+          if (amendResult.paymentDetails) {
+            console.log('Show payment details')
+            document.querySelector('.modal-body').innerHTML = `
+            <i class="bi bi-info-circle fs-1 text-primary"></i>
+            <h5 class="modal-title fs-5 mb-3 lead text-primary">AmendListing</h5>
+            <p class="mb-3">You will receive an ingame mail containing the payment information. It will also be available on your <a href="/sell">seller</a> page<p>
+            <p class="mb-3">In game, search for and right click on the <code>${amendResult.paymentDetails.corpName}</code> corporation, then click 'Give Money'. Fill in the details as follows</p>
+
+            <div class="alert alert-info fade show col-lg-8 offset-lg-2" role="alert">
+              <p class="mb-0 d-flex justify-content-between"><b class="text-">Account:</b> <code>${amendResult.paymentDetails.account}</code></p>
+              <p class="mb-0 d-flex justify-content-between"><b>Amount:</b> <code>${amendResult.paymentDetails.amount}</code></p>
+              <p class="mb-0 d-flex justify-content-between"><b>Reason:</b> <code>${amendResult.paymentDetails.reason}</code></p>
+            </div>
+
+            <p>Please be careful to fill this information in carefully.</p>
+            <p>It may take up to 1 hour for the transation to be registered and your listing price to be changed.</p>
+            `
+            for (const btn of [...document.querySelectorAll('.modal-footer .btn:not([data-bs-dismiss])')]) {
+              btn.style.display = 'none'
+            }
+            reloadPageOnClose = true
+          } else {
+            window.location.reload()
+          }
           // invOnSaleEle.querySelector('.listing-price').innerHTML = `<p>Listing price: <b>${formatToISKString(listingPrice)}</b></p>`
           // document.querySelector('.modal .btn-close').click()
         }
@@ -285,6 +310,10 @@ const renderSellerListing = (listedItems) => {
         })
         console.log('listingPrice', newListingPriceEle.value)
       })
+
+      if (reloadPageOnClose) {
+        window.location.reload()
+      }
     })
   }
 }
@@ -365,9 +394,20 @@ const renderPaymentsListing = (payments, appConfig) => {
               <h6 class="">Type: </h6>
             </div>
             <div class="text-end">
-              <span class="">${payment.type.replace('_', ' ')} (${payment.inventory.length} mod${payment.inventory.length > 1 ? 's' : ''})</span>
+              <span class="">${payment.type.replace(/_/g, ' ')}${payment.type === 'LISTING_FEE' ? ` (${payment.inventory.length} mod${payment.inventory.length > 1 ? 's' : ''})` : ''}</span>
             </div>
           </div>
+          ${payment.type === 'PRICE_CHANGE_FEE'
+        ? `
+        <div class="d-flex">
+          <div class="flex-grow-1">
+            <h6 class="">New Price: </h6>
+          </div>
+          <div class="text-end">
+            <span class="fs-6">${formatToISKString(payment.newListingPrice)}</span>
+          </div>
+        </div>`
+ : ''}
         </div>
       </div>
     </div>`

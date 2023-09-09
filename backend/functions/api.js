@@ -54,7 +54,7 @@ app.delete('/api/listing/:itemID', verifyToken, async function (req, res) {
 })
 
 app.patch('/api/listing/:itemID', verifyToken, async function (req, res) {
-  res.json(await amendListing(parseInt(req.params.itemID), req.body))
+  res.json(await amendListing(req.auth, parseInt(req.params.itemID), req.body))
 })
 app.post('/api/search/:typeID', async function (req, res) {
   res.json(await searchForModulesOfType(parseInt(req.params.typeID), req.body))

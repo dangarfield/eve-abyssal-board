@@ -2,7 +2,8 @@ import { getTypeIDCounts } from './board-api'
 import { getAbyssModuleTypes } from './module-types'
 
 const renderHome = (moduleTypes, typeCounts) => {
-  console.log('typeCounts', typeCounts)
+  const totalMods = Object.values(typeCounts).reduce((sum, v) => sum + v, 0)
+  console.log('typeCounts', typeCounts, totalMods)
   const html = `
     <div class="container">
         

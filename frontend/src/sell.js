@@ -168,7 +168,7 @@ const renderSellerListing = (listedItems) => {
 
         </div>
         `
-    html += '<div class="row mb-4">'
+    html += '<div class="row mb-4 inventory-row">'
     for (const listedItem of listedItems) {
       html += `
         <div class="col-lg-3 mt-4">
@@ -472,8 +472,13 @@ const renderPaymentsListing = (payments, appConfig) => {
     console.log('visiblePaymentCount', visiblePaymentCount)
     if (visiblePaymentCount > 0) document.querySelector('.payments-filtered').style.display = 'none'
   }
+
   for (const paymentEle of [...document.querySelectorAll('.payment')]) {
     paymentEle.addEventListener('mouseenter', () => {
+      const inventoryRow = document.querySelector('.inventory-row')
+      console.log('inventoryRow', inventoryRow.offsetHeight)
+      inventoryRow.style.height = `${inventoryRow.offsetHeight}px`
+
       const inventory = paymentEle.getAttribute('data-inventory')
       if (inventory === undefined) {
         return
@@ -489,6 +494,8 @@ const renderPaymentsListing = (payments, appConfig) => {
     })
     paymentEle.addEventListener('mouseleave', () => {
     //   console.log('mouseleave')
+      const inventoryRow = document.querySelector('.inventory-row')
+      inventoryRow.removeAttribute('style')
       filterCards()
     })
   }

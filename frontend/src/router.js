@@ -9,6 +9,8 @@ import { displayBuyHome } from './buy'
 import { displayTypeSearch } from './buy-search'
 import { renderHome } from './home'
 import { generateAppraisalModels } from './admin-appraisal-training'
+import { displayStore } from './store'
+import { render404 } from './utils'
 
 const renderError = () => {
   let html = ''
@@ -26,22 +28,7 @@ const renderError = () => {
     `
   document.querySelector('.content').innerHTML = html
 }
-const render404 = () => {
-  let html = ''
-  html += `
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <div class="alert alert-danger my-5" role="alert">
-                    <h3>404 - Page not found!</h3>
-                    <p>We don't think anything should be here, if you do, please contact us and let us know!</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    `
-  document.querySelector('.content').innerHTML = html
-}
+
 const routes = [
   { path: '', handler: () => renderHome() },
   { path: '/', handler: () => renderHome() },
@@ -52,6 +39,7 @@ const routes = [
   { path: '/sell/inventory', handler: () => initListModInventory() },
   { path: '/buy', handler: () => displayBuyHome() },
   { path: '/buy/category/:categoryID', handler: (params) => displayTypeSearch(params.categoryID) },
+  { path: '/store/:storeID', handler: (params) => displayStore(params.storeID) },
   { path: '/error', handler: () => renderError() },
   { path: '/admin', handler: () => initAdmin() },
   { path: '/admin/payments-pending', handler: () => initAdminPendingPayments() },

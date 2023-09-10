@@ -187,7 +187,15 @@
 .visible {
     opacity: 1 !important;
 }
-  
+.storefront-color {
+    padding-top: 1.7rem !important;
+}
+.storefront-description {
+    height: 179px !important;
+}
+.store-description {
+    border-left: 2px solid white;
+}
 .hidden {
     opacity: 0 !important;
 }

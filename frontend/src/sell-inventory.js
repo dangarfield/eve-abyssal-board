@@ -149,7 +149,7 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
             <div class="pt-3">
               <i class="bi bi-info-circle fs-1 text-info card-title"></i>
             </div>
-            <h5 class="card-title">Some listed mods are hidden - Use <code>Show already listed</code> to see all item</h5>
+            <h5 class="card-title">Some listed mods are hidden - Use <code>Show already listed</code> to see all items</h5>
           </div>
         </div>
       </div>`

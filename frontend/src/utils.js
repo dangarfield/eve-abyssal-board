@@ -195,3 +195,19 @@ export const initBackToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   })
 }
+export const render404 = () => {
+  let html = ''
+  html += `
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="alert alert-danger my-5" role="alert">
+                    <h3>404 - Page not found!</h3>
+                    <p>We don't think anything should be here, if you do, please contact us and let us know!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    `
+  document.querySelector('.content').innerHTML = html
+}

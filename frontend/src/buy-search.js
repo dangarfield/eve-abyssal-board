@@ -182,6 +182,56 @@ const filterResults = (mainObjects, filteringObjects) => {
   }, mainObjects)
 }
 
+export const bindInventoryCardClickForContact = async (resultCard, results) => {
+  const mutaplasmidSpaceText = `<p>View this mod on <a href="https://mutaplasmid.space/module/${resultCard.querySelector('.inventory-item').getAttribute('data-item-id')}/" target="_blank">mutaplasmid.space</a></p>`
+  const itemID = parseInt(resultCard.querySelector('.inventory-item').getAttribute('data-item-id'))
+  const result = results.find(r => r.itemID === itemID)
+  console.log('result', result)
+  const currentUserDetails = getCurrentUserDetails()
+  console.log('currentUserDetails', currentUserDetails)
+  const appConfig = await getAppConfig()
+  console.log('getAppConfig', appConfig)
+  if (result.status !== 'CONTRACT') {
+    const discordText = result.discordName ? `<p>This seller is known on the <a href="${appConfig.discordUrl}" target="_blank">Abyssal Trade Discord Board</a> as <code>${result.discordName}</code></p>` : ''
+    const inGameText = currentUserDetails ? '<p>Click below to open an EVE mail to communicate with the seller</p>' : '<p>If you login we can help by creating an EVE mail draft with a link to the seller and item</p>'
+    const actions = []
+    if (currentUserDetails) {
+      actions.push({
+        buttonText: 'Create EVE mail draft',
+        style: 'btn-primary',
+        cb: async () => {
+          console.log('callback')
+          await openBuyerToSellerDraftEVEMail(result.typeID, result.itemID, result.typeName, formatToISKString(result.listingPrice), result.characterName, result.characterId)
+          console.log('opened')
+          document.querySelector('.btn-close').click()
+        }
+      })
+    }
+    const content = `
+      <p>Contact the seller in EVE Online: <code>${result.characterName}</code></p>
+      ${discordText}
+      ${inGameText}
+      ${mutaplasmidSpaceText}
+      `
+    showModalAlert('Interested?', content, actions)
+  } else {
+    const content = (currentUserDetails ? '<p>Click below to view this contract in EVE online</p>' : '<p>If you login we can help by opening the contract directly in EVE online</p>') + mutaplasmidSpaceText
+    const actions = []
+    if (currentUserDetails) {
+      actions.push({
+        buttonText: 'Open contract',
+        style: 'btn-primary',
+        cb: async () => {
+          console.log('callback')
+          await openContractInEVEOnline(result.contract.id)
+          console.log('opened')
+          document.querySelector('.btn-close').click()
+        }
+      })
+    }
+    showModalAlert('Interested?', content, actions)
+  }
+}
 const triggerSearch = async () => {
 //   console.log('allResults', allResults)
   updateResultsText('Waiting for results to load')
@@ -232,54 +282,7 @@ const triggerSearch = async () => {
 
   for (const resultCard of [...document.querySelectorAll('.search-results .result')]) {
     resultCard.addEventListener('click', async () => {
-      const mutaplasmidSpaceText = `<p>View this mod on <a href="https://mutaplasmid.space/module/${resultCard.querySelector('.inventory-item').getAttribute('data-item-id')}/" target="_blank">mutaplasmid.space</a></p>`
-      const itemID = parseInt(resultCard.querySelector('.inventory-item').getAttribute('data-item-id'))
-      const result = allResults.find(r => r.itemID === itemID)
-      console.log('result', result)
-      const currentUserDetails = getCurrentUserDetails()
-      console.log('currentUserDetails', currentUserDetails)
-      const appConfig = await getAppConfig()
-      console.log('getAppConfig', appConfig)
-      if (result.status !== 'CONTRACT') {
-        const discordText = result.discordName ? `<p>This seller is known on the <a href="${appConfig.discordUrl}" target="_blank">Abyssal Trade Discord Board</a> as <code>${result.discordName}</code></p>` : ''
-        const inGameText = currentUserDetails ? '<p>Click below to open an EVE mail to communicate with the seller</p>' : '<p>If you login we can help by creating an EVE mail draft with a link to the seller and item</p>'
-        const actions = []
-        if (currentUserDetails) {
-          actions.push({
-            buttonText: 'Create EVE mail draft',
-            style: 'btn-primary',
-            cb: async () => {
-              console.log('callback')
-              await openBuyerToSellerDraftEVEMail(result.typeID, result.itemID, result.typeName, formatToISKString(result.listingPrice), result.characterName, result.characterId)
-              console.log('opened')
-              document.querySelector('.btn-close').click()
-            }
-          })
-        }
-        const content = `
-          <p>Contact the seller in EVE Online: <code>${result.characterName}</code></p>
-          ${discordText}
-          ${inGameText}
-          ${mutaplasmidSpaceText}
-          `
-        showModalAlert('Interested?', content, actions)
-      } else {
-        const content = (currentUserDetails ? '<p>Click below to view this contract in EVE online</p>' : '<p>If you login we can help by opening the contract directly in EVE online</p>') + mutaplasmidSpaceText
-        const actions = []
-        if (currentUserDetails) {
-          actions.push({
-            buttonText: 'Open contract',
-            style: 'btn-primary',
-            cb: async () => {
-              console.log('callback')
-              await openContractInEVEOnline(result.contract.id)
-              console.log('opened')
-              document.querySelector('.btn-close').click()
-            }
-          })
-        }
-        showModalAlert('Interested?', content, actions)
-      }
+      bindInventoryCardClickForContact(resultCard, allResults)
     })
   }
 }

@@ -1,5 +1,5 @@
 import { doesCurrentCharacterHaveSellerScope, getCurrentUserDetails, triggerLoginFlow } from './auth'
-import { amendListing, cancelListing, getAppConfig, getCurrentSellerInventory, getCurrentSellerPayments, getCurrentSellerData, setCurrentSellerData } from './board-api'
+import { amendListing, cancelListing, getAppConfig, getCurrentSellerInventory, getCurrentSellerPayments, getCurrentSellerData, setCurrentSellerData, initiateStorefrontCreationFlow, saveStoreSettings } from './board-api'
 import { renderInventoryCard } from './component/inventory-card'
 import { inventoryToInventoryCardDTO } from './dogma-utils'
 import { validateListingPrice } from './sell-inventory'
@@ -524,6 +524,73 @@ const renderSellerSettings = async (sellerData) => {
       </div>
     </div>
   </div>
+  <div class="row mb-4">
+    <div class="col-lg-12">
+      <div class="card h-100">
+        <div class="card-body pb-0">
+          <h5 class="card-title">Personalised Storefront</h5>
+          <div class="row">
+            <div class="col-lg-4">
+            ${sellerData.storefront
+              ? `
+              <p>Visit your personalised storefront:</p>
+              <a class="btn btn-primary storefront-link" href="/store/${sellerData.storefront.url}" target="_blank">abyssboard.com/store/${sellerData.storefront.url}</a>
+              `
+ : `
+              <p>Want your own private storefront?</p>
+              <p>A direct link to all of your available mods for your buyers to see?</p>
+              <p>For a one time fee of <code>${formatToISKString(appConfig.storefrontFee)}</code>, you can make as many instant changes as you want.</p>
+              `}
+              
+            </div>
+
+            ${sellerData.storefront
+ ? `
+            <div class="col-lg-4">
+              <div class="form-floating mb-2">
+                <input type="text" class="form-control storefront-name" id="storefront-name" value="${sellerData.storefront.name}">
+                <label for="storefront-name">Storefront Name</label>
+              </div>
+              <div class="input-group mb-3">
+                <span class="input-group-text">abyssboard.com/store/</span>
+                <input type="text" class="form-control storefront-url" id="storefront-url" value="${sellerData.storefront.url}" placeholder="your-store-name">
+              </div>
+              <div class="input-group mb-3">
+                <div class="form-floating">
+                  <input type="color" class="form-control storefront-color" id="storefront-color" value="${sellerData.storefront.color}">
+                  <label for="storefront-color">Storefront Colour</label>
+                </div>
+                <div class="input-group-text">
+                <input class="form-check-input storefront-black-text mt-0" id="storefront-black-text" type="checkbox"${sellerData.storefront.blackText ? ' checked' : ''}>
+                <label for="storefront-black-text" class="ps-2">Black text</label>
+              </div>
+                            
+              </div>
+            </div>
+            <div class="col-lg-4">
+              <div class="form-floating mb-2">
+                <textarea class="form-control storefront-description" id="storefront-description">${sellerData.storefront.description}</textarea>
+                <label for="storefront-description">Welcome Text</label>
+              </div>
+              <div class="text-end">
+                <button type="submit" class="btn btn-primary storefront-save">Save Storefront</button>
+              </div>
+            </div>
+            `
+ : `
+            <div class="col-lg-4">
+              <button type="button" class="btn btn-primary storefront-create">Create private storefront - ${formatToISKString(appConfig.storefrontFee)}</button>
+            </div>
+            `}
+            
+            <!--
+            
+            -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 `
   document.querySelector('.settings-content').innerHTML = html
 
@@ -534,6 +601,54 @@ const renderSellerSettings = async (sellerData) => {
     await setCurrentSellerData({ discordName })
     showModalAlert('Success', 'Settings saved')
   })
+
+  const storefrontCreateEle = document.querySelector('.storefront-create')
+  if (storefrontCreateEle) {
+    storefrontCreateEle.addEventListener('click', async () => {
+      console.log('storefrontCreateEle')
+      const paymentDetails = await initiateStorefrontCreationFlow()
+      await showModalAlert('Private Storefront Payment Details', `
+        <p class="mb-3">You will receive an ingame mail containing the payment information. It will also be available on your <a href="/sell">seller</a> page<p>
+        <p class="mb-3">In game, search for and right click on the <code>${paymentDetails.corpName}</code> corporation, then click 'Give Money'. Fill in the details as follows</p>
+
+        <div class="alert alert-info fade show col-lg-8 offset-lg-2" role="alert">
+          <p class="mb-0 d-flex justify-content-between"><b class="text-">Account:</b> <code>${paymentDetails.account}</code></p>
+          <p class="mb-0 d-flex justify-content-between"><b>Amount:</b> <code>${paymentDetails.amount}</code></p>
+          <p class="mb-0 d-flex justify-content-between"><b>Reason:</b> <code>${paymentDetails.reason}</code></p>
+        </div>
+
+        <p>Please be careful to fill this information in carefully.</p>
+        <p>It may take up to 1 hour for the transation to be registered and your storefront created.</p>
+        `)
+      window.location.reload()
+    })
+  }
+  const storefrontSaveEle = document.querySelector('.storefront-save')
+  if (storefrontSaveEle) {
+    document.querySelector('.storefront-url').addEventListener('blur', function () {
+      this.value = this.value.toLowerCase().replace(/[^a-z-_]/g, '')
+    })
+    storefrontSaveEle.addEventListener('click', async () => {
+      const storefront = {
+        name: document.querySelector('.storefront-name').value,
+        url: document.querySelector('.storefront-url').value,
+        color: document.querySelector('.storefront-color').value,
+        blackText: document.querySelector('.storefront-black-text').checked,
+        description: document.querySelector('.storefront-description').value
+      }
+      console.log('storefront-save', storefront)
+      const saveResult = await saveStoreSettings(storefront)
+      console.log('saveResult', saveResult)
+      if (saveResult.info) {
+        await showModalAlert('Storefront info', saveResult.info)
+      } else {
+        const storefrontLink = document.querySelector('.storefront-link')
+        storefrontLink.setAttribute('href', `/store/${saveResult.url}`)
+        storefrontLink.textContent = `abyssboard.com/store/${saveResult.url}`
+        await showModalAlert('Storefront saved', 'Storefront changes saved successfully')
+      }
+    })
+  }
 }
 const displaySellerSettings = async () => {
   const sellerData = await getCurrentSellerData()

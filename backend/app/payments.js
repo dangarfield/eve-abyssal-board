@@ -1,6 +1,6 @@
 import { inventoryCollection, paymentCollection } from './db.js'
 import { getEvePaymentJournal } from './eve-api.js'
-import { PAYMENT_TYPES, receivePaymentAndPutInventoryOnSale, receivePaymentAndAmendInventoryListingPrice } from './listing-flow.js'
+import { PAYMENT_TYPES, receivePaymentAndPutInventoryOnSale, receivePaymentAndAmendInventoryListingPrice, receivePaymentAndCreateStorefront } from './listing-flow.js'
 
 function groupByAttribute (objects, attribute) {
   const grouped = {}
@@ -58,6 +58,8 @@ export const findAndUpdateCompletedPayments = async () => {
       await receivePaymentAndPutInventoryOnSale(toUpdate.LISTING_FEE)
     } else if (toUpdate.PRICE_CHANGE_FEE) {
       await receivePaymentAndAmendInventoryListingPrice(toUpdate.PRICE_CHANGE_FEE)
+    } else if (toUpdate.STOREFRONT_FEE) {
+      await receivePaymentAndCreateStorefront(toUpdate.STOREFRONT_FEE)
     }
   }
 
@@ -115,6 +117,8 @@ export const amendPayment = async (paymentId, update) => {
       await receivePaymentAndPutInventoryOnSale([payment])
     } else if (payment.type === PAYMENT_TYPES.PRICE_CHANGE_FEE) {
       await receivePaymentAndAmendInventoryListingPrice([payment])
+    } else if (payment.type === PAYMENT_TYPES.STOREFRONT_FEE) {
+      await receivePaymentAndCreateStorefront([payment])
     }
   }
   return payment

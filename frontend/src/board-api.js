@@ -73,6 +73,7 @@ export const setCurrentSellerData = async (data) => {
   })
   return res
 }
+
 export const getAppConfig = async (forceRefresh) => {
   if (appConfig !== undefined && !forceRefresh) return appConfig
   const req = await window.fetch(`${API_ROOT}/api/app-config`)
@@ -95,6 +96,47 @@ export const initiateListingFlow = async (inventoryItems) => {
     body: JSON.stringify(inventoryItems)
   })
   console.log('initialListing res', res)
+  return res
+}
+export const initiateStorefrontCreationFlow = async () => {
+  const { accessToken } = await getCurrentUserAccessToken()
+  const url = `${API_ROOT}/api/store/@me`
+  const res = await fetchWithRetry(url, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+  console.log('initiateStorefrontCreationFlow res', res)
+  return res
+}
+export const saveStoreSettings = async (storefront) => {
+  const { accessToken } = await getCurrentUserAccessToken()
+  const url = `${API_ROOT}/api/store/@me`
+  const res = await fetchWithRetry(url, {
+    method: 'PATCH',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(storefront)
+  })
+  console.log('initiateStorefrontCreationFlow res', res)
+  return res
+}
+export const getStoreData = async (storeID) => {
+  const url = `${API_ROOT}/api/store/${storeID}`
+  const res = await fetchWithRetry(url, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json'
+    }
+  })
+  console.log('initiateStorefrontCreationFlow res', res)
   return res
 }
 export const cancelListing = async (itemID) => {

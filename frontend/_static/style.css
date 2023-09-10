@@ -101,12 +101,16 @@
 .payment-complete-grid .gridjs-tr th:nth-child(3),
 .payment-complete-grid .gridjs-tr td:nth-child(3),
 .payment-complete-grid .gridjs-tr th:nth-child(4),
-.payment-complete-grid .gridjs-tr td:nth-child(4) {
+.payment-complete-grid .gridjs-tr td:nth-child(4),
+.payment-complete-grid .gridjs-tr th:nth-child(7),
+.payment-complete-grid .gridjs-tr td:nth-child(7),
+.payment-complete-grid .gridjs-tr th:nth-child(8),
+.payment-complete-grid .gridjs-tr td:nth-child(8) {
     background-color: #cfe2ff;
 }
 
-.payment-complete-grid .gridjs-tr th:nth-child(7),
-.payment-complete-grid .gridjs-tr td:nth-child(7) {
+.payment-complete-grid .gridjs-tr th:nth-child(11),
+.payment-complete-grid .gridjs-tr td:nth-child(11) {
     background-color: #d1e7dd;
 }
 .selected-inventory-item-holder {

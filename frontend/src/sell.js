@@ -239,7 +239,7 @@ const renderSellerListing = (listedItems) => {
           </div>
         </div>
       </div>
-      <p>You can promote a premium to the top of all search results for ${formatToISKString(appConfig.premiumListing)}</p>
+      <p>You can promote a premium mod to the top of all search results for ${formatToISKString(appConfig.premiumListing)}</p>
       `, [{
         buttonText: 'Cancel listing',
         style: 'btn-danger',

@@ -100,12 +100,14 @@ export const getCompletePayments = async () => {
   return result
 }
 export const deletePayment = async (paymentId) => {
-  console.log('deletePayment', paymentId)
   const payment = await paymentCollection.findOne({ _id: paymentId, paid: false })
+  console.log('deletePayment', paymentId, payment)
   if (payment.type === PAYMENT_TYPES.LISTING_FEE) {
     const iD = await inventoryCollection.deleteMany({ _id: { $in: payment.inventory } })
     const pD = await paymentCollection.deleteOne({ _id: paymentId })
     console.log('deleted', iD, pD)
+  } else {
+    await paymentCollection.deleteOne({ _id: paymentId })
   }
   return payment
 }

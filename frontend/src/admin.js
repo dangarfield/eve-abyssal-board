@@ -144,13 +144,14 @@ const renderAdminDetails = (appAuth, appConfig, adminToken) => {
     event.preventDefault()
 
     const newAppConfig = {
-      listingPercentage: parseInt(document.querySelector('#listingPercentage').value),
+      listingPercentage: parseFloat(document.querySelector('#listingPercentage').value),
       storefrontFee: parseInt(document.querySelector('#storefrontFee').value),
       premiumListing: parseInt(document.querySelector('#premiumListing').value),
       corpDivisionId: parseInt(document.querySelector('#corpDivisionId').value),
       corpDivisionName: document.querySelector('#corpDivisionName').value,
       discordUrl: document.querySelector('#discordUrl').value
     }
+    console.log('newAppConfig', newAppConfig)
     await setAppConfig(newAppConfig)
   })
 

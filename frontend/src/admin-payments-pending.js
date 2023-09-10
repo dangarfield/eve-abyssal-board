@@ -10,7 +10,7 @@ const renderPendingPayments = (payments) => {
 
   let html = ''
   html += `
-  <div class="container pt-3">
+  <div class="container-fluid pt-3">
     <div class="row">
       <div class="col">
         ${renderAdminHeader()}

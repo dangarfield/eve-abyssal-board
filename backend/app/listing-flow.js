@@ -290,7 +290,7 @@ Thanks</font>`.replace(/\n/g, '')
 }
 export const cancelListing = async (itemID) => {
   const payment = await paymentCollection.findOne({ inventory: itemID, type: PAYMENT_TYPES.LISTING_FEE, paid: false })
-
+  console.log('cancelListing', itemID, payment)
   if (payment) {
     if (payment.inventory.length > 1) {
       payment.inventory = payment.inventory.filter(i => i !== itemID)

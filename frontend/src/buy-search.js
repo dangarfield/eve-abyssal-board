@@ -258,7 +258,7 @@ const triggerSearch = async () => {
   }
   if (sourceValue > 0) results = results.filter(r => r.sourceTypeID === sourceValue)
   if (!showContracts) results = results.filter(r => r.status !== 'CONTRACT')
-  results.sort((a, b) => b.qualityScore - a.qualityScore) // TODO - Add different sort options
+  results.sort((a, b) => (a.premium === b.premium ? 0 : a.premium ? -1 : 1) || b.qualityScore - a.qualityScore) // TODO - Add different sort options
 
   console.log('triggerSearch', query, results)
 

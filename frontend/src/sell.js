@@ -220,13 +220,14 @@ const renderSellerListing = (listedItems) => {
     invOnSaleEle.addEventListener('click', async () => {
       const itemID = parseInt(invOnSaleEle.getAttribute('data-item-id'))
       const listingPrice = listedItems.find(i => i.itemID === itemID).listingPrice
-      const listingPercentage = (await getAppConfig()).listingPercentage
+      const appConfig = await getAppConfig()
+      const listingPercentage = appConfig.listingPercentage
       console.log('on-sale', itemID, listedItems, listingPrice)
       let reloadPageOnClose = false
       await showModalAlert('Amend Listing', `
       <p>You've already paid the listing fee, if you want to cancel or have sold it elsewhere, the listing fee will not be returned.</p>
       <p>If you cancel this listing, it'll disappear from this screen along but the completed payments will remain visible. If you want to relist it, simply add a new mod listing as before.</p>
-      <p>Discounting your mod will be free, but increasing the price will be 1% of the difference.</p>
+      <p>Discounting your mod will be free, but increasing the price will be ${listingPercentage * 100}% of the difference.</p>
       <div class="row align-items-center">
         <div class="col-auto">
           <label for="list-price-modal" class="col-form-label">Listing Price</label>
@@ -238,7 +239,7 @@ const renderSellerListing = (listedItems) => {
           </div>
         </div>
       </div>
-
+      <p>You can promote a premium to the top of all search results for ${formatToISKString(appConfig.premiumListing)}</p>
       `, [{
         buttonText: 'Cancel listing',
         style: 'btn-danger',
@@ -272,7 +273,7 @@ const renderSellerListing = (listedItems) => {
             console.log('Show payment details')
             document.querySelector('.modal-body').innerHTML = `
             <i class="bi bi-info-circle fs-1 text-primary"></i>
-            <h5 class="modal-title fs-5 mb-3 lead text-primary">AmendListing</h5>
+            <h5 class="modal-title fs-5 mb-3 lead text-primary">Amend Listing</h5>
             <p class="mb-3">You will receive an ingame mail containing the payment information. It will also be available on your <a href="/sell">seller</a> page<p>
             <p class="mb-3">In game, search for and right click on the <code>${amendResult.paymentDetails.corpName}</code> corporation, then click 'Give Money'. Fill in the details as follows</p>
 
@@ -294,6 +295,40 @@ const renderSellerListing = (listedItems) => {
           }
           // invOnSaleEle.querySelector('.listing-price').innerHTML = `<p>Listing price: <b>${formatToISKString(listingPrice)}</b></p>`
           // document.querySelector('.modal .btn-close').click()
+        }
+      }, {
+        buttonText: `Premium - ${formatToISKString(appConfig.premiumListing)}`,
+        style: 'btn-warning',
+        cb: async () => {
+          console.log('callback', invOnSaleEle, itemID)
+          const amendResult = await amendListing(itemID, { premium: true })
+          console.log('amendResult', amendResult)
+          // console.log('premium listing complete')
+          // window.location.reload()
+          if (amendResult.paymentDetails) {
+            console.log('Show premium listing payment details')
+            document.querySelector('.modal-body').innerHTML = `
+            <i class="bi bi-info-circle fs-1 text-primary"></i>
+            <h5 class="modal-title fs-5 mb-3 lead text-primary">Amend Listing</h5>
+            <p class="mb-3">You will receive an ingame mail containing the payment information. It will also be available on your <a href="/sell">seller</a> page<p>
+            <p class="mb-3">In game, search for and right click on the <code>${amendResult.paymentDetails.corpName}</code> corporation, then click 'Give Money'. Fill in the details as follows</p>
+
+            <div class="alert alert-info fade show col-lg-8 offset-lg-2" role="alert">
+              <p class="mb-0 d-flex justify-content-between"><b class="text-">Account:</b> <code>${amendResult.paymentDetails.account}</code></p>
+              <p class="mb-0 d-flex justify-content-between"><b>Amount:</b> <code>${amendResult.paymentDetails.amount}</code></p>
+              <p class="mb-0 d-flex justify-content-between"><b>Reason:</b> <code>${amendResult.paymentDetails.reason}</code></p>
+            </div>
+
+            <p>Please be careful to fill this information in carefully.</p>
+            <p>It may take up to 1 hour for the transation to be registered and your premium mod status will be updated.</p>
+            `
+            for (const btn of [...document.querySelectorAll('.modal-footer .btn:not([data-bs-dismiss])')]) {
+              btn.style.display = 'none'
+            }
+            reloadPageOnClose = true
+          } else {
+            window.location.reload()
+          }
         }
       }],
       async (modelEle) => {
@@ -502,6 +537,7 @@ const renderSellerSettings = async (sellerData) => {
           <h5 class="card-title">Seller Settings</h5>
           <p>Buyers will be shown your EVE details, but to make it even easier and quicker, join <a href="${appConfig.discordUrl}" target="_blank">Abyssal Trading Discord</a>. By adding your username, buyers can negotiate with you more directly</p>
           <p>Don't forget to update any sold or no longer available modules here, so that you get get any unwanted offers and PMs</p>
+          <p>Clicking on a mod below. You can cancel the listing, mark the sale as complete / unavailable, update the list price or even <b>promote the mod to appear at the top of the search results!</b></p>
         </div>
       </div>
     </div>

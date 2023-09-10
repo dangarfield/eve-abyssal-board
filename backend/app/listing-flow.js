@@ -6,7 +6,7 @@ import { createStorefront } from './sellers.js'
 
 export const INVENTORY_STATUS = { AWAITING_PAYMENT: 'AWAITING_PAYMENT', ON_SALE: 'ON_SALE', CANCELLED: 'CANCELLED', COMPLETE: 'COMPLETE', CONTRACT: 'CONTRACT', UNAVAILABLE: 'UNAVAILABLE' }
 // CONST APPRAISAL_STATUS = {AWAITING_APPRAISAL: 'AWAITING_APPRAISAL', COMPLETE:'COMPLETE'}
-export const PAYMENT_TYPES = { LISTING_FEE: 'LISTING_FEE', PRICE_CHANGE_FEE: 'PRICE_CHANGE_FEE', STOREFRONT_FEE: 'STOREFRONT_FEE' }
+export const PAYMENT_TYPES = { LISTING_FEE: 'LISTING_FEE', PRICE_CHANGE_FEE: 'PRICE_CHANGE_FEE', STOREFRONT_FEE: 'STOREFRONT_FEE', PREMIUM_FEE: 'PREMIUM_FEE' }
 
 export const initiateListingFlow = async (auth, inventoryItems) => {
   for (const inventoryItem of inventoryItems) {
@@ -162,6 +162,50 @@ Thanks</font>`.replace(/\n/g, '')
   }
 }
 
+export const initiatePremiumModFlow = async (auth, itemID) => {
+  const appConfig = await getAppConfig(true)
+  const appAuth = await getAppAuth()
+  const paymentItem = {
+    _id: nanoid(10),
+    characterId: auth.characterId,
+    characterName: auth.characterName,
+    amount: appConfig.premiumListing,
+    inventory: [itemID],
+    type: PAYMENT_TYPES.PREMIUM_FEE,
+    creationDate: new Date(),
+    paid: false
+  }
+
+  try {
+    await paymentCollection.insertOne(paymentItem)
+  } catch (error) {
+    console.error('initiateListingFlow ADD PAYMENT ITEM ERROR', error)
+  }
+  // Mail payment request
+  const body = `
+<font size="14" color="#bfffffff">
+Thanks for choosing Abyss Board.<br><br>
+You have chosen to create a premium mod<br>
+Premium mod fee is ${paymentItem.amount.toLocaleString()} ISK.<br>
+Right click on this </font><font size="14" color="#ffd98d00"><a href="showinfo:2//${appAuth.corpId}">${appAuth.corpName}</a></font><font size="14" color="#bfffffff"> and click 'Give Money'.<br><br>
+Fill in the details as follows:<br><br>
+<b>Account</b>: ${appConfig.corpDivisionName}<br>
+<b>Amount</b>: ${paymentItem.amount}<br>
+<b>Reason</b>: ${paymentItem._id}<br><br><br>
+Please be careful to fill this information in carefully.<br>
+It may take up to 1 hour for the transation to be registered and your premium mod.<br><br>
+For any specific questions, contact us on </font><font size="14" color="#ffffe400"><loc><a href="${appConfig.discordUrl}" target="_blank">discord</a></loc></font><font size="14" color="#bfffffff">.<br><br>
+Thanks</font>`.replace(/\n/g, '')
+  await sendMail(auth.characterId, 'Abyss Board Premium Listing Fee', body)
+
+  return {
+    corpName: appAuth.corpName,
+    account: appConfig.corpDivisionName,
+    amount: paymentItem.amount,
+    reason: paymentItem._id
+  }
+}
+
 export const receivePaymentAndPutInventoryOnSale = async (paymentsMade) => {
   // console.log('receivePaymentAndPutInventoryOnSale a', paymentsMade)
   const uniqueInventoryValues = new Set()
@@ -225,6 +269,25 @@ Thanks</font>`.replace(/\n/g, '')
     await sendMail(paymentMade.characterId, 'Abyss Board Storefront Payment Received', body)
   }
 }
+export const receivePaymentAndMakeModPremium = async (paymentsMade) => {
+  const appConfig = await getAppConfig()
+  for (const paymentMade of paymentsMade) {
+    console.log('receivePaymentAndMakeModPremium', 'paymentMade', paymentMade)
+
+    await inventoryCollection.updateMany(
+      { _id: { $in: paymentMade.inventory } },
+      { $set: { premium: true } }
+    )
+
+    const body = `
+<font size="14" color="#bfffffff">
+Thanks for paying your premium listing fee on Abyss Board.<br><br>
+Your premium listing mod is now live!<br>
+For any specific questions, contact us on </font><font size="14" color="#ffffe400"><loc><a href="${appConfig.discordUrl}">discord</a></loc></font><font size="14" color="#bfffffff">.<br><br>
+Thanks</font>`.replace(/\n/g, '')
+    await sendMail(paymentMade.characterId, 'Abyss Board Premium Listing Payment Received', body)
+  }
+}
 export const cancelListing = async (itemID) => {
   const payment = await paymentCollection.findOne({ inventory: itemID, type: PAYMENT_TYPES.LISTING_FEE, paid: false })
 
@@ -249,8 +312,8 @@ export const cancelListing = async (itemID) => {
 export const amendListing = async (auth, itemID, amend) => {
   if (amend && amend.status && INVENTORY_STATUS[amend.status]) {
     console.log('Good to amend status', amend)
-  }
-  if (amend && amend.listingPrice) {
+    await inventoryCollection.updateOne({ _id: itemID }, { $set: { status: amend.status } })
+  } else if (amend && amend.listingPrice) {
     const inventory = await inventoryCollection.findOne({ _id: itemID })
     console.log('amendListing inventory', inventory, amend.listingPrice, inventory.listingPrice, amend.listingPrice <= inventory.listingPrice)
     if (amend.listingPrice <= inventory.listingPrice) {
@@ -260,6 +323,10 @@ export const amendListing = async (auth, itemID, amend) => {
       const paymentDetails = await initiateAmendListingPriceFlow(auth, inventory, amend.listingPrice)
       return { itemID, amend, paymentDetails }
     }
+  } else if (amend && amend.premium) {
+    console.log('premium listing flow')
+    const paymentDetails = await initiatePremiumModFlow(auth, itemID)
+    return { itemID, paymentDetails }
   }
   // const item = await inventoryCollection.deleteOne({ _id: itemID })
   console.log('amendListing', itemID, amend)

@@ -37,6 +37,9 @@
 .search-results .inventory-item.contract .card {
     background-color: #ddd;
 }
+.inventory-item.premium .card {
+    background-color: lightyellow;
+}
 .search-results .form-switch {
     margin-right: -8px;
 }
@@ -57,6 +60,12 @@
   right: 0px;
   cursor: pointer;
   visibility: hidden;
+  pointer-events: none;
+}
+.inventory-item .premium-icon {
+  position: absolute;
+  top: 0px;
+  right: 0px;
   pointer-events: none;
 }
 .inventory-item .faction-icon {

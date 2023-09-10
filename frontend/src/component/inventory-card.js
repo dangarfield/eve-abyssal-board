@@ -13,7 +13,7 @@ export const renderInventoryCard = (item) => {
         <div class="p-0"><img src="/icons/${attr.iconID}.png" width="32" height="32"></div>
         <div class="p-0">
             <p class="m-0">
-                ${attr.name}
+            ${attr.name}
                 <!--
                 <br/>
                 zero ${attr.allComparisonZero}<br/>
@@ -210,7 +210,7 @@ export const renderInventoryCard = (item) => {
     statusBG = 'bg-warning text-dark'
   }
   html += `
-        <div class="card-container inventory-item${itemDisplayClass}" data-item-id="${item.itemID}" data-status="${item.status}" role="button">
+        <div class="card-container inventory-item${itemDisplayClass}${item.premium ? ' premium' : ''}" data-item-id="${item.itemID}" data-status="${item.status}" role="button">
             <div class="card">
                 <div class="card-body px-0 pb-0">
                     <div class="d-flex flex-row gap-2 align-items-center px-1">
@@ -219,7 +219,6 @@ export const renderInventoryCard = (item) => {
                             <p class="lead mb-0 type-name">
                                 <b>
                                     ${item.typeName}
-                                    
                                 </b>
                             </p>
                             ${item.qualityScore !== undefined ? `<span class="badge bg-primary"><i class="bi bi-hand-thumbs-up-fill"></i> ${Math.round(item.qualityScore)}%</span>` : ''}
@@ -256,6 +255,14 @@ export const renderInventoryCard = (item) => {
                 <i class="bi bi-plus-circle-fill"></i>
             </button>
             </span>
+            ${item.premium
+            ? `
+            <span class="premium-icon">
+            <button class="btn btn-warning btn-sm">
+                <i class="bi bi-star-fill"></i>
+            </button>
+            </span>`
+ : ''}
             ${item.metaGroupIconID ? `<span class="faction-icon"><img src="/icons/${item.metaGroupIconID}.png" width='32px'/></span>` : ''}
           </div>`
   return html

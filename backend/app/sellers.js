@@ -20,9 +20,9 @@ export const createStorefront = async (sellerID, sellerName) => {
   const storefront = {
     name: `${sellerName}'s Store`,
     url: sellerName.toLowerCase().replace(/[^a-z-_]/g, ''),
-    color: '#ff00ff',
+    color: '#4154f1',
     description: 'Welcome to my store! o/\nHave a good look around!',
-    blackText: true
+    blackText: false
   }
   await sellersCollection.findOneAndUpdate({ _id: sellerID }, { $set: { storefront } }, { upsert: true, returnOriginal: false })
 }

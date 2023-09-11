@@ -124,11 +124,11 @@ export const renderHome = () => {
                     </p>
 
                     <p class="fs-6 text-light">
-                      Listing through EVE Online contracts with perfect skills and standings will cost 1.5% - 2% plus any additional relist fees.
+                      Listing through EVE Online contracts with perfect skills and standings will cost 1.5% - 2% plus any additional relist fees
                     </p>
 
                     <p class="fs-6 text-light">
-                      Listing 10x 10b abyssal mods ?!
+                      Listing x10 abyssal modules worth 10b ISK each? Compare the costs:
                     </p>
                   
                     <div class="d-flex flex-row align-items-center text-light">
@@ -153,11 +153,11 @@ export const renderHome = () => {
                     </div>
                     <div class="d-flex flex-row align-items-center text-light">
                         <div class="px-2"><i class="bi bi-2-circle-fill fs-4"></i></div>
-                        <div class="p-2">One click select the abyss modules from your inventory</div>
+                        <div class="p-2">Select your abyss modules with a single click from your inventory</div>
                     </div>
                     <div class="d-flex flex-row mb-3 align-items-center text-light">
                         <div class="px-2"><i class="bi bi-3-circle-fill fs-4"></i></div>
-                        <div class="p-2">Pay the 1% ISK listing fee and voila!</div>
+                        <div class="p-2">Pay the minimal 1% ISK listing fee and voila!</div>
                     </div>
 
 
@@ -182,10 +182,10 @@ export const renderHome = () => {
             <div class="col-lg-12">
                 <div class="text-center">
                     <h1 class="mt-0"><i class="bi bi-infinity"></i></h1>
-                    <h3>We're a group of experienced <span class="text-primary">abyssal sellers</span> with a huge reach and <span class="text-primary">community</span></h3>
+                    <h3>We're a collective of experienced <span class="text-primary">abyssal sellers</span> with a huge reach and <span class="text-primary">community</span></h3>
                     <p class="text-muted mt-2">
-                        We known what's hot and what's not. Think you've got something good?<br/>
-                        List it here for a few ISK instead of getting lost in the abyss of contract listings
+                        We know what's in demand and what's not. Believe you have a valuable asset?<br/>
+                        List it here for just a few ISK instead of getting lost in the abyss of contract listings
                     </p>
                 </div>
             </div>
@@ -200,7 +200,7 @@ export const renderHome = () => {
                     </div>
                     <h4 class="mt-3">Buy Modules</h4>
                     <p class="text-muted mt-2 mb-0">
-                        Our search and filtering viewer shows how good a roll a module is, how it compares to every other base module and how god-like an item you have!
+                      Our advanced search and filtering tool provides insights into the quality of a module's roll, its comparison to other base modules, and its rarity. Discover the god-like items you've been seeking!
                     </p>
                 </div>
             </div>
@@ -214,7 +214,7 @@ export const renderHome = () => {
                     </div>
                     <h4 class="mt-3">Sell Modules</h4>
                     <p class="text-muted mt-2 mb-0">
-                        Sick of setting up contracts manually? Spending so much time unsure of your module's marketing reach? Sell with us, we have connections
+                        Tired of setting up contracts manually every few weeks? Spending so much time unsure of your module's market reach? Sell with us, and tap into our extensive connections and expertise
                     </p>
                 </div>
             </div>
@@ -228,7 +228,7 @@ export const renderHome = () => {
                     </div>
                     <h4 class="mt-3">Module Valuation <span class="badge bg-primary">Coming soon</span></h4>
                     <p class="text-muted mt-2 mb-0">
-                        We'll be introducing an AI generated appraiser as well as appraisal service that guarantees at least 3 independent appraisals from our experienced team! Watch this space
+                      Stay tuned for our AI-generated appraiser and appraisal service, ensuring you receive at least 3 independent valuations from our experienced team. Watch this space for updates!
                     </p>
                 </div>
             </div>

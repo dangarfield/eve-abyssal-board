@@ -32,7 +32,7 @@ export const getAppraisalForItemIDs = async (itemIDs) => {
     }
   })
   await runBatches(missingAppraisalPromises, 10)
-  console.log('getAppraisalForItemIDs END')
+  console.log('getAppraisalForItemIDs END', appraisals)
   return appraisals
 }
 export const getAppraisalForItemID = async (itemID) => {

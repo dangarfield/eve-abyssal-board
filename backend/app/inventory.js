@@ -1,4 +1,4 @@
-import { getAppraisalForItemID } from './appraisal.js'
+import { getAppraisalForItemIDs } from './appraisal.js'
 import { inventoryCollection } from './db.js'
 
 export const getSellerInventory = async (authCharacterId, characterId) => {
@@ -34,28 +34,31 @@ export const updateMissingAppraisals = async () => {
       ]
     }
   )
-  for (let i = 0; i < itemIDsToAddAppraisals.length; i++) {
-    const itemID = itemIDsToAddAppraisals[i]
-    if (itemID !== null) {
-      const appraisal = await getAppraisalForItemID(itemID)
-      console.log('appraisal', i + 1, 'of', itemIDsToAddAppraisals.length, '-', itemID, appraisal)
-      await inventoryCollection.updateOne(
-        { _id: itemID },
-        {
-          $pull: {
-            appraisal: { type: 'AUTO', price: 'Error' }
-          }
+  console.log('itemIDsToAddAppraisals', itemIDsToAddAppraisals)
+  const appraisals = await getAppraisalForItemIDs(itemIDsToAddAppraisals)
+  const appraisalsKeys = Object.keys(appraisals)
+  console.log('appraisals', appraisalsKeys)
+  for (let i = 0; i < appraisalsKeys.length; i++) {
+    const itemIDString = appraisalsKeys[i]
+    const appraisal = appraisals[itemIDString]
+    const itemID = parseInt(itemIDString)
+    console.log('Updating appraisal', `${i + 1} of ${appraisalsKeys.length}`, itemIDString, itemID, appraisal)
+    await inventoryCollection.updateOne(
+      { _id: itemID },
+      {
+        $pull: {
+          appraisal: { type: 'AUTO', price: 'Error' }
         }
-      )
-      await inventoryCollection.updateOne(
-        { _id: itemID },
-        {
-          $push: {
-            appraisal: { $each: [appraisal] }
-          }
+      }
+    )
+    await inventoryCollection.updateOne(
+      { _id: itemID },
+      {
+        $push: {
+          appraisal: { $each: [appraisal] }
         }
-      )
-    }
+      }
+    )
   }
   console.log('updateMissingAppraisals results', itemIDsToAddAppraisals.length)
 }

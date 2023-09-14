@@ -6,6 +6,7 @@ const ID_APP_AUTH = 'authConfig'
 const appConfigDefault = {
   _id: ID_APP_CONFIG,
   listingPercentage: 0.01,
+  listingFreeThreshold: 200000000,
   storefrontFee: 1000000000,
   premiumListing: 100000000,
   discordUrl: 'https://discord.gg/PfecDHkBRP',

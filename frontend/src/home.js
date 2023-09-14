@@ -141,7 +141,7 @@ export const renderHome = () => {
                     </div>
                     <div class="d-flex flex-row align-items-center text-light mb-3">
                         <div class="px-2"><i class="bi bi-piggy-bank-fill fs-4"></i></div>
-                        <div class="p-2"><b><span class="badge bg-danger">+500m ISK</span> saving!</b></div>
+                        <div class="p-2"><b><span class="badge bg-danger">+500m ISK</span> saving!</b> List mods under 200m ISK for free!</div>
                     </div>
 
                     <p class="fs-5 text-light">

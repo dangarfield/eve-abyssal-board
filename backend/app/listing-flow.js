@@ -29,15 +29,23 @@ export const initiateListingFlow = async (auth, inventoryItems) => {
 
   const appConfig = await getAppConfig(true)
   const appAuth = await getAppAuth()
+
+  const totalListingPrice = inventoryItems.map(i => i.listingPrice).reduce((sum, v) => {
+    let listingPrice = v
+    if (listingPrice <= appConfig.listingFreeThreshold) {
+      listingPrice = 0
+    }
+    return sum + listingPrice
+  }, 0)
   const paymentItem = {
     _id: nanoid(10),
     characterId: auth.characterId,
     characterName: auth.characterName,
-    amount: appConfig.listingPercentage * inventoryItems.map(i => i.listingPrice).reduce((sum, v) => sum + v, 0),
+    amount: appConfig.listingPercentage * totalListingPrice,
     inventory: inventoryItems.map(i => i._id),
     type: PAYMENT_TYPES.LISTING_FEE,
     creationDate: new Date(),
-    paid: false
+    paid: totalListingPrice === 0
   }
   console.log('paymentItem', paymentItem)
   try {
@@ -62,6 +70,10 @@ It may take up to 1 hour for the transation to be registered and your items list
 For any specific questions, contact us on </font><font size="14" color="#ffffe400"><loc><a href="${appConfig.discordUrl}" target="_blank">discord</a></loc></font><font size="14" color="#bfffffff">.<br><br>
 Thanks</font>`.replace(/\n/g, '')
   await sendMail(auth.characterId, 'Abyss Board Listing Fee', body)
+
+  if (totalListingPrice === 0) {
+    await receivePaymentAndPutInventoryOnSale([paymentItem]) // Put on sale immediately // async
+  }
 
   return {
     corpName: appAuth.corpName,

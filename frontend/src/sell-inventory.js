@@ -5,7 +5,7 @@ import { listingPriceStringToInt, formatToISKString, triggerRefreshTime, showMod
 import { getAppraisalForItem } from './appraisal'
 import { renderInventoryCard } from './component/inventory-card'
 
-const renderInventoryPlaceholder = (userDetails) => {
+const renderInventoryPlaceholder = (userDetails, appConfig) => {
   let html = `
 <div class="container">
   <div class="row">
@@ -19,7 +19,8 @@ const renderInventoryPlaceholder = (userDetails) => {
         <div class="card-body">
           <h5 class="card-title">Find your assets</h5>
           <p class="card-text">EVE Online servers cache this data and it is made available to us up to 60 minutes after requesting.</p>
-          <p class="card-text">Select the mods that you wish to sell and add your listing price. You can update the listing price at any time after it is listed. Discounting your mod will be free, but increasing the price will be 1% of the difference.</p>
+          <p class="card-text">Select the mods that you wish to sell and add your listing price. You can update the listing price at any time after it is listed. Discounting your mod will be free, but increasing the price will be ${appConfig.listingPercentage * 100}% of the difference.</p>
+          <p class="card-text">Listing a mod for less than ${formatToISKString(appConfig.listingFreeThreshold)} will be free.</p>
           <p class="card-text"><i><b>Note:</b> Once you send a listing fee payment and you cancel after the mod is on sale or sell the item elsewhere, the listing fee will not be returned.</i></p>
         </div>
       </div>
@@ -181,8 +182,15 @@ const filterCards = () => {
   document.querySelector('.inventory-filtered').style.display = allItemsHidden ? 'block' : 'none'
 }
 const updateTotalListingPrice = async () => {
+  const appConfig = await getAppConfig()
   if (document.querySelectorAll('.inventory-item.selected .listing-price').length > 0) {
-    const totalListingPrice = Array.from(document.querySelectorAll('.inventory-item.selected .listing-price')).reduce((sum, element) => sum + listingPriceStringToInt(element.value || '0'), 0)
+    const totalListingPrice = Array.from(document.querySelectorAll('.inventory-item.selected .listing-price')).reduce((sum, element) => {
+      let listingPrice = listingPriceStringToInt(element.value || '0')
+      if (listingPrice <= appConfig.listingFreeThreshold) {
+        listingPrice = 0
+      }
+      return sum + listingPrice
+    }, 0)
     console.log('totalListingPrice', totalListingPrice)
     const totalListingFee = (await getAppConfig()).listingPercentage * totalListingPrice
     document.querySelector('.confirm-inventory .price').innerHTML = `<span class="badge text-bg-secondary">${formatToISKString(totalListingFee)}</span>`
@@ -320,7 +328,8 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
 
     const paymentDetails = await initiateListingFlow(selectedInventoryToList)
     console.log('paymentDetails', paymentDetails)
-    await showModalAlert('Listing Payment Details', `
+    if (paymentDetails.amount > 0) {
+      await showModalAlert('Listing Payment Details', `
         <p class="mb-3">You will receive an ingame mail containing the payment information. It will also be available on your <a href="/sell">seller</a> page<p>
         <p class="mb-3">In game, search for and right click on the <code>${paymentDetails.corpName}</code> corporation, then click 'Give Money'. Fill in the details as follows</p>
 
@@ -333,6 +342,7 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
         <p>Please be careful to fill this information in carefully.</p>
         <p>It may take up to 1 hour for the transation to be registered and your items listed.</p>
         `)
+    }
     window.location.assign('/sell')
   })
 }
@@ -345,8 +355,7 @@ const runBatches = async (promises, batchSize) => {
   }
 }
 
-const updateAppraisals = async (inventory) => {
-  await getAppConfig() // Preloading appConfig
+const updateAppraisals = async (inventory, appConfig) => {
   const appraisalElements = [...document.querySelectorAll('.appraisal:not(.appraisal-complete)')]
   const appraisalPromises = appraisalElements.map(appraisalEle => async (batchID) => {
     const itemID = parseInt(appraisalEle.getAttribute('data-item-id'))
@@ -359,7 +368,11 @@ const updateAppraisals = async (inventory) => {
         <p><b>${formatToISKString(appraisal.price)}</b> <i>(${appraisal.type})</i></p>
       </span>
     </div>`
-    appraisalEle.parentNode.querySelector('.listing-price').value = typeof appraisal.price === 'string' ? 0 : formatToISKString(appraisal.price).replace(' ISK', '')
+    let appraisalPrice = 0
+    if (typeof appraisal.price !== 'string') {
+      appraisalPrice = formatToISKString(appraisal.price).replace(' ISK', '')
+    }
+    appraisalEle.parentNode.querySelector('.listing-price').value = appraisalPrice
     // console.log('itemID END', itemID)
   })
 
@@ -384,7 +397,8 @@ export const validateListingPrice = async (inputValue) => {
 export const initListModInventory = async () => {
   if (doesCurrentCharacterHaveSellerScope()) {
     const userDetails = getCurrentUserDetails()
-    renderInventoryPlaceholder(userDetails)
+    const appConfig = await getAppConfig()
+    renderInventoryPlaceholder(userDetails, appConfig)
     console.log('Seller logged in, show available mods')
     const { inventory, cacheExpires, lastModified } = await getCurrentUserModInventory()
     inventory.sort((a, b) => a.typeName.localeCompare(b.typeName) || b.qualityScore - a.qualityScore)

@@ -293,7 +293,9 @@ const updateMinMaxForAbyssItemAttributes = (attributes, mutators, sources) => {
     // console.log('attribute', attribute, sourceValues, sourceMin, sourceMax, shouldGetMutationStats)
     if (shouldGetMutationStats) {
       const mutatorValues = Object.keys(mutators).map(m => mutators[m].mutationValues[attribute.id])
-      const mutatorHighIsGood = mutatorValues.every(v => v.highIsGood !== 0)
+      let mutatorHighIsGood = mutatorValues.every(v => v.highIsGood !== 0)
+      if (attribute.id === 2267) mutatorHighIsGood = 0 // Cap Battery
+
       const allMutatorsValuesMin = mutatorValues.map(m => m.min)
       const allMutatorsMin = Math.min(...allMutatorsValuesMin)
       const allMutatorsValuesMax = mutatorValues.map(m => m.max)
@@ -302,9 +304,10 @@ const updateMinMaxForAbyssItemAttributes = (attributes, mutators, sources) => {
       const allMin = allSourcesMin * (mutatorHighIsGood ? allMutatorsMin : allMutatorsMax)
       const allMax = allSourcesMax * (mutatorHighIsGood ? allMutatorsMax : allMutatorsMin)
       // if (attribute.id === 20) { // && Object.values(sources)[0].name.includes('Webi')) {
-      if (!mutatorHighIsGood) {
-        console.log('mutatorValues', attribute.id, Object.values(sources)[0].name, mutatorValues, 'src', allSourcesMin, allSourcesMax, 'mut', allMutatorsMin, allMutatorsMax, '=', allMin, allMax)
-      }
+      // if (attribute.id === 2267) {
+      // if (allSourcesMin < 0 && allSourcesMin < allSourcesMax) {
+      //   console.log('mutatorValues', attribute.id, Object.values(sources)[0].name, mutatorValues, 'src', allSourcesMin, allSourcesMax, 'mut', allMutatorsMin, allMutatorsMax, '=', allMin, allMax)
+      // }
 
       // TODO - set the comparisonZero to a type specific value for officer mods etc
       const allComparisonZero = allMax - (0.5 * (allMax - allMin)) // Updates existing one if muta

@@ -7,7 +7,6 @@ export const renderSearchCard = (type, defaultItem) => {
     // console.log('plusMinusDisplayValue', plusMinusValue, plusMinusDisplayValue, attr.allMax, attr.allMin)
 
     // TODO - Something wrong with Capacitor Warfare Resistance Bonus slider - Cap Batteries
-    // TODO - Something wrong with Maximum Velocity Bonus slider - Stasis Webifier
 
     return `
         <div class="d-flex flex-row gap-2 align-items-center px-1">

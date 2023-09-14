@@ -281,7 +281,6 @@ const getMutatorsAndSourcesForAbyssItem = (mutatorAttributes, types, typeDogmas,
   return { mutators, sources }
 }
 const updateMinMaxForAbyssItemAttributes = (attributes, mutators, sources) => {
-  // TODO - I don't think this is quite right, it doesn't show the complete min and max as available on mutaplasmid.space
   for (const attribute of attributes.filter(a => a.type !== 'derived')) {
     const sourceValues = Object.keys(sources).map(s => sources[s].attributes[attribute.id])
     const allSourcesMin = Math.min(...sourceValues)
@@ -294,14 +293,19 @@ const updateMinMaxForAbyssItemAttributes = (attributes, mutators, sources) => {
     // console.log('attribute', attribute, sourceValues, sourceMin, sourceMax, shouldGetMutationStats)
     if (shouldGetMutationStats) {
       const mutatorValues = Object.keys(mutators).map(m => mutators[m].mutationValues[attribute.id])
+      const mutatorHighIsGood = mutatorValues.every(v => v.highIsGood !== 0)
       const allMutatorsValuesMin = mutatorValues.map(m => m.min)
       const allMutatorsMin = Math.min(...allMutatorsValuesMin)
       const allMutatorsValuesMax = mutatorValues.map(m => m.max)
       const allMutatorsMax = Math.max(...allMutatorsValuesMax)
-      // console.log('mutatorValues', mutatorValues, mutatorValuesMin, mutatorMin, mutatorValuesMax, mutatorMax)
 
-      const allMin = allSourcesMin * allMutatorsMin
-      const allMax = allSourcesMax * allMutatorsMax
+      const allMin = allSourcesMin * (mutatorHighIsGood ? allMutatorsMin : allMutatorsMax)
+      const allMax = allSourcesMax * (mutatorHighIsGood ? allMutatorsMax : allMutatorsMin)
+      // if (attribute.id === 20) { // && Object.values(sources)[0].name.includes('Webi')) {
+      if (!mutatorHighIsGood) {
+        console.log('mutatorValues', attribute.id, Object.values(sources)[0].name, mutatorValues, 'src', allSourcesMin, allSourcesMax, 'mut', allMutatorsMin, allMutatorsMax, '=', allMin, allMax)
+      }
+
       // TODO - set the comparisonZero to a type specific value for officer mods etc
       const allComparisonZero = allMax - (0.5 * (allMax - allMin)) // Updates existing one if muta
       const toAdd = { allMutatorsMax, allMutatorsMin, allMin, allMax, allComparisonZero }

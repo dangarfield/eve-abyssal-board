@@ -299,7 +299,7 @@ export const setComparisonAttributes = () => {
     } else {
       attr.searchValue = ((attr.allMax - attr.allMin) / 2) + attr.allMin
     }
-    // console.log('searchValue', defaultItem, attr.id, attr.searchValue)
+    console.log('searchValue', attr.name, attr.searchValue, 'min', attr.allMin, 'max', attr.allMax, attr)
   }
 }
 export const displayTypeSearch = async (typeID) => {

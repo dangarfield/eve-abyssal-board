@@ -1,4 +1,4 @@
-import { getAppraisalForItem } from '../../frontend/src/appraisal.js'
+import { getAppraisalForItemID } from './appraisal.js'
 import { inventoryCollection } from './db.js'
 
 export const getSellerInventory = async (authCharacterId, characterId) => {
@@ -37,7 +37,7 @@ export const updateMissingAppraisals = async () => {
   for (let i = 0; i < itemIDsToAddAppraisals.length; i++) {
     const itemID = itemIDsToAddAppraisals[i]
     if (itemID !== null) {
-      const appraisal = await getAppraisalForItem({ itemID }, itemID, false)
+      const appraisal = await getAppraisalForItemID(itemID)
       console.log('appraisal', i + 1, 'of', itemIDsToAddAppraisals.length, '-', itemID, appraisal)
       await inventoryCollection.updateOne(
         { _id: itemID },

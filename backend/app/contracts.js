@@ -2,7 +2,6 @@ import { getAllPublicContracts, getContractItems, getDogmaAttributes } from './e
 import { inventoryCollection, contractsCollection } from '../app/db.js'
 
 import { evaluate } from 'mathjs'
-// import { getAppraisalForItem } from '../../frontend/src/appraisal.js'
 import { INVENTORY_STATUS } from './listing-flow.js'
 
 // const loadJSON = (path) => JSON.parse(fs.readFileSync(new URL(path, import.meta.url)))
@@ -33,7 +32,7 @@ const dogmaToAttributesRaw = (typeID, dogmaAttributes, sde) => {
   return filteredAttributesObject
 }
 
-const runBatches = async (promises, batchSize) => {
+export const runBatches = async (promises, batchSize) => {
   for (let i = 0; i < promises.length; i += batchSize) {
     const batch = promises.slice(i, i + batchSize)
     // console.log('runBatches START', i)
@@ -72,8 +71,6 @@ export const updateInventoryFromPublicContracts = async (sde) => {
         const dogma = await getDogmaAttributes(item.item_id, item.type_id)
         // console.log('i.dogma', i, i.itemID, i.typeID, i.dogma)
         const filteredAttributesObject = await dogmaToAttributesRaw(item.type_id, dogma.dogma_attributes, sde)
-
-        // const appraisal = await getAppraisalForItem({ itemID: item.item_id }, batchID)
 
         const doc = {
           itemID: item.item_id,

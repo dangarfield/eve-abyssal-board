@@ -98,6 +98,21 @@ export const initiateListingFlow = async (inventoryItems) => {
   console.log('initialListing res', res)
   return res
 }
+export const getAppraisalsForItemIDs = async (itemIDs) => {
+  const { accessToken } = await getCurrentUserAccessToken()
+  const url = `${API_ROOT}/api/appraisals`
+  const res = await fetchWithRetry(url, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(itemIDs)
+  })
+  console.log('getAppraisalsForItemIDs res', res)
+  return res
+}
 export const initiateStorefrontCreationFlow = async () => {
   const { accessToken } = await getCurrentUserAccessToken()
   const url = `${API_ROOT}/api/store/@me`

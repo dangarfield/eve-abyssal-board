@@ -10,6 +10,7 @@ import { searchForModulesOfType } from '../app/search.js'
 import { setSellerData, getSellerData, amendStorefront, getStoreData } from '../app/sellers.js'
 import { updateInventoryFromPublicContracts } from '../app/contracts.js'
 import sde from '../../frontend/src/generated-data/sde.json' // assert {type:'json'} // assert breaks netlify prod, but is required in heroku
+import { getAppraisalForItemIDs } from '../app/appraisal.js'
 
 const app = API()
 
@@ -64,9 +65,11 @@ app.post('/api/listing', verifyToken, async function (req, res) {
 app.delete('/api/listing/:itemID', verifyToken, async function (req, res) {
   res.json(await cancelListing(parseInt(req.params.itemID)))
 })
-
 app.patch('/api/listing/:itemID', verifyToken, async function (req, res) {
   res.json(await amendListing(req.auth, parseInt(req.params.itemID), req.body))
+})
+app.post('/api/appraisals', verifyToken, async function (req, res) {
+  res.json(await getAppraisalForItemIDs(req.body))
 })
 app.post('/api/search/:typeID', async function (req, res) {
   res.json(await searchForModulesOfType(parseInt(req.params.typeID), req.body))

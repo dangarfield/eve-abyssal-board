@@ -108,20 +108,22 @@ export const renderHome = () => {
         <div class="row align-items-center">
             <div class="col-md-5">
                 <div class="mt-md-4">
-                    <!--
-                    <div>
-                        <span class="badge bg-light text-primary rounded-pill">o7</span>
-                    </div>
-                    -->
                     <h2 class="text-white fw-normal mb-4 mt-3 hero-title">
                         Buy and sell EVE online abyssal modules easily and cheaply
                     </h2>
 
-                    
-
-                    <p class="fs-5 text-light">
-                        Why list with us? <span class="text-light"><span class="badge bg-secondary">FREE under 1b ISK</span> Max fees of 10m</span>
+                    <p class="fs-5 text-light mb-0">
+                        Why list with us?
                     </p>
+
+                    <div class="d-flex flex-row align-items-center text-light">
+                        <div class="px-2"><i class="bi bi-arrow-up-right-circle-fill fs-4"></i></div>
+                        <div class="p-2">Less than 1b ISK? <span class="badge bg-secondary fs-6">List for FREE!</span></div>
+                    </div>
+                    <div class="d-flex flex-row align-items-center text-light mb-3">
+                        <div class="px-2"><i class="bi bi-arrow-down-right-circle-fill fs-4"></i></div>
+                        <div class="p-2">1b+ ISK mod? <span class="badge bg-secondary fs-6">Only 10m ISK per mod</span></div>
+                    </div>
 
                     <p class="fs-6 text-light">
                       Listing through EVE Online contracts with perfect skills and standings will cost 1.5% - 2% plus any additional relist fees
@@ -133,7 +135,7 @@ export const renderHome = () => {
                   
                     <div class="d-flex flex-row align-items-center text-light">
                         <div class="px-2"><i class="bi bi-emoji-angry-fill fs-4"></i></div>
-                        <div class="p-2">EVE Online Contract: <span class="badge bg-secondary">1.5b ISK</span> PLUS relists</div>
+                        <div class="p-2">EVE Online Contract: <span class="badge bg-secondary">1.5b+ ISK</span> PLUS relists</div>
                     </div>
                     <div class="d-flex flex-row align-items-center text-light">
                         <div class="px-2"><i class="bi bi-emoji-heart-eyes-fill fs-4"></i></div>
@@ -157,7 +159,7 @@ export const renderHome = () => {
                     </div>
                     <div class="d-flex flex-row mb-3 align-items-center text-light">
                         <div class="px-2"><i class="bi bi-3-circle-fill fs-4"></i></div>
-                        <div class="p-2">If >1b, pay the minimal 100m ISK listing fee and voila!</div>
+                        <div class="p-2">If >1b, pay the minimal 10m ISK listing fee and voila!</div>
                     </div>
 
 
@@ -169,6 +171,9 @@ export const renderHome = () => {
             </div>
             <div class="col-md-3 offset-md-3">
                 ${renderSearchCard(type, defaultItem)}
+                <p class="fs-6 text-light mb-0 text-center">
+                  <i>* We also list all public contracts</i>
+                </p>
             </div>
         </div>
     </div>

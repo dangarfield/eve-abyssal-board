@@ -32,8 +32,13 @@ export const initiateListingFlow = async (auth, inventoryItems) => {
 
   const totalListingPrice = inventoryItems.map(i => i.listingPrice).reduce((sum, v) => {
     let listingPrice = v
-    if (listingPrice <= appConfig.listingFreeThreshold) {
+    if (listingPrice < appConfig.listingFeeThreshold) {
       listingPrice = 0
+    } else {
+      listingPrice = appConfig.listingPercentage * listingPrice
+    }
+    if (listingPrice >= appConfig.listingFeeCap) {
+      listingPrice = appConfig.listingFeeCap
     }
     return sum + listingPrice
   }, 0)
@@ -69,10 +74,11 @@ Please be careful to fill this information in carefully.<br>
 It may take up to 1 hour for the transation to be registered and your items listed.<br><br>
 For any specific questions, contact us on </font><font size="14" color="#ffffe400"><loc><a href="${appConfig.discordUrl}" target="_blank">discord</a></loc></font><font size="14" color="#bfffffff">.<br><br>
 Thanks</font>`.replace(/\n/g, '')
-  await sendMail(auth.characterId, 'Abyss Board Listing Fee', body)
 
   if (totalListingPrice === 0) {
     await receivePaymentAndPutInventoryOnSale([paymentItem]) // Put on sale immediately // async
+  } else {
+    await sendMail(auth.characterId, 'Abyss Board Listing Fee', body)
   }
 
   return {
@@ -86,7 +92,15 @@ Thanks</font>`.replace(/\n/g, '')
 export const initiateAmendListingPriceFlow = async (auth, inventory, newListingPrice) => {
   const appConfig = await getAppConfig(true)
   const appAuth = await getAppAuth()
-  const listingFee = appConfig.listingPercentage * (newListingPrice - inventory.listingPrice)
+  let listingFee = newListingPrice
+  if (listingFee < appConfig.listingFeeThreshold) {
+    listingFee = 0
+  } else {
+    listingFee = appConfig.listingPercentage * listingFee
+  }
+  if (listingFee >= appConfig.listingFeeCap) {
+    listingFee = appConfig.listingFeeCap
+  }
   const paymentItem = {
     _id: nanoid(10),
     characterId: auth.characterId,
@@ -240,11 +254,10 @@ export const receivePaymentAndPutInventoryOnSale = async (paymentsMade) => {
   for (const paymentMade of paymentsMade) {
     const body = `
 <font size="14" color="#bfffffff">
-Thanks for paying your listing fee on Abyss Board.<br><br>
 Your ${paymentMade.inventory.length} mod${paymentMade.inventory.length > 1 ? 's have' : ' has'} now been listed for sale!<br>
 For any specific questions, contact us on </font><font size="14" color="#ffffe400"><loc><a href="${appConfig.discordUrl}">discord</a></loc></font><font size="14" color="#bfffffff">.<br><br>
 Thanks</font>`.replace(/\n/g, '')
-    await sendMail(paymentMade.characterId, 'Abyss Board Listing Payment Received', body)
+    await sendMail(paymentMade.characterId, 'Abyss Board Listing Now Live', body)
   }
 }
 export const receivePaymentAndAmendInventoryListingPrice = async (paymentsMade) => {

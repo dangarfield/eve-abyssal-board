@@ -120,7 +120,7 @@ export const renderHome = () => {
                     
 
                     <p class="fs-5 text-light">
-                        Why list with us? <b><span class="text-light">Max fees of 1%</span></b>
+                        Why list with us? <span class="text-light"><span class="badge bg-secondary">FREE under 1b ISK</span> Max fees of 10m</span>
                     </p>
 
                     <p class="fs-6 text-light">
@@ -137,11 +137,11 @@ export const renderHome = () => {
                     </div>
                     <div class="d-flex flex-row align-items-center text-light">
                         <div class="px-2"><i class="bi bi-emoji-heart-eyes-fill fs-4"></i></div>
-                        <div class="p-2">Abyss Board: <span class="badge bg-secondary">1b ISK</span> NO relists</div>
+                        <div class="p-2">Abyss Board: <span class="badge bg-secondary">100m ISK</span> NO relists</div>
                     </div>
                     <div class="d-flex flex-row align-items-center text-light mb-3">
                         <div class="px-2"><i class="bi bi-piggy-bank-fill fs-4"></i></div>
-                        <div class="p-2"><b><span class="badge bg-danger">+500m ISK</span> saving!</b> List mods under 200m ISK for free!</div>
+                        <div class="p-2"><b><span class="badge bg-danger">1.4b ISK</span> saving!</b> List mods under 1b ISK for free!</div>
                     </div>
 
                     <p class="fs-5 text-light">
@@ -157,7 +157,7 @@ export const renderHome = () => {
                     </div>
                     <div class="d-flex flex-row mb-3 align-items-center text-light">
                         <div class="px-2"><i class="bi bi-3-circle-fill fs-4"></i></div>
-                        <div class="p-2">Pay the minimal 1% ISK listing fee and voila!</div>
+                        <div class="p-2">If >1b, pay the minimal 100m ISK listing fee and voila!</div>
                     </div>
 
 

@@ -221,13 +221,14 @@ const renderSellerListing = (listedItems) => {
       const itemID = parseInt(invOnSaleEle.getAttribute('data-item-id'))
       const listingPrice = listedItems.find(i => i.itemID === itemID).listingPrice
       const appConfig = await getAppConfig()
-      const listingPercentage = appConfig.listingPercentage
       console.log('on-sale', itemID, listedItems, listingPrice)
       let reloadPageOnClose = false
       await showModalAlert('Amend Listing', `
       <p>You've already paid the listing fee, if you want to cancel or have sold it elsewhere, the listing fee will not be returned.</p>
       <p>If you cancel this listing, it'll disappear from this screen along but the completed payments will remain visible. If you want to relist it, simply add a new mod listing as before.</p>
-      <p>Discounting your mod will be free, but increasing the price will be ${listingPercentage * 100}% of the difference.</p>
+      <p>Mods ${formatToISKString(appConfig.listingFeeThreshold)} and over - Amend price is ${formatToISKString(appConfig.listingFeeCap)}</p>
+      <p>Mods under ${formatToISKString(appConfig.listingFeeThreshold)} - FREE!</p>
+
       <div class="row align-items-center">
         <div class="col-auto">
           <label for="list-price-modal" class="col-form-label">Listing Price</label>
@@ -337,10 +338,16 @@ const renderSellerListing = (listedItems) => {
         const newListingFeeEle = modelEle.querySelector('.list-price-fee')
         newListingPriceEle.addEventListener('blur', async () => {
           newListingPriceEle.value = await validateListingPrice(newListingPriceEle.value)
-          const newListingPrice = listingPriceStringToInt(newListingPriceEle.value)
-          let listingFee = listingPercentage * (newListingPrice - listingPrice)
-          if (listingFee < 0) listingFee = 0
-          console.log('listingFee', listingPercentage, '-', listingPrice, newListingPrice, '-', listingFee, formatToISKString(listingFee))
+          let listingFee = listingPriceStringToInt(newListingPriceEle.value)
+          if (listingFee < appConfig.listingFeeThreshold) {
+            listingFee = 0
+          } else {
+            listingFee = appConfig.listingPercentage * listingFee
+          }
+          if (listingFee >= appConfig.listingFeeCap) {
+            listingFee = appConfig.listingFeeCap
+          }
+          console.log('listingFee', appConfig.listingPercentage, '-', listingPrice, listingFee, '-', listingFee, formatToISKString(listingFee))
           newListingFeeEle.innerHTML = `Fee: ${formatToISKString(listingFee)}`
         })
         console.log('listingPrice', newListingPriceEle.value)

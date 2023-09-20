@@ -11,3 +11,4 @@ uptime-robot*
 niceadmin
 
 sync-local-contract-inventory-to-prod.js
+*.xlsx

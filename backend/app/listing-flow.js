@@ -109,7 +109,7 @@ export const initiateAmendListingPriceFlow = async (auth, inventory, newListingP
     inventory: [inventory._id],
     type: PAYMENT_TYPES.PRICE_CHANGE_FEE,
     creationDate: new Date(),
-    paid: false,
+    paid: listingFee === 0,
     newListingPrice
   }
   console.log('paymentItem', paymentItem)
@@ -134,7 +134,12 @@ Please be careful to fill this information in carefully.<br>
 It may take up to 1 hour for the transation to be registered and your items listed.<br><br>
 For any specific questions, contact us on </font><font size="14" color="#ffffe400"><loc><a href="${appConfig.discordUrl}" target="_blank">discord</a></loc></font><font size="14" color="#bfffffff">.<br><br>
 Thanks</font>`.replace(/\n/g, '')
-  await sendMail(auth.characterId, 'Abyss Board Price Change Fee', body)
+
+  if (listingFee === 0) {
+    await receivePaymentAndAmendInventoryListingPrice([paymentItem]) // Put on sale immediately // async
+  } else {
+    await sendMail(auth.characterId, 'Abyss Board Price Change Fee', body)
+  }
 
   return {
     corpName: appAuth.corpName,
@@ -271,11 +276,10 @@ export const receivePaymentAndAmendInventoryListingPrice = async (paymentsMade) 
     )
     const body = `
 <font size="14" color="#bfffffff">
-Thanks for paying your price change fee on Abyss Board.<br><br>
 Your mod listing price has now been changed!<br>
 For any specific questions, contact us on </font><font size="14" color="#ffffe400"><loc><a href="${appConfig.discordUrl}">discord</a></loc></font><font size="14" color="#bfffffff">.<br><br>
 Thanks</font>`.replace(/\n/g, '')
-    await sendMail(paymentMade.characterId, 'Abyss Board Price Change Payment Received', body)
+    await sendMail(paymentMade.characterId, 'Abyss Board Price Change Now Live', body)
   }
 }
 export const receivePaymentAndCreateStorefront = async (paymentsMade) => {

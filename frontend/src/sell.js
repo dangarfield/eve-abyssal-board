@@ -226,9 +226,10 @@ const renderSellerListing = (listedItems) => {
       await showModalAlert('Amend Listing', `
       <p>You've already paid the listing fee, if you want to cancel or have sold it elsewhere, the listing fee will not be returned.</p>
       <p>If you cancel this listing, it'll disappear from this screen along but the completed payments will remain visible. If you want to relist it, simply add a new mod listing as before.</p>
+      <!--
       <p>Mods ${formatToISKString(appConfig.listingFeeThreshold)} and over - Amend price is ${formatToISKString(appConfig.listingFeeCap)}</p>
       <p>Mods under ${formatToISKString(appConfig.listingFeeThreshold)} - FREE!</p>
-
+      -->
       <div class="row align-items-center">
         <div class="col-auto">
           <label for="list-price-modal" class="col-form-label">Listing Price</label>
@@ -270,7 +271,7 @@ const renderSellerListing = (listedItems) => {
           console.log('listing complete', newListingPriceString, newListingPrice)
           const amendResult = await amendListing(itemID, { listingPrice: newListingPrice })
           console.log('amendResult', amendResult)
-          if (amendResult.paymentDetails) {
+          if (amendResult.paymentDetails && amendResult.paymentDetails.amount > 0) {
             console.log('Show payment details')
             document.querySelector('.modal-body').innerHTML = `
             <i class="bi bi-info-circle fs-1 text-primary"></i>
@@ -549,9 +550,9 @@ const renderSellerSettings = async (sellerData) => {
       <div class="card h-100">
         <div class="card-body pb-0">
           <h5 class="card-title">Seller Settings</h5>
-          <p>Buyers will be shown your EVE details, but to make it even easier and quicker, join <a href="${appConfig.discordUrl}" target="_blank">Abyssal Trading Discord</a>. By adding your username, buyers can negotiate with you more directly</p>
-          <p>Don't forget to update any sold or no longer available modules here, so that you get get any unwanted offers and PMs</p>
-          <p>Clicking on a mod below. You can cancel the listing, mark the sale as complete / unavailable, update the list price or even <b>promote the mod to appear at the top of the search results!</b></p>
+          <p>Buyers will be shown your EVE details, but to make it even easier and quicker, join <a href="${appConfig.discordUrl}" target="_blank">Abyssal Trading Discord</a>. By adding your username, buyers can negotiate with you more directly.</p>
+          <p>Don't forget to update any sold or no longer available modules here, so that you don't get any unwanted offers and PMs.</p>
+          <p>Click on a mod below. You can cancel the listing, mark the sale as complete / unavailable, update the list price or even <b>promote the mod to appear at the top of the search results!</b></p>
         </div>
       </div>
     </div>

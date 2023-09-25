@@ -109,7 +109,7 @@ export const renderHome = () => {
             <div class="col-md-5">
                 <div class="mt-md-4">
                     <h2 class="text-white fw-normal mb-4 mt-3 hero-title">
-                        Buy and sell EVE online abyssal modules easily and cheaply
+                        Buy and sell EVE online abyssal modules for FREE
                     </h2>
 
                     <p class="fs-5 text-light mb-0">
@@ -117,34 +117,18 @@ export const renderHome = () => {
                     </p>
 
                     <div class="d-flex flex-row align-items-center text-light">
-                        <div class="px-2"><i class="bi bi-arrow-up-right-circle-fill fs-4"></i></div>
-                        <div class="p-2">Less than 1b ISK? <span class="badge bg-secondary fs-6">List for FREE!</span></div>
-                    </div>
-                    <div class="d-flex flex-row align-items-center text-light mb-3">
-                        <div class="px-2"><i class="bi bi-arrow-down-right-circle-fill fs-4"></i></div>
-                        <div class="p-2">1b+ ISK mod? <span class="badge bg-secondary fs-6">Only 10m ISK per mod</span></div>
-                    </div>
-
-                    <p class="fs-6 text-light">
-                      Listing through EVE Online contracts with perfect skills and standings will cost 1.5% - 2% plus any additional relist fees
-                    </p>
-
-                    <p class="fs-6 text-light">
-                      Listing x10 abyssal modules worth 10b ISK each? Compare the costs:
-                    </p>
-                  
-                    <div class="d-flex flex-row align-items-center text-light">
-                        <div class="px-2"><i class="bi bi-emoji-angry-fill fs-4"></i></div>
-                        <div class="p-2">EVE Online Contract: <span class="badge bg-secondary">1.5b+ ISK</span> PLUS relists</div>
+                        <div class="px-2"><i class="bi bi-currency-exchange fs-4"></i></div>
+                        <div class="p-2"><span class="badge bg-success fs-6">It's FREE!</span></div>
                     </div>
                     <div class="d-flex flex-row align-items-center text-light">
-                        <div class="px-2"><i class="bi bi-emoji-heart-eyes-fill fs-4"></i></div>
-                        <div class="p-2">Abyss Board: <span class="badge bg-secondary">100m ISK</span> NO relists</div>
+                        <div class="px-2"><i class="bi bi-box-seam-fill fs-4"></i></div>
+                        <div class="p-2">Our community sells +10b ISK of mods daily</div>
                     </div>
                     <div class="d-flex flex-row align-items-center text-light mb-3">
-                        <div class="px-2"><i class="bi bi-piggy-bank-fill fs-4"></i></div>
-                        <div class="p-2"><b><span class="badge bg-danger">1.4b ISK</span> saving!</b> List mods under 1b ISK for free!</div>
+                        <div class="px-2"><i class="bi bi-discord fs-4"></i></div>
+                        <div class="p-2">We have +4.5k members</div>
                     </div>
+
 
                     <p class="fs-5 text-light">
                         The process is simple:
@@ -162,6 +146,26 @@ export const renderHome = () => {
                         <div class="p-2">If >1b, pay the minimal 10m ISK listing fee and voila!</div>
                     </div>
 
+                    <div class="text-light">
+                      <hr>
+                    </div>
+                    
+                    <p class="fs-6 text-light">
+                      Listing through EVE Online contracts with perfect skills and standings will cost 1.5% - 2% plus any additional relist fees
+                    </p>
+
+                    <p class="fs-6 text-light">
+                      Listing x10 abyssal modules worth 10b ISK each? Compare the costs:
+                    </p>
+                  
+                    <div class="d-flex flex-row align-items-center text-light">
+                        <div class="px-2"><i class="bi bi-emoji-angry-fill fs-4"></i></div>
+                        <div class="p-2">EVE Online Contract: <span class="badge bg-danger">+1.5b ISK</span> PLUS relists</div>
+                    </div>
+                    <div class="d-flex flex-row align-items-center text-light mb-3">
+                        <div class="px-2"><i class="bi bi-emoji-heart-eyes-fill fs-4"></i></div>
+                        <div class="p-2">Abyss Board: <span class="badge bg-success">FREE</span> NO relists</div>
+                    </div>
 
                     <div class="d-flex flex-row mb-3 align-items-center text-light">
                         <div class="p-2 w-100"><a href="/buy" class="btn btn-success mb-3 w-100">Buy Modules</a></div>

@@ -9,7 +9,8 @@
     "dev:functions": "netlify dev",
     "dev:frontend": "npm run dev -w frontend",
     "build:frontend": "npm run build -w frontend",
-    "deploy": "netlify deploy --prod"
+    "deploy": "netlify deploy --prod",
+    "generate-data": "node generate-static-data.js"
   },
   "author": "",
   "license": "ISC",

@@ -143,7 +143,7 @@ export const renderHome = () => {
                     </div>
                     <div class="d-flex flex-row mb-3 align-items-center text-light">
                         <div class="px-2"><i class="bi bi-3-circle-fill fs-4"></i></div>
-                        <div class="p-2">If >1b, pay the minimal 10m ISK listing fee and voila!</div>
+                        <div class="p-2">Click list items and voila!</div>
                     </div>
 
                     <div class="text-light">

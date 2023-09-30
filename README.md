@@ -26,8 +26,8 @@
 - Setup EVE Online SSO application - eg, for local and production
 - Rename `.env.local.example` to `.env.local`
 - Populate environment variables
-- You can run `npm run generate-data` to download, process and prepate data set from EVE SDE
-- Install and configure `Netlify dev` for local development
+- You can run `npm run generate-data` to download, process and prepaee data set from EVE SDE
+- Install and configure `netlify dev` for local development
 - Run local development by `npm run dev` - Which builds local front and netlify local lambda function APIs
 
 ## Prod Deployment

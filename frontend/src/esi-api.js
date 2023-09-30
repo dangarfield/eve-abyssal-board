@@ -41,6 +41,7 @@ export const getCurrentUserModInventory = async () => {
   const abyssTypesFlat = getAbyssModuleTypesFlatIds()
   console.log('abyssTypesFlat', abyssTypesFlat)
   // const abyssModuleTypes = getAbyssModuleTypes()
+  console.log('alsalaw debug', inventory.filter(i => abyssTypesFlat.includes(i.type_id)).map(i => `${i.item_id} - ${i.type_id} - ${i.location_id} - ${i.location_flag}`))
   inventory = inventory.filter(i => abyssTypesFlat.includes(i.type_id) && ['Hangar', 'Cargo', 'AutoFit'].includes(i.location_flag))
 
   // .filter(i => i.item_id === 1037642882589)

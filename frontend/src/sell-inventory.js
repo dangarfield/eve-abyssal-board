@@ -19,6 +19,7 @@ const renderInventoryPlaceholder = (userDetails, appConfig) => {
           <h5 class="card-title">Find your assets</h5>
           <p class="card-text">EVE Online servers cache this data and it is made available to us up to 60 minutes after requesting.</p>
           <p class="card-text">Select the mods that you wish to sell and add your listing price. You can update the listing price at any time after it is listed.</p>
+          <p class="card-text">There is a simplistic filter to hide auto-defined bricked mods. This is subjective and will be improved over time. Let us know how it works for you.</p>
           <!--
           <p class="card-text">Mods ${formatToISKString(appConfig.listingFeeThreshold)} and over - Listing price is ${formatToISKString(appConfig.listingFeeCap)}</p>
           <p class="card-text">Mods under ${formatToISKString(appConfig.listingFeeThreshold)} - FREE!</p>
@@ -133,6 +134,12 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
       </div>
       <div class="col-12">
         <div class="form-check form-switch">
+          <input class="form-check-input toggle-show-bricked" type="checkbox" role="switch" id="toggle-show-bricked" checked>
+          <label class="form-check-label" for="toggle-show-bricked" title="Note: This may be incorrect, we will improve this over time.">Show bricked</label>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="form-check form-switch">
           <input class="form-check-input toggle-show-all" type="checkbox" role="switch" id="toggle-show-all">
           <label class="form-check-label" for="toggle-show-all">Show already listed</label>
         </div>
@@ -170,13 +177,15 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
 const filterCards = () => {
   const searchQuery = document.querySelector('.data-search').value.toLowerCase()
   const hideListed = !document.querySelector('.toggle-show-all').checked
+  const hideBricked = !document.querySelector('.toggle-show-bricked').checked
   let allItemsHidden = true
+  console.log('hideBricked', hideBricked)
   document.querySelectorAll('.inventory-item').forEach((element) => {
     const text = element.querySelector('.type-name').textContent.toLowerCase()
     const isListed = element.classList.contains('listed')
-
+    const isBricked = element.classList.contains('bricked')
     // Filter based on search query and hide/show based on hideListed
-    const shouldHide = (searchQuery && !text.includes(searchQuery)) || (hideListed && isListed)
+    const shouldHide = (searchQuery && !text.includes(searchQuery)) || (hideListed && isListed) || (hideBricked && isBricked)
     // element.style.display = shouldHide ? 'none' : 'block'
     element.parentElement.style.display = shouldHide ? 'none' : 'block'
     if (!shouldHide) allItemsHidden = false
@@ -209,6 +218,9 @@ const updateTotalListingPrice = async () => {
 const bindInventoryActions = (availableInventory, cacheExpires, lastModified) => {
   triggerRefreshTime('.refresh-time-inventory', 'Inventory data', cacheExpires, lastModified)
 
+  document.querySelector('.toggle-show-bricked').addEventListener('click', function () {
+    filterCards()
+  })
   document.querySelector('.toggle-show-all').addEventListener('click', function () {
     filterCards()
   })

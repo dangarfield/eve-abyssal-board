@@ -40,6 +40,9 @@
 .inventory-item.premium .card {
     background-color: lightyellow;
 }
+.inventory-item.bricked .card {
+    background-color: rgb(255, 230, 230);
+}
 .search-results .form-switch {
     margin-right: -8px;
 }

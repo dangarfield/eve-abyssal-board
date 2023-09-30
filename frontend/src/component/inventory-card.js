@@ -178,6 +178,7 @@ export const renderInventoryCard = (item) => {
     </div>
   `
     : ''
+
   const contractPriceHtml = item.contractPrice !== undefined
     ? `
     <div class="listing-price px-2">
@@ -209,8 +210,23 @@ export const renderInventoryCard = (item) => {
     itemDisplayClass = ' contract'
     statusBG = 'bg-warning text-dark'
   }
+  let isBricked = false
+  if (Math.round(item.qualityScore) < 15) {
+    isBricked = true
+  }
+  const qualityScoreHtml = item.qualityScore === undefined
+    ? ''
+    : (
+        isBricked
+          ? `<span class="badge bg-danger"><i class="bi bi-hand-thumbs-down-fill"></i> ${Math.round(item.qualityScore)}%</span>`
+          : `<span class="badge bg-primary"><i class="bi bi-hand-thumbs-up-fill"></i> ${Math.round(item.qualityScore)}%</span>`
+      )
+  //   isBricked
+  //                                 `<span class="badge bg-primary"><i class="bi bi-hand-thumbs-up-fill"></i> ${Math.round(item.qualityScore)}%</span>` : '':
+  //                                 `<span class="badge bg-primary"><i class="bi bi-hand-thumbs-up-fill"></i> ${Math.round(item.qualityScore)}%</span>` : ''
+  //                             }}
   html += `
-        <div class="card-container inventory-item${itemDisplayClass}${item.premium ? ' premium' : ''}" data-item-id="${item.itemID}" data-status="${item.status}" role="button">
+        <div class="card-container inventory-item${itemDisplayClass}${item.premium ? ' premium' : ''}${isBricked ? ' bricked' : ''}" data-item-id="${item.itemID}" data-status="${item.status}" role="button">
             <div class="card">
                 <div class="card-body px-0 pb-0">
                     <div class="d-flex flex-row gap-2 align-items-center px-1">
@@ -221,7 +237,7 @@ export const renderInventoryCard = (item) => {
                                     ${item.typeName}
                                 </b>
                             </p>
-                            ${item.qualityScore !== undefined ? `<span class="badge bg-primary"><i class="bi bi-hand-thumbs-up-fill"></i> ${Math.round(item.qualityScore)}%</span>` : ''}
+                            ${qualityScoreHtml}
                             <span class="badge bg-secondary">${item.group}</span>
                             <span class="badge bg-secondary">${item.category}</span>
                             ${item.status !== 'NONE' ? `<span class="badge ${statusBG}">${getFriendlyStatus(item.status)}</span>` : ''}

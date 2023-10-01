@@ -20,7 +20,9 @@ export const initiateListingFlow = async (auth, inventoryItems) => {
 
   // Add items to inventory collection
   try {
+    await inventoryCollection.deleteMany({ _id: { $in: inventoryItems.map(i => i.itemID) } })
     await inventoryCollection.insertMany(inventoryItems)
+    // TODO - Change this to an upsert and amend, because they might be public contracts
   } catch (error) {
     console.error('initiateListingFlow ADD INVENTORY ITEMS ERROR', error)
   }

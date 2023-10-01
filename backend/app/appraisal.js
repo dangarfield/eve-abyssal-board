@@ -1,5 +1,3 @@
-import { runBatches } from './contracts'
-
 const predictionConfidence = (conf) => {
   if (conf > 0.98) {
     return 'Extremely high'
@@ -17,6 +15,14 @@ const predictionConfidence = (conf) => {
     return 'Extremely low'
   } else {
     return 'Completely garbage'
+  }
+}
+const runBatches = async (promises, batchSize) => {
+  for (let i = 0; i < promises.length; i += batchSize) {
+    const batch = promises.slice(i, i + batchSize)
+    // console.log('runBatches START', i)
+    await Promise.all(batch.map(promiseFn => promiseFn(i / batchSize)))
+    // console.log('runBatches END', i)
   }
 }
 export const getAppraisalForItemIDs = async (itemIDs) => {

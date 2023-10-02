@@ -328,11 +328,7 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
       const data = deepCopy(inventory.data)
       // data.listingPriceString = a.querySelector('.listing-price').value
       data.listingPrice = listingPriceStringToInt(a.querySelector('.listing-price').value)
-      data.appraisal = [{
-        type: 'AUTO',
-        price: parseInt(a.querySelector('.appraisal div').getAttribute('data-appraisal-value')),
-        confidence: a.querySelector('.appraisal div').getAttribute('data-appraisal-confidence')
-      }]
+      data.appraisal = inventory.appraisal
       // TODO - Appraisal value seems to have floating point issues
       return data
     })

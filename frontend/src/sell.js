@@ -3,7 +3,7 @@ import { amendListing, cancelListing, getAppConfig, getCurrentSellerInventory, g
 import { renderInventoryCard } from './component/inventory-card'
 import { inventoryToInventoryCardDTO } from './dogma-utils'
 import { validateListingPrice } from './sell-inventory'
-import { formatToISKString, listingPriceStringToInt, showModalAlert } from './utils'
+import { formatToISKString, listingPriceStringToInt, loadData, showModalAlert } from './utils'
 
 const askForSellerScopePermission = () => {
   const html = `
@@ -541,7 +541,7 @@ const displayInventory = async () => {
   console.log('listedItems', listedItems)
   renderSellerListing(listedItems)
 }
-const renderSellerSettings = async (sellerData) => {
+const renderSellerSettings = async (sellerData, availableCharacters) => {
   const appConfig = await getAppConfig()
   let html = ''
   html += `
@@ -559,12 +559,20 @@ const renderSellerSettings = async (sellerData) => {
     <div class="col-lg-4">
       <div class="card h-100">
         <div class="card-body pb-0">
-          <h5 class="card-title">Discord Settings</h5>
+          <h5 class="card-title">Seller Settings</h5>
           <form class="seller-settings row g-3">
             <div class="col-md-12">
               <div class="form-floating">
                 <input type="text" class="form-control discord-name" id="discord-name" value="${sellerData.discordName}">
                 <label for="discord-name">Discord Name</label>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="form-floating">
+                <select class="form-select mail-recipient" id="mail-recipient">
+                ${availableCharacters.map(c => { return `<option value="${c.characterId}"${c.characterId === sellerData.mailRecipient ? ' selected' : ''}>${c.characterName}</option>` }).join()}
+                </select>
+                <label for="mail-recipient">Mail recipient</label>
               </div>
             </div>
             <div class="text-end">
@@ -648,8 +656,11 @@ const renderSellerSettings = async (sellerData) => {
   document.querySelector('.seller-settings').addEventListener('submit', async (event) => {
     event.preventDefault()
     const discordName = document.querySelector('.discord-name').value
+    const mailRecipient = document.querySelector('.mail-recipient').value
     console.log('discordName', discordName)
-    await setCurrentSellerData({ discordName })
+    const update = { discordName }
+    if (mailRecipient) update.mailRecipient = parseInt(mailRecipient)
+    await setCurrentSellerData(update)
     showModalAlert('Success', 'Settings saved')
   })
 
@@ -705,7 +716,14 @@ const displaySellerSettings = async () => {
   const sellerData = await getCurrentSellerData()
   if (sellerData.discordName === undefined) sellerData.discordName = ''
   console.log('sellerData', sellerData)
-  renderSellerSettings(sellerData)
+  const data = loadData()
+  const { characterId } = getCurrentUserDetails()
+  if (!sellerData.mailRecipient) sellerData.mailRecipient = characterId
+  const availableCharacters = Object.keys(data)
+    .filter(key => key.startsWith('token-'))
+    .map(key => { return { characterId: parseInt(data[key].character_id), characterName: data[key].payload.name } })
+  console.log('availableCharacters', availableCharacters)
+  renderSellerSettings(sellerData, availableCharacters)
 }
 export const initSellFlow = async () => {
   if (doesCurrentCharacterHaveSellerScope()) {

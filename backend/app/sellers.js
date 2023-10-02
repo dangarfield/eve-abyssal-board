@@ -1,5 +1,13 @@
 import { sellersCollection, inventoryCollection } from './db.js'
 
+export const getMailIDForSeller = async (sellerID) => {
+  const sellerData = await sellersCollection.findOne({ _id: sellerID })
+  if (sellerData.mailRecipient) {
+    return sellerData.mailRecipient
+  } else {
+    return sellerID
+  }
+}
 export const getSellerContactDetails = (sellerIDs) => {
   return [sellerIDs.map(sellerID => { return { sellerID } })]
 }
@@ -13,7 +21,10 @@ export const getSellerData = async (sellerID) => {
 }
 export const setSellerData = async (sellerID, data) => {
   console.log('setSellerData', sellerID, data)
-  await sellersCollection.findOneAndUpdate({ _id: sellerID }, { $set: { discordName: data.discordName } }, { upsert: true, returnOriginal: false })
+  const update = {}
+  if (data.discordName) update.discordName = data.discordName
+  if (data.mailRecipient) update.mailRecipient = data.mailRecipient
+  await sellersCollection.findOneAndUpdate({ _id: sellerID }, { $set: update }, { upsert: true, returnOriginal: false })
   return data
 }
 export const createStorefront = async (sellerID, sellerName) => {

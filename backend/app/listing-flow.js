@@ -2,7 +2,7 @@ import { inventoryCollection, paymentCollection } from '../app/db.js'
 import { getAppAuth, getAppConfig } from './config.js'
 import { nanoid } from 'nanoid'
 import { sendMail } from './eve-api.js'
-import { createStorefront } from './sellers.js'
+import { createStorefront, getMailIDForSeller } from './sellers.js'
 
 export const INVENTORY_STATUS = { AWAITING_PAYMENT: 'AWAITING_PAYMENT', ON_SALE: 'ON_SALE', CANCELLED: 'CANCELLED', COMPLETE: 'COMPLETE', CONTRACT: 'CONTRACT', UNAVAILABLE: 'UNAVAILABLE' }
 // CONST APPRAISAL_STATUS = {AWAITING_APPRAISAL: 'AWAITING_APPRAISAL', COMPLETE:'COMPLETE'}
@@ -80,7 +80,8 @@ Thanks</font>`.replace(/\n/g, '')
   if (totalListingPrice === 0) {
     await receivePaymentAndPutInventoryOnSale([paymentItem]) // Put on sale immediately // async
   } else {
-    await sendMail(auth.characterId, 'Abyss Board Listing Fee', body)
+    const mailCharacterID = await getMailIDForSeller(auth.characterId)
+    await sendMail(mailCharacterID, 'Abyss Board Listing Fee', body)
   }
 
   return {
@@ -140,7 +141,8 @@ Thanks</font>`.replace(/\n/g, '')
   if (listingFee === 0) {
     await receivePaymentAndAmendInventoryListingPrice([paymentItem]) // Put on sale immediately // async
   } else {
-    await sendMail(auth.characterId, 'Abyss Board Price Change Fee', body)
+    const mailCharacterID = await getMailIDForSeller(auth.characterId)
+    await sendMail(mailCharacterID, 'Abyss Board Price Change Fee', body)
   }
 
   return {
@@ -185,7 +187,8 @@ Please be careful to fill this information in carefully.<br>
 It may take up to 1 hour for the transation to be registered and your storefront created.<br><br>
 For any specific questions, contact us on </font><font size="14" color="#ffffe400"><loc><a href="${appConfig.discordUrl}" target="_blank">discord</a></loc></font><font size="14" color="#bfffffff">.<br><br>
 Thanks</font>`.replace(/\n/g, '')
-  await sendMail(auth.characterId, 'Abyss Board Storefront Fee', body)
+  const mailCharacterID = await getMailIDForSeller(auth.characterId)
+  await sendMail(mailCharacterID, 'Abyss Board Storefront Fee', body)
 
   return {
     corpName: appAuth.corpName,
@@ -229,7 +232,8 @@ Please be careful to fill this information in carefully.<br>
 It may take up to 1 hour for the transation to be registered and your premium mod.<br><br>
 For any specific questions, contact us on </font><font size="14" color="#ffffe400"><loc><a href="${appConfig.discordUrl}" target="_blank">discord</a></loc></font><font size="14" color="#bfffffff">.<br><br>
 Thanks</font>`.replace(/\n/g, '')
-  await sendMail(auth.characterId, 'Abyss Board Premium Listing Fee', body)
+  const mailCharacterID = await getMailIDForSeller(auth.characterId)
+  await sendMail(mailCharacterID, 'Abyss Board Premium Listing Fee', body)
 
   return {
     corpName: appAuth.corpName,
@@ -264,7 +268,9 @@ export const receivePaymentAndPutInventoryOnSale = async (paymentsMade) => {
 Your ${paymentMade.inventory.length} mod${paymentMade.inventory.length > 1 ? 's have' : ' has'} now been listed for sale!<br>
 For any specific questions, contact us on </font><font size="14" color="#ffffe400"><loc><a href="${appConfig.discordUrl}">discord</a></loc></font><font size="14" color="#bfffffff">.<br><br>
 Thanks</font>`.replace(/\n/g, '')
-    await sendMail(paymentMade.characterId, 'Abyss Board Listing Now Live', body)
+    const mailCharacterID = await getMailIDForSeller(paymentMade.characterId)
+    console.log('sendMail Abyss Board Listing Now Live', paymentMade.characterId, '->', mailCharacterID)
+    await sendMail(mailCharacterID, 'Abyss Board Listing Now Live', body)
   }
 }
 export const receivePaymentAndAmendInventoryListingPrice = async (paymentsMade) => {
@@ -281,7 +287,8 @@ export const receivePaymentAndAmendInventoryListingPrice = async (paymentsMade) 
 Your mod listing price has now been changed!<br>
 For any specific questions, contact us on </font><font size="14" color="#ffffe400"><loc><a href="${appConfig.discordUrl}">discord</a></loc></font><font size="14" color="#bfffffff">.<br><br>
 Thanks</font>`.replace(/\n/g, '')
-    await sendMail(paymentMade.characterId, 'Abyss Board Price Change Now Live', body)
+    const mailCharacterID = await getMailIDForSeller(paymentMade.characterId)
+    await sendMail(mailCharacterID, 'Abyss Board Price Change Now Live', body)
   }
 }
 export const receivePaymentAndCreateStorefront = async (paymentsMade) => {
@@ -297,7 +304,8 @@ Thanks for paying your storefront fee on Abyss Board.<br><br>
 Your storefront will now be available!<br>
 For any specific questions, contact us on </font><font size="14" color="#ffffe400"><loc><a href="${appConfig.discordUrl}">discord</a></loc></font><font size="14" color="#bfffffff">.<br><br>
 Thanks</font>`.replace(/\n/g, '')
-    await sendMail(paymentMade.characterId, 'Abyss Board Storefront Payment Received', body)
+    const mailCharacterID = await getMailIDForSeller(paymentMade.characterId)
+    await sendMail(mailCharacterID, 'Abyss Board Storefront Payment Received', body)
   }
 }
 export const receivePaymentAndMakeModPremium = async (paymentsMade) => {
@@ -316,7 +324,8 @@ Thanks for paying your premium listing fee on Abyss Board.<br><br>
 Your premium listing mod is now live!<br>
 For any specific questions, contact us on </font><font size="14" color="#ffffe400"><loc><a href="${appConfig.discordUrl}">discord</a></loc></font><font size="14" color="#bfffffff">.<br><br>
 Thanks</font>`.replace(/\n/g, '')
-    await sendMail(paymentMade.characterId, 'Abyss Board Premium Listing Payment Received', body)
+    const mailCharacterID = await getMailIDForSeller(paymentMade.characterId)
+    await sendMail(mailCharacterID, 'Abyss Board Premium Listing Payment Received', body)
   }
 }
 export const cancelListing = async (itemID) => {

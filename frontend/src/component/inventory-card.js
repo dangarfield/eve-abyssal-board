@@ -151,6 +151,12 @@ export const renderInventoryCard = (item) => {
             ${item.appraisal.map(appraisal => `<p><b>${formatToISKString(appraisal.price)}</b> <i>(${appraisal.type})</i></p>`).join('')}
             </span>
         </div>
+    </div>
+    <div class="mt-2 listing-price-holder px-2" style="display:none;">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control listing-price no-click-close text-end" placeholder="Add listing price" value="${formatToISKString(item.appraisal[0].price).replace(' ISK', '')}">
+            <span class="input-group-text no-click-close">eg, 13m 1.9b</span>
+        </div>
     </div>`
     : `
     <div class="appraisal px-2" data-item-id="${item.itemID}">
@@ -159,8 +165,8 @@ export const renderInventoryCard = (item) => {
             <span class="placeholder col-6"></span>
             <span class="placeholder col-2"></span>
         </div>
-        </div>
-        <div class="mt-2 listing-price-holder px-2" style="display:none;">
+    </div>
+    <div class="mt-2 listing-price-holder px-2" style="display:none;">
         <div class="input-group mb-3">
             <input type="text" class="form-control listing-price no-click-close text-end" placeholder="Add listing price">
             <span class="input-group-text no-click-close">eg, 13m 1.9b</span>

@@ -1,5 +1,5 @@
 import { switchUser, triggerLoginFlow, getCurrentUserDetails } from './auth'
-import { clearAllData, loadData } from './utils'
+import { clearAllData, loadData, saveData } from './utils'
 
 export const initNav = () => {
 //   console.log('initNav')
@@ -51,5 +51,20 @@ export const initNav = () => {
     // console.log('login')
       triggerLoginFlow()
     })
+  }
+}
+export const initTheme = () => {
+  document.querySelector('.dark-mode').addEventListener('click', (event) => {
+    const currentTheme = document.querySelector('html').getAttribute('data-bs-theme')
+    const newTheme = currentTheme === 'dark' ? 'default' : 'dark'
+    console.log('dark-mode', currentTheme, newTheme, event.target)
+    document.querySelector('html').setAttribute('data-bs-theme', newTheme)
+    document.querySelector('.dark-mode').innerHTML = currentTheme === 'dark' ? '<i class="bi bi-moon"></i>' : '<i class="bi bi-sun-fill"></i>'
+    saveData('theme', newTheme)
+  })
+  const data = loadData()
+  const currentTheme = document.querySelector('html').getAttribute('data-bs-theme')
+  if (data.theme && data.theme !== currentTheme) {
+    document.querySelector('.dark-mode').click()
   }
 }

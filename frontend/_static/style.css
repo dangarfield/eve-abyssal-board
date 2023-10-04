@@ -264,3 +264,45 @@
 .dogma-value {
     min-width: 75px;
 }
+
+/* DARK MODE */
+
+[data-bs-theme=dark] body {
+    background-color: #343a40;
+    color: white;
+}
+[data-bs-theme=dark] .logo span,
+[data-bs-theme=dark] .header-nav .nav-icon {
+    color: white !important;
+}
+
+[data-bs-theme=dark] .header {
+    background-color: inherit;
+}
+
+[data-bs-theme=dark] .search-results .inventory-item.contract .card {
+    background-color: #212529;
+}
+
+[data-bs-theme=dark] .inventory-row .inventory-item .card:hover {
+    background-color: #4c5359;
+}
+[data-bs-theme=dark] .inventory-row .inventory-item.selected .card {
+    background-color: #213f59;
+    /* background-color: #cff4fc; */
+}
+[data-bs-theme=dark] .inventory-row .inventory-item.listed .card {
+    background-color: #4c5359;
+}
+[data-bs-theme=dark] .inventory-row .inventory-item.listed.on-sale .card {
+    background-color: #212529;
+}
+[data-bs-theme=dark] .search-results .inventory-item.contract .card {
+    background-color: #28252e;
+}
+[data-bs-theme=dark] .inventory-item.premium .card {
+    background-color: #2e2c1a;
+}
+[data-bs-theme=dark] .inventory-item.bricked .card {
+    background-color: rgb(50, 25, 25);
+}

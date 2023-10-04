@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 
 <head>
     <meta charset="utf-8">
@@ -58,7 +58,8 @@
 
                 <div class="asds">
                     <li class="nav-item d-block d-lg-none">
-                        <button class="nav-link nav-icon search-bar-toggle" href="#" data-bs-toggle="dropdown">
+                        <button class="nav-link nav-icon text-primary search-bar-toggle" href="#"
+                            data-bs-toggle="dropdown">
                             <i class="bi bi-list"></i>
                         </button>
                         <ul class="dropdown-menu">
@@ -69,6 +70,11 @@
                     </li>
                 </div>
 
+                <li class="nav-item dropdown pe-3">
+                    <button class="btn btn-secondary py-0 px-2 fs-5 dark-mode">
+                        <i class="bi bi-sun-fill"></i>
+                    </button>
+                </li>
                 <li class="nav-item dropdown pe-3 not-logged-in">
                     <button class="login nav-link nav-profile d-flex align-items-center" type="button">
                         <img src="https://web.ccpgamescdn.com/eveonlineassets/developers/eve-sso-login-white-small.png"
@@ -84,7 +90,7 @@
                         <span class="d-none d-md-block dropdown-toggle ps-2 logged-in-user-name">EVE Online User</span>
                     </button>
 
-                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                    <ul class="dropdown-menu dropdown-menu-end profile">
                         <div class="logged-in-users">
                             <li>
                                 <button class="dropdown-item d-flex align-items-center">

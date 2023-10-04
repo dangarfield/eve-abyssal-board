@@ -69,7 +69,6 @@ You have listed ${inventoryItems.length} item${inventoryItems.length > 1 ? 's' :
 Listing payment is ${paymentItem.amount.toLocaleString()} ISK.<br>
 Right click on this </font><font size="14" color="#ffd98d00"><a href="showinfo:2//${appAuth.corpId}">${appAuth.corpName}</a></font><font size="14" color="#bfffffff"> and click 'Give Money'.<br><br>
 Fill in the details as follows:<br><br>
-<b>Account</b>: ${appConfig.corpDivisionName}<br>
 <b>Amount</b>: ${paymentItem.amount}<br>
 <b>Reason</b>: ${paymentItem._id}<br><br><br>
 Please be careful to fill this information in carefully.<br>
@@ -130,7 +129,6 @@ You have amended the price of an item<br>
 Price change payment is ${paymentItem.amount.toLocaleString()} ISK.<br>
 Right click on this </font><font size="14" color="#ffd98d00"><a href="showinfo:2//${appAuth.corpId}">${appAuth.corpName}</a></font><font size="14" color="#bfffffff"> and click 'Give Money'.<br><br>
 Fill in the details as follows:<br><br>
-<b>Account</b>: ${appConfig.corpDivisionName}<br>
 <b>Amount</b>: ${paymentItem.amount}<br>
 <b>Reason</b>: ${paymentItem._id}<br><br><br>
 Please be careful to fill this information in carefully.<br>
@@ -180,7 +178,6 @@ You have chosen to create a personalised storefront<br>
 Personalised storefront fee is ${paymentItem.amount.toLocaleString()} ISK.<br>
 Right click on this </font><font size="14" color="#ffd98d00"><a href="showinfo:2//${appAuth.corpId}">${appAuth.corpName}</a></font><font size="14" color="#bfffffff"> and click 'Give Money'.<br><br>
 Fill in the details as follows:<br><br>
-<b>Account</b>: ${appConfig.corpDivisionName}<br>
 <b>Amount</b>: ${paymentItem.amount}<br>
 <b>Reason</b>: ${paymentItem._id}<br><br><br>
 Please be careful to fill this information in carefully.<br>
@@ -225,7 +222,6 @@ You have chosen to create a premium mod<br>
 Premium mod fee is ${paymentItem.amount.toLocaleString()} ISK.<br>
 Right click on this </font><font size="14" color="#ffd98d00"><a href="showinfo:2//${appAuth.corpId}">${appAuth.corpName}</a></font><font size="14" color="#bfffffff"> and click 'Give Money'.<br><br>
 Fill in the details as follows:<br><br>
-<b>Account</b>: ${appConfig.corpDivisionName}<br>
 <b>Amount</b>: ${paymentItem.amount}<br>
 <b>Reason</b>: ${paymentItem._id}<br><br><br>
 Please be careful to fill this information in carefully.<br>

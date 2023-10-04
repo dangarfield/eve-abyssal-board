@@ -280,7 +280,6 @@ const renderSellerListing = (listedItems) => {
             <p class="mb-3">In game, search for and right click on the <code>${amendResult.paymentDetails.corpName}</code> corporation, then click 'Give Money'. Fill in the details as follows</p>
 
             <div class="alert alert-info fade show col-lg-8 offset-lg-2" role="alert">
-              <p class="mb-0 d-flex justify-content-between"><b class="text-">Account:</b> <code>${amendResult.paymentDetails.account}</code></p>
               <p class="mb-0 d-flex justify-content-between"><b>Amount:</b> <code>${amendResult.paymentDetails.amount}</code></p>
               <p class="mb-0 d-flex justify-content-between"><b>Reason:</b> <code>${amendResult.paymentDetails.reason}</code></p>
             </div>
@@ -316,7 +315,6 @@ const renderSellerListing = (listedItems) => {
             <p class="mb-3">In game, search for and right click on the <code>${amendResult.paymentDetails.corpName}</code> corporation, then click 'Give Money'. Fill in the details as follows</p>
 
             <div class="alert alert-info fade show col-lg-8 offset-lg-2" role="alert">
-              <p class="mb-0 d-flex justify-content-between"><b class="text-">Account:</b> <code>${amendResult.paymentDetails.account}</code></p>
               <p class="mb-0 d-flex justify-content-between"><b>Amount:</b> <code>${amendResult.paymentDetails.amount}</code></p>
               <p class="mb-0 d-flex justify-content-between"><b>Reason:</b> <code>${amendResult.paymentDetails.reason}</code></p>
             </div>
@@ -384,7 +382,7 @@ const renderPaymentsListing = (payments, appConfig) => {
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Outstanding Payments</h5>
-          <p>Payments should be made in game to <code>${appConfig.corpName}</code>. Right click then 'Give ISK'. Always pay into the <code>${appConfig.corpDivisionName}</code> account with the reason shown below.</p>
+          <p>Payments should be made in game to <code>${appConfig.corpName}</code>. Right click then 'Give ISK'. Always add the reason shown below.</p>
           <p>Any issues? Contact us on <a href="${appConfig.discordUrl}" target="_blank">discord</a>. <i><b>Note:</b> Payments take up to 1 hour to be registered</i></p>
         </div>
       </div>
@@ -674,7 +672,6 @@ const renderSellerSettings = async (sellerData, availableCharacters) => {
         <p class="mb-3">In game, search for and right click on the <code>${paymentDetails.corpName}</code> corporation, then click 'Give Money'. Fill in the details as follows</p>
 
         <div class="alert alert-info fade show col-lg-8 offset-lg-2" role="alert">
-          <p class="mb-0 d-flex justify-content-between"><b class="text-">Account:</b> <code>${paymentDetails.account}</code></p>
           <p class="mb-0 d-flex justify-content-between"><b>Amount:</b> <code>${paymentDetails.amount}</code></p>
           <p class="mb-0 d-flex justify-content-between"><b>Reason:</b> <code>${paymentDetails.reason}</code></p>
         </div>

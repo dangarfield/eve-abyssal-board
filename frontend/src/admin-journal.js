@@ -31,6 +31,7 @@ const renderAdminJournal = (journal, lastModified) => {
 
   const journalCol = journal.map((p, i) => [
     i,
+    p.division,
     p.id,
     p.date,
 
@@ -48,6 +49,7 @@ const renderAdminJournal = (journal, lastModified) => {
   new Grid({
     columns: [
       { name: 'i', hidden: true },
+      { name: 'Division', sort: true },
       { name: 'ID', sort: true },
       { name: 'Date (EVE time)', sort: true },
       { name: 'Ref Type', sort: true },

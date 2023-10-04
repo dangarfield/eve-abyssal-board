@@ -52,9 +52,22 @@ export const getEvePaymentJournal = async () => {
   // console.log('getEvePaymentJournal', characterId, accessToken, appAuth.corpId, appConfig.corpDivisionId)
   try {
     const result = (await esi.corporations.getCorporationsCorporationIdWalletsDivisionJournal(appAuth.corpId, appConfig.corpDivisionId, { token: accessToken }))
+    for (const item of result.data) {
+      item.division = appConfig.corpDivisionName
+      item.date = new Date(item.date)
+    }
     const lastModified = new Date(result.headers.get('last-modified'))
-    console.log('result', result.data, lastModified, lastModified.toLocaleString())
-    return { journal: result.data, lastModified }
+    // console.log('result', result.data, lastModified, lastModified.toLocaleString())
+
+    const resultMaster = (await esi.corporations.getCorporationsCorporationIdWalletsDivisionJournal(appAuth.corpId, 1, { token: accessToken }))
+    for (const item of resultMaster.data) {
+      item.division = 'Master Wallet'
+      item.date = new Date(item.date)
+    }
+    const combinedResult = [...result.data, ...resultMaster.data]
+    combinedResult.sort((a, b) => b.date - a.date)
+    console.log('combinedResult', combinedResult)
+    return { journal: combinedResult, lastModified }
   } catch (error) {
     console.log('getEvePaymentJournal ERROR', error)
     // NOTE: There can be some blocked contacts, I think there are a few limits too

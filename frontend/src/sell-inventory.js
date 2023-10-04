@@ -360,7 +360,6 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
         <p class="mb-3">In game, search for and right click on the <code>${paymentDetails.corpName}</code> corporation, then click 'Give Money'. Fill in the details as follows</p>
 
         <div class="alert alert-info fade show col-lg-8 offset-lg-2" role="alert">
-          <p class="mb-0 d-flex justify-content-between"><b class="text-">Account:</b> <code>${paymentDetails.account}</code></p>
           <p class="mb-0 d-flex justify-content-between"><b>Amount:</b> <code>${paymentDetails.amount}</code></p>
           <p class="mb-0 d-flex justify-content-between"><b>Reason:</b> <code>${paymentDetails.reason}</code></p>
         </div>

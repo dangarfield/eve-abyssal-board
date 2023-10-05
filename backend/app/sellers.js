@@ -66,3 +66,9 @@ export const getStoreData = async (storeID) => {
   console.log('getStoreData', storeID, seller.storefront, mods)
   return { storefront: seller.storefront, mods, discordName: seller.discordName }
 }
+export const getStorefrontList = async () => {
+  const stores = await sellersCollection.find({
+    'storefront.url': { $ne: null }
+  }).toArray()
+  return stores
+}

@@ -28,13 +28,14 @@ const renderButton = (text, value, cssClass) => {
 ${text} <span class="badge text-bg-danger fs-6">${value}</span>
         </button>`
 }
-const renderCompletePayments = (payments) => {
+const renderCompletePayments = (payments, stores) => {
   console.log('renderCompletePayments', payments)
 
   const paymentsCol = payments.map((p, i) => {
     const listingFee = p.types.find(t => t.type === 'LISTING_FEE')
     const priceChangeFee = p.types.find(t => t.type === 'PRICE_CHANGE_FEE')
     const storefrontFee = p.types.find(t => t.type === 'STOREFRONT_FEE')
+    if (storefrontFee && storefrontFee.totalAmount > 0) storefrontFee.inventoryCount = 1
     const premiumFee = p.types.find(t => t.type === 'PREMIUM_FEE')
     const total = (listingFee ? listingFee.totalAmount : 0) + (priceChangeFee ? priceChangeFee.totalAmount : 0) +
      (storefrontFee ? storefrontFee.totalAmount : 0) + (premiumFee ? premiumFee.totalAmount : 0)
@@ -53,6 +54,7 @@ const renderCompletePayments = (payments) => {
       total]
   })
 
+  const storesHtml = stores.map(s => `<a class="btn btn-primary" target="_blank" href="/store/${s.storefront.url}">${s.storefront.url}</a>`).join('')
   console.log('paymentsCol', paymentsCol)
 
   const totals = sumColumns(paymentsCol, [3, 4, 5, 6, 7, 8, 9, 10, 11])
@@ -64,11 +66,6 @@ const renderCompletePayments = (payments) => {
     <div class="row">
       <div class="col">
         ${renderAdminHeader()}
-        
-        
-        
-        
-        
       </div>
     </div>
     <div class="row">
@@ -96,6 +93,11 @@ const renderCompletePayments = (payments) => {
     <div class="row">
       <div class="col">
         <div class="payment-complete-grid"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <p>Stores: ${storesHtml}</p>
       </div>
     </div>
   </div>`
@@ -135,8 +137,8 @@ export const initAdminCompletePayments = async () => {
     } else {
       // const appConfig = await getAppConfigAdmin()
       console.log('LOGGED IN!!! ADMIN PAYMENTS', appAuth)
-      const payments = await getCompletePaymentsAdmin()
-      renderCompletePayments(payments)
+      const { payments, stores } = await getCompletePaymentsAdmin()
+      renderCompletePayments(payments, stores)
     }
     // TODO is null, password is bad, clear password and reload page
   } else {

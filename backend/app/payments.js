@@ -1,6 +1,7 @@
 import { inventoryCollection, paymentCollection } from './db.js'
 import { getEvePaymentJournal } from './eve-api.js'
 import { PAYMENT_TYPES, receivePaymentAndPutInventoryOnSale, receivePaymentAndAmendInventoryListingPrice, receivePaymentAndCreateStorefront, receivePaymentAndMakeModPremium } from './listing-flow.js'
+import { getStorefrontList } from './sellers.js'
 
 function groupByAttribute (objects, attribute) {
   const grouped = {}
@@ -74,7 +75,7 @@ export const getPendingPayments = async () => {
 }
 export const getCompletePayments = async () => {
   console.log('getCompletePayments')
-  const result = await paymentCollection.aggregate([
+  const payments = await paymentCollection.aggregate([
     { $match: { paid: true } },
     {
       $group: {
@@ -96,8 +97,9 @@ export const getCompletePayments = async () => {
       }
     }
   ]).toArray()
-  console.log('getCompletePayments', result)
-  return result
+  console.log('getCompletePayments', payments)
+  const stores = await getStorefrontList()
+  return { payments, stores }
 }
 export const deletePayment = async (paymentId) => {
   const payment = await paymentCollection.findOne({ _id: paymentId, paid: false })

@@ -30,9 +30,9 @@ export const renderInventoryCard = (item) => {
             <p class="m-0"><b>${formatForUnit(attr.valueDisplay, attr.unitID)}  <span class="${attr.isGood ? 'text-success' : 'text-danger'}">(${formatForUnit(attr.diffDisplay, attr.unitID, true)})</span></b></p>
         </div>
     </div>
-    <div class="row gx-0 mb-2">
+    <div class="row gx-0 mb-2" title="${attr.isGood ? attr.perc : -attr.perc}% roll\n${attr.allIsGood ? attr.allPerc : -attr.allPerc}% maximum possible value">
     <div class="col-6">
-        <div class="progress justify-content-end" role="progressbar">
+        <div class="progress justify-content-end" role="progressbar" >
             <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" style="width: ${attr.isGood ? '0' : attr.perc}%"></div>
         </div>
     </div>
@@ -128,7 +128,7 @@ export const renderInventoryCard = (item) => {
         </div>
     </div>
     
-    <div class="row gx-0 mb-2">
+    <div class="row gx-0 mb-2" title="${attr.isGood ? attr.perc : -attr.perc}% maximum possible value">
         <div class="col-6">
             <div class="progress justify-content-end" role="progressbar">
                 <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" style="width: ${attr.isGood ? '0' : attr.perc}%"></div>

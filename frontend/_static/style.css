@@ -84,11 +84,14 @@
   visibility: visible;
 }
 .inventory-item .progress,
-.inventory-item .progress-stacked {
+.inventory-item .progress-stacked,
+.legend .progress,
+.legend .progress-stacked {
     border-radius: 0;
     height: 10px;
 }
-.inventory-item .progress.short {
+.inventory-item .progress.short,
+.legend .progress.short {
     height: 5px;
 }
 

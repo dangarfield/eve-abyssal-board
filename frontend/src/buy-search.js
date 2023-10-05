@@ -41,6 +41,42 @@ const renderSearchPlaceholder = () => {
                 <h2>${type.name}</h2>
             </div>
         </div>
+        <div class="row">
+          <div class="col">
+            <div class="card legend">
+              <div class="card-body pb-0">
+                <h5 class="card-title">Legend</h5>
+                <p>
+                  <span style="width:50px;display:inline-block; margin:0;padding:0;">
+                    <span class="progress justify-content-end" role="progressbar">
+                      <span class="progress-bar progress-bar-striped progress-bar-animated bg-danger" style="width: 30%"></span>
+                    </span>
+                  </span><span style="width:50px;display:inline-block; margin:0;padding:0;">
+                    <span class="progress justify-content-start" role="progressbar">
+                      <span class="progress-bar progress-bar-striped progress-bar-animated-reverse bg-success" style="width: 80%"></span>
+                    </span>
+                  </span>
+                  <b class="text-primary">Compare roll</b> - As in game, the quality of the roll. But you should only compare green and red rolls of the same source and mutaplasmid
+                </p>
+                <p>
+                  <span style="width:50px;display:inline-block; margin:0;padding:0;">
+                    <span class="progress short justify-content-end" role="progressbar">
+                      <span class="progress-bar progress-bar-striped progress-bar-animated bg-warning" style="width: 40%"></span>
+                    </span>
+                  </span><span style="width:50px;display:inline-block; margin:0;padding:0;">
+                    <span class="progress short justify-content-start" role="progressbar">
+                      <span class="progress-bar progress-bar-striped progress-bar-animated-reverse bg-primary" style="width: 50%"></span>
+                    </span>
+                  </span>
+                  <b class="text-primary">Compare across sources</b> - Full blue = best possible roll from best possible source & muta. A green T2 may still provide a lower actual value that a red officer</p>
+                <p>
+                  <span class="badge bg-primary"><i class="bi bi-hand-thumbs-up-fill"></i> 31%</span>
+                  <span class="badge bg-danger"><i class="bi bi-hand-thumbs-down-fill"></i> -22%</span>
+                  <b class="text-primary">How god-like</b> - 100% = full blue on every attribute = maximum roll on the source with the best base attribute</p>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="row search-results">
             <div class="col-lg-3 mb-4 search-card-holder">
                 ${renderSearchCard(type, defaultItem)}

@@ -74,9 +74,9 @@ export const getCurrentUserModInventory = async () => {
       if (maxPagesHeader !== undefined) { maxPage = parseInt(maxPagesHeader) }
 
       console.log('ESI inventory debug', res.data)
-      for (let i = 0; i < 60; i++) {
-        inventory.push(...res.data)
-      }
+      // for (let i = 0; i < 60; i++) {
+      inventory.push(...res.data)
+      // }
       pagesFetched++
       sendLoadingStatusEvent('assets', `Fetched page ${pagesFetched} of ${maxPage}`)
       cacheExpires = new Date(`${res.headers.get('Expires')}`)

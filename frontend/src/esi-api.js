@@ -24,7 +24,7 @@ export const getCurrentUserModInventory = async () => {
       //   console.log('maxPagesHeader', maxPagesHeader)
       if (maxPagesHeader !== undefined) { maxPage = parseInt(maxPagesHeader) }
 
-      console.log('res.data', res.data)
+      console.log('ESI inventory debug', res.data)
       inventory.push(...res.data)
       pagesFetched++
       cacheExpires = new Date(`${res.headers.get('Expires')}`)
@@ -39,9 +39,9 @@ export const getCurrentUserModInventory = async () => {
   } while (pagesFetched < maxPage)
 
   const abyssTypesFlat = getAbyssModuleTypesFlatIds()
-  console.log('abyssTypesFlat', abyssTypesFlat)
+  // console.log('abyssTypesFlat', abyssTypesFlat)
   // const abyssModuleTypes = getAbyssModuleTypes()
-  console.log('alsalaw debug', inventory.filter(i => abyssTypesFlat.includes(i.type_id)).map(i => `${i.item_id} - ${i.type_id} - ${i.location_id} - ${i.location_flag}`))
+  console.log('inventory flags debug', inventory.filter(i => abyssTypesFlat.includes(i.type_id)).map(i => `${i.item_id} - ${i.type_id} - ${i.location_id} - ${i.location_flag}`))
   inventory = inventory.filter(i => abyssTypesFlat.includes(i.type_id) && ['Hangar', 'Cargo', 'AutoFit', 'Unlocked'].includes(i.location_flag))
 
   // .filter(i => i.item_id === 1037642882589)

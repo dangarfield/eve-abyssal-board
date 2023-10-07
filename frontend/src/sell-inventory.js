@@ -187,7 +187,7 @@ const filterCards = () => {
   const hideListed = !document.querySelector('.toggle-show-all').checked
   const hideBricked = !document.querySelector('.toggle-show-bricked').checked
   let allItemsHidden = true
-  console.log('hideBricked', hideBricked)
+  // console.log('hideBricked', hideBricked)
   document.querySelectorAll('.inventory-item').forEach((element) => {
     const text = element.querySelector('.type-name').textContent.toLowerCase()
     const isListed = element.classList.contains('listed')
@@ -400,7 +400,7 @@ const processItemIDsInBatches = async (itemIDs) => {
 }
 const fetchAndAddAppraisalData = async (inventory) => {
   const cachedAppraisals = loadData().appraisals || {}
-  console.log('fetchAndAddAppraisalData', cachedAppraisals)
+  // console.log('fetchAndAddAppraisalData', cachedAppraisals)
   const itemIDsForAppraisal = []
   for (const item of inventory) {
     if (cachedAppraisals[item.itemID]) {
@@ -410,15 +410,15 @@ const fetchAndAddAppraisalData = async (inventory) => {
     }
   }
   const appraisals = await processItemIDsInBatches(itemIDsForAppraisal)
-  console.log('appraisals', appraisals)
+  // console.log('appraisals', appraisals)
   for (const itemIDString in appraisals) {
     const itemID = parseInt(itemIDString)
     const appraisal = appraisals[itemIDString]
-    console.log('appraisalHolder', itemID, appraisal)
+    // console.log('appraisalHolder', itemID, appraisal)
     inventory.find(i => i.itemID === itemID).appraisal = [appraisal]
     cachedAppraisals[itemIDString] = appraisal
   }
-  console.log('cachedAppraisals', cachedAppraisals)
+  // console.log('cachedAppraisals', cachedAppraisals)
   saveData('appraisals', cachedAppraisals)
 }
 export const validateListingPrice = async (inputValue) => {
@@ -437,7 +437,7 @@ export const validateListingPrice = async (inputValue) => {
 }
 const sortInventory = (inventory) => {
   const sortKey = loadData().sellInventorySort || 'appraisal'
-  console.log('sellInventorySort', sortKey)
+  // console.log('sellInventorySort', sortKey)
   switch (sortKey) {
     case 'quality':
       inventory.sort((a, b) => b.qualityScore - a.qualityScore || b.appraisal[0].price - a.appraisal[0].price)

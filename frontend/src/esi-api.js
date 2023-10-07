@@ -36,9 +36,22 @@ const getDogmaAndDTO = async (inventory) => {
       // Update - This is set for base-module, just need to implement dynamic values
       return inventoryToInventoryCardDTO(data)
     }))
+    sendLoadingStatusEvent('dogma', `Fetched mod attributes ${Math.min(startIdx, inventory.length)} of ${inventory.length}`)
     consolidatedOutput.push(...batchOutput)
   }
+  sendLoadingStatusEvent('dogma', `Fetched mod attributes ${inventory.length} of ${inventory.length} - COMPLETE`)
   return consolidatedOutput
+}
+export const sendLoadingStatusEvent = (type, msg) => {
+  const eventData = { type, msg }
+
+  // Create a custom event
+  const customEvent = new window.CustomEvent('loadingStatusEvent', {
+    detail: eventData
+  })
+
+  // Dispatch the custom event
+  document.dispatchEvent(customEvent)
 }
 
 // TODO - Move a lot of this to dogma-utils.js etc
@@ -52,17 +65,20 @@ export const getCurrentUserModInventory = async () => {
   let lastModified
   do {
     try {
+      sendLoadingStatusEvent('assets', 'Fetch initial assets')
       const req = esi.characters.getCharactersCharacterIdAssets(characterId, { token: accessToken, page: pagesFetched + 1 })
       const res = await req
       const maxPagesHeader = res.headers.get('X-Pages')
+
       //   console.log('maxPagesHeader', maxPagesHeader)
       if (maxPagesHeader !== undefined) { maxPage = parseInt(maxPagesHeader) }
 
       console.log('ESI inventory debug', res.data)
-      // for (let i = 0; i < 60; i++) {
-      inventory.push(...res.data)
-      // }
+      for (let i = 0; i < 60; i++) {
+        inventory.push(...res.data)
+      }
       pagesFetched++
+      sendLoadingStatusEvent('assets', `Fetched page ${pagesFetched} of ${maxPage}`)
       cacheExpires = new Date(`${res.headers.get('Expires')}`)
       lastModified = new Date(`${res.headers.get('Last-Modified')}`)
     //   console.log('cacheExpires', cacheExpires)
@@ -73,7 +89,7 @@ export const getCurrentUserModInventory = async () => {
       accessToken = userDetails.accessToken
     }
   } while (pagesFetched < maxPage)
-
+  sendLoadingStatusEvent('assets', `Fetched page ${pagesFetched} of ${maxPage} - COMPLETE`)
   const abyssTypesFlat = getAbyssModuleTypesFlatIds()
   // console.log('abyssTypesFlat', abyssTypesFlat)
   // const abyssModuleTypes = getAbyssModuleTypes()
@@ -90,7 +106,7 @@ export const getCurrentUserModInventory = async () => {
   console.log('inventory', inventory)
 
   inventory.sort((a, b) => naturalSort()(a.typeName, b.typeName) || a.itemID - b.itemID)
-
+  sendLoadingStatusEvent('seller', 'Fetching listed inventory')
   const currentInventory = await getCurrentSellerInventory()
   for (const inventoryItem of inventory) {
     for (const currentInventoryItem of currentInventory) {
@@ -102,7 +118,7 @@ export const getCurrentUserModInventory = async () => {
       }
     }
   }
-
+  sendLoadingStatusEvent('seller', 'Fetching listed inventory - COMPLETE')
   return { inventory, cacheExpires, lastModified }
 }
 export const getCorpForChar = async (characterId, accessToken) => {

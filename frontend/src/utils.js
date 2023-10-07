@@ -124,7 +124,7 @@ export const triggerRefreshTime = (elementSelector, typeMessage, expireTime, las
   const refreshTimeInterval = setInterval(refreshTime, 1000)
   refreshTime()
 }
-
+let currentModal
 export const showModalAlert = async (title, contentHtml, footerConfig, renderCallback) => {
   return new Promise((resolve, reject) => {
     const id = `modal-${nanoid(10)}`
@@ -160,15 +160,19 @@ export const showModalAlert = async (title, contentHtml, footerConfig, renderCal
     }
 
     const modalEle = document.getElementById(id)
-    const modal = new window.bootstrap.Modal(modalEle, {})
-    modal.show()
+    currentModal = new window.bootstrap.Modal(modalEle, {})
+    currentModal.show()
     modalEle.addEventListener('hidden.bs.modal', event => {
       console.log('destroy')
-      modal.dispose()
+      currentModal.dispose()
       modalEle.remove()
       resolve()
     })
   })
+}
+export const closeCurrentModal = () => {
+  console.log('closeCurrentModal', currentModal)
+  currentModal.hide()
 }
 export const deepCopy = (obj) => {
   return JSON.parse(JSON.stringify(obj))

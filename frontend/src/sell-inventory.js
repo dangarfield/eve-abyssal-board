@@ -1,7 +1,7 @@
 import { doesCurrentCharacterHaveSellerScope, getCurrentUserDetails } from './auth'
 import { getAppConfig, getAppraisalsForItemIDs, initiateListingFlow } from './board-api'
-import { getCurrentUserModInventory } from './esi-api'
-import { listingPriceStringToInt, formatToISKString, triggerRefreshTime, showModalAlert, deepCopy, loadData, saveData, clearData } from './utils'
+import { getCurrentUserModInventory, sendLoadingStatusEvent } from './esi-api'
+import { listingPriceStringToInt, formatToISKString, triggerRefreshTime, showModalAlert, deepCopy, loadData, saveData, clearData, closeCurrentModal } from './utils'
 import { renderInventoryCard } from './component/inventory-card'
 
 const renderInventoryPlaceholder = (userDetails, appConfig) => {
@@ -382,24 +382,23 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
 
 const processItemIDsInBatches = async (itemIDs) => {
   const batchSize = 100
-  const appraisalPromises = []
+  const appraisals = {}
+  sendLoadingStatusEvent('appraisal', `Fetching ${itemIDs.length} appraisals`)
   for (let i = 0; i < itemIDs.length; i += batchSize) {
     const batchOfItemIDs = itemIDs.slice(i, i + batchSize)
-    const appraisalPromise = getAppraisalsForItemIDs(batchOfItemIDs)
-    appraisalPromises.push(appraisalPromise)
-  }
-  const batchedAppraisals = await Promise.all(appraisalPromises)
-  const appraisals = []
-  for (const batchedAppraisalsGroup of batchedAppraisals) {
+
+    const batchedAppraisalsGroup = await getAppraisalsForItemIDs(batchOfItemIDs)
     for (const appraisalID in batchedAppraisalsGroup) {
       appraisals[appraisalID] = batchedAppraisalsGroup[appraisalID]
     }
+    sendLoadingStatusEvent('appraisal', `Fetched ${Math.min(i + batchSize, itemIDs.length)} of ${itemIDs.length} appraisals`)
   }
-
+  sendLoadingStatusEvent('appraisal', `Fetched all ${itemIDs.length} appraisals - COMPLETE`)
   return appraisals
 }
 const fetchAndAddAppraisalData = async (inventory) => {
-  const cachedAppraisals = loadData().appraisals || {}
+  const cachedAppraisals = loadData().appraisals || {} // TEMP commented out
+  // const cachedAppraisals = {}
   // console.log('fetchAndAddAppraisalData', cachedAppraisals)
   const itemIDsForAppraisal = []
   for (const item of inventory) {
@@ -416,9 +415,15 @@ const fetchAndAddAppraisalData = async (inventory) => {
     const appraisal = appraisals[itemIDString]
     // console.log('appraisalHolder', itemID, appraisal)
     inventory.find(i => i.itemID === itemID).appraisal = [appraisal]
+
+    for (const i of inventory.filter(i => i.itemID === itemID)) { // TEMP for testing because inventory is duplicated
+      i.appraisal = [appraisal]
+    }
+
     cachedAppraisals[itemIDString] = appraisal
   }
   // console.log('cachedAppraisals', cachedAppraisals)
+  // console.log('non appraised', inventory.filter())
   saveData('appraisals', cachedAppraisals)
 }
 export const validateListingPrice = async (inputValue) => {
@@ -467,23 +472,59 @@ const bindAppraisalCacheRefresh = () => {
     window.location.reload()
   })
 }
+let statusAssetsEle
+let statusDogmaEle
+let statusSellerEle
+let statusAppraisalEle
+let statusRenderEle
+
+const handleLoadingStatusEvent = (event) => {
+  // Do something with the event data
+  console.log('LoadingStatus Event received:', event.detail)
+  switch (event.detail.type) {
+    case 'assets':statusAssetsEle.innerHTML = event.detail.msg; break
+    case 'dogma':statusDogmaEle.innerHTML = event.detail.msg; break
+    case 'seller':statusSellerEle.innerHTML = event.detail.msg; break
+    case 'appraisal':statusAppraisalEle.innerHTML = event.detail.msg; break
+    case 'render':statusRenderEle.innerHTML = event.detail.msg; break
+  }
+}
+
 export const initListModInventory = async () => {
   if (doesCurrentCharacterHaveSellerScope()) {
     const userDetails = getCurrentUserDetails()
     const appConfig = await getAppConfig()
+    showModalAlert('Loading inventory',
+    `<table class="table">
+      <tbody>
+        <tr><td>Loading inventory</td> <td class="status-assets">...</td></tr>
+        <tr><td>Loading mod attributes</td> <td class="status-dogma">...</td></tr>
+        <tr><td>Loading listed mods</td> <td class="status-seller">...</td></tr>
+        <tr><td>Loading appraisals</td> <td class="status-appraisal">...</td></tr>
+        <tr><td>Displaying mods</td> <td class="status-render">...</td></tr>
+      </tbody>
+    </table>`)
+    statusAssetsEle = document.querySelector('.modal .status-assets')
+    statusDogmaEle = document.querySelector('.modal .status-dogma')
+    statusSellerEle = document.querySelector('.modal .status-seller')
+    statusAppraisalEle = document.querySelector('.modal .status-appraisal')
+    statusRenderEle = document.querySelector('.modal .status-render')
     renderInventoryPlaceholder(userDetails, appConfig)
+    document.addEventListener('loadingStatusEvent', handleLoadingStatusEvent)
     console.log('Seller logged in, show available mods')
     const { inventory, cacheExpires, lastModified } = await getCurrentUserModInventory()
     await fetchAndAddAppraisalData(inventory)
 
     const sortKey = sortInventory(inventory)
-
+    sendLoadingStatusEvent('render', 'Displaying mods on the page')
     renderAvailableInventory(inventory, cacheExpires, lastModified, sortKey)
     if (inventory.length > 0) {
       bindInventoryActions(inventory, cacheExpires, lastModified)
     }
     bindAppraisalCacheRefresh()
     bindSortSelection()
+    sendLoadingStatusEvent('render', 'Displaying mods on the page - COMPLETE')
+    closeCurrentModal()
   } else {
     window.location.assign('/sell')
   }

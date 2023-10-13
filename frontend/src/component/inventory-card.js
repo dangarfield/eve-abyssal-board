@@ -2,6 +2,7 @@ import { formatForUnit, formatToISKString } from '../utils'
 // import { getUnitForDogma } from '../dogma-utils'
 
 const getFriendlyStatus = (status) => {
+  if (!status) return 'CONTRACT'
   return status.replace(/_/g, ' ')
 }
 export const renderInventoryCard = (item) => {
@@ -185,13 +186,13 @@ export const renderInventoryCard = (item) => {
   `
     : ''
 
-  const contractPriceHtml = item.contractPrice !== undefined
+  const contractPriceHtml = item.contract && item.contract.price !== undefined
     ? `
     <div class="listing-price px-2">
         <div class="d-flex flex-row gap-2 align-items-center justify-content-between px-0">
             <span class="p-0"><p>Contract price:</p></span>
             <span class="p-0 text-end">
-                <p><b>${formatToISKString(item.contractPrice)}</b>
+                <p><b>${formatToISKString(item.contract.price)}</b>
             </span>
         </div>
     </div>

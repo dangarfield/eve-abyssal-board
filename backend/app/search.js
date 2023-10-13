@@ -4,7 +4,13 @@ export const searchForModulesOfType = async (typeID, query) => {
   console.log('searchForModulesOfType', typeID, query)
 
   const andQuery = []
-  andQuery.push({ typeID, status: { $in: ['ON_SALE', 'CONTRACT'] } })
+  andQuery.push({
+    typeID,
+    $or: [
+      { status: 'ON_SALE' },
+      { contract: { $exists: true } }
+    ]
+  })
   if (query.attributes !== undefined) {
     for (const attr of query.attributes) {
       const obj = {}

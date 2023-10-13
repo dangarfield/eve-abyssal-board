@@ -227,7 +227,7 @@ export const bindInventoryCardClickForContact = async (resultCard, results) => {
   console.log('currentUserDetails', currentUserDetails)
   const appConfig = await getAppConfig()
   console.log('getAppConfig', appConfig)
-  if (result.status !== 'CONTRACT') {
+  if (result.status) {
     const discordText = result.discordName ? `<p>This seller is known on the <a href="${appConfig.discordUrl}" target="_blank">Abyssal Trade Discord Board</a> as <code>${result.discordName}</code></p>` : ''
     const inGameText = currentUserDetails ? '<p>Click below to open an EVE mail to communicate with the seller</p>' : '<p>If you login we can help by creating an EVE mail draft with a link to the seller and item</p>'
     const actions = []
@@ -293,7 +293,7 @@ const triggerSearch = async () => {
     if (result.appraisal === undefined) result.appraisal = [{ type: 'AUTO', price: 'Unavailable', confidence: 'Unavailable' }]
   }
   if (sourceValue > 0) results = results.filter(r => r.sourceTypeID === sourceValue)
-  if (!showContracts) results = results.filter(r => r.status !== 'CONTRACT')
+  if (!showContracts) results = results.filter(r => r.status)
   results.sort((a, b) => (a.premium === b.premium ? 0 : a.premium ? -1 : 1) || b.qualityScore - a.qualityScore) // TODO - Add different sort options
 
   console.log('triggerSearch', query, results)

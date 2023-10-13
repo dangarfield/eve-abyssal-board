@@ -14,7 +14,14 @@ export const getSellerInventory = async (authCharacterId, characterId) => {
 }
 export const getTypeIDCounts = async () => {
   const result = await inventoryCollection.aggregate([
-    { $match: { status: { $ne: 'UNAVAILABLE' } } },
+    {
+      $match: {
+        $or: [
+          { status: 'ON_SALE' },
+          { contract: { $exists: true } }
+        ]
+      }
+    },
     { $group: { _id: '$typeID', count: { $sum: 1 } } }
   ]).toArray()
   const countByTypeID = result.reduce((obj, item) => ({ ...obj, [item._id]: item.count }), {})

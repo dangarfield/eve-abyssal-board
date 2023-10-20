@@ -171,35 +171,88 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
             <h5 class="card-title">Some listed mods are hidden - Use <code>Show already listed</code> to see all items</h5>
           </div>
         </div>
-      </div>`
+      </div>
+      <div class="col-lg-12 mt-4 inventory-pagination">
+      </div>
+      `
     for (const item of availableInventory) {
-      html += '<div class="col-lg-3 mt-4">'
-      html += renderInventoryCard(item)
+      html += '<div class="col-lg-3 mt-4" style="display:none;">'
+      html += renderInventoryCard(item, true)
       html += '</div>'
     }
-    html += '</div>'
+    html += `
+      <div class="col-lg-12 inventory-pagination">
+      </div>
+    </div>`
   }
   document.querySelector('.inner-content').innerHTML = html
 }
-
+const pagination = {
+  activePage: 1,
+  itemsPerPage: 4 * 20,
+  pages: 1
+}
 const filterCards = () => {
   const searchQuery = document.querySelector('.data-search').value.toLowerCase()
   const hideListed = !document.querySelector('.toggle-show-all').checked
   const hideBricked = !document.querySelector('.toggle-show-bricked').checked
   let allItemsHidden = true
   // console.log('hideBricked', hideBricked)
-  document.querySelectorAll('.inventory-item').forEach((element) => {
+  for (const element of [...document.querySelectorAll('.inventory-item')]) {
+    // }
+    // document.querySelectorAll('.inventory-item').forEach((element) => {
     const text = element.querySelector('.type-name').textContent.toLowerCase()
     const isListed = element.classList.contains('listed')
     const isBricked = element.classList.contains('bricked')
     // Filter based on search query and hide/show based on hideListed
     const shouldHide = (searchQuery && !text.includes(searchQuery)) || (hideListed && isListed) || (hideBricked && isBricked)
     // element.style.display = shouldHide ? 'none' : 'block'
-    element.parentElement.style.display = shouldHide ? 'none' : 'block'
+    // console.log('i', i, shouldHide)
+    // element.parentElement.style.display = shouldHide ? 'none' : 'block'
+    element.parentElement.style.display = 'none'
+    element.parentElement.setAttribute('data-should-show', !shouldHide)
     if (!shouldHide) allItemsHidden = false
-  })
+  }
+  const showList = [...document.querySelectorAll('.inventory-row [data-should-show="true"]')]
+  pagination.pages = Math.ceil(showList.length / pagination.itemsPerPage)
+  if (pagination.activePage > pagination.pages) pagination.activePage = 1
+  // console.log('showList', showList, pagination)
+  for (const [i, element] of showList.entries()) {
+    const page = 1 + Math.floor(i / pagination.itemsPerPage)
+    // console.log(i, 'page', page, i / pagination.itemsPerPage)
+    if (page === pagination.activePage) element.style.display = 'block'
+  }
 
   document.querySelector('.inventory-filtered').style.display = allItemsHidden ? 'block' : 'none'
+
+  for (const paginationEle of [...document.querySelectorAll('.inventory-pagination')]) {
+    if (pagination.pages === 1) {
+      paginationEle.style.display = 'none'
+      continue
+    } else {
+      paginationEle.style.display = 'block'
+    }
+    const items = Array.from({ length: pagination.pages }, (_, i) => i + 1).map(i => i === pagination.activePage
+      ? `<li class="page-item active"><span class="page-link">${i}</span></li>`
+      : `<li class="page-item"><button class="page-link">${i}</button></li>`).join('')
+
+    paginationEle.innerHTML = `
+    <nav>
+      <ul class="pagination pagination-sm flex-wrap">
+        ${items}
+      </ul>
+    </nav>
+    `
+    for (const pageLinkEle of [...document.querySelectorAll('.inventory-pagination button.page-link')]) {
+      pageLinkEle.addEventListener('click', () => {
+        const newPage = parseInt(pageLinkEle.textContent)
+        console.log('pageLinkEle', newPage)
+        pagination.activePage = newPage
+        filterCards()
+      })
+    }
+    //  = `Page: ${pagination.activePage} of ${pagination.pages}`
+  }
 }
 const updateTotalListingPrice = async () => {
   const appConfig = await getAppConfig()
@@ -239,6 +292,7 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
   document.querySelector('.toggle-select-all').addEventListener('change', function () {
     const selectAll = this.checked
     document.querySelectorAll('.inventory-item').forEach(element => {
+      if (element.parentElement.style.display === 'none') return
       const isListed = element.classList.contains('listed')
       const isSelected = element.classList.contains('selected')
       // console.log('e', element, isListed, '-', selectAll, isSelected)
@@ -253,7 +307,7 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
       if (event.target.classList.contains('no-click-close')) return
       const itemID = parseInt(inventoryItemEle.getAttribute('data-item-id'))
       const item = availableInventory.find(i => i.itemID === itemID)
-      console.log('inventoryItemEle', inventoryItemEle, itemID, availableInventory, item)
+      // console.log('inventoryItemEle', inventoryItemEle, itemID, availableInventory, item)
       const isListed = inventoryItemEle.classList.contains('listed')
       if (isListed) {
         console.log('Item already listed')

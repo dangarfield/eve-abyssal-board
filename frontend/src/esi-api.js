@@ -74,7 +74,7 @@ export const getCurrentUserModInventory = async () => {
       if (maxPagesHeader !== undefined) { maxPage = parseInt(maxPagesHeader) }
 
       console.log('ESI inventory debug', res.data)
-      // for (let i = 0; i < 60; i++) {
+      // for (let i = 0; i < 300; i++) {
       inventory.push(...res.data)
       // }
       pagesFetched++

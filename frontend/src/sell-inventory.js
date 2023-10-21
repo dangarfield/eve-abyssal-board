@@ -191,7 +191,7 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
 }
 const pagination = {
   activePage: 1,
-  itemsPerPage: 4 * 40,
+  itemsPerPage: 4 * 25,
   pages: 1
 }
 const filterCardsAndRender = (availableInventory) => {

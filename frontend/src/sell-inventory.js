@@ -160,8 +160,8 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
       </div>
     </div>
 `
-    html += `<div class="row inventory-row">
-      
+    html += `
+    <div class="row inventory-row">  
       <div class="col-lg-12 mt-4 inventory-filtered">
         <div class="card text-bg-info-subtle">
           <div class="card-body text-center">
@@ -174,54 +174,54 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
       </div>
       <div class="col-lg-12 mt-4 inventory-pagination">
       </div>
+    </div>
       `
-    for (const item of availableInventory) {
-      html += '<div class="col-lg-3 mt-4" style="display:none;">'
-      html += renderInventoryCard(item, true)
-      html += '</div>'
-    }
+    html += '<div class="row inventory-list"></div>'
     html += `
+    <div class="row">
       <div class="col-lg-12 inventory-pagination">
       </div>
+    </div>
     </div>`
   }
   document.querySelector('.inner-content').innerHTML = html
+  for (const item of availableInventory) {
+    item.typeNameLower = item.typeName.toLowerCase()
+  }
 }
 const pagination = {
   activePage: 1,
-  itemsPerPage: 4 * 20,
+  itemsPerPage: 4 * 40,
   pages: 1
 }
-const filterCards = () => {
+const filterCardsAndRender = (availableInventory) => {
   const searchQuery = document.querySelector('.data-search').value.toLowerCase()
   const hideListed = !document.querySelector('.toggle-show-all').checked
   const hideBricked = !document.querySelector('.toggle-show-bricked').checked
   let allItemsHidden = true
-  // console.log('hideBricked', hideBricked)
-  for (const element of [...document.querySelectorAll('.inventory-item')]) {
-    // }
-    // document.querySelectorAll('.inventory-item').forEach((element) => {
-    const text = element.querySelector('.type-name').textContent.toLowerCase()
-    const isListed = element.classList.contains('listed')
-    const isBricked = element.classList.contains('bricked')
+  // console.log('filterCardsAndRender', availableInventory, availableInventory.map(i => i.typeName))
+  for (const item of availableInventory) {
+    const isListed = item.status !== 'NONE'
+    const isBricked = Math.round(item.qualityScore) < 15
     // Filter based on search query and hide/show based on hideListed
-    const shouldHide = (searchQuery && !text.includes(searchQuery)) || (hideListed && isListed) || (hideBricked && isBricked)
-    // element.style.display = shouldHide ? 'none' : 'block'
-    // console.log('i', i, shouldHide)
-    // element.parentElement.style.display = shouldHide ? 'none' : 'block'
-    element.parentElement.style.display = 'none'
-    element.parentElement.setAttribute('data-should-show', !shouldHide)
+    // console.log('searchQuery', item.typeName, searchQuery, item.typeNameLower.includes(searchQuery))
+    const shouldHide = (searchQuery && !item.typeNameLower.includes(searchQuery)) || (hideListed && isListed) || (hideBricked && isBricked)
+    item.shouldShow = !shouldHide
     if (!shouldHide) allItemsHidden = false
   }
-  const showList = [...document.querySelectorAll('.inventory-row [data-should-show="true"]')]
+  const showList = availableInventory.filter(i => i.shouldShow)
   pagination.pages = Math.ceil(showList.length / pagination.itemsPerPage)
   if (pagination.activePage > pagination.pages) pagination.activePage = 1
-  // console.log('showList', showList, pagination)
-  for (const [i, element] of showList.entries()) {
-    const page = 1 + Math.floor(i / pagination.itemsPerPage)
-    // console.log(i, 'page', page, i / pagination.itemsPerPage)
-    if (page === pagination.activePage) element.style.display = 'block'
-  }
+  const skip = (pagination.activePage - 1) * pagination.itemsPerPage
+  const limit = pagination.itemsPerPage
+  const displayList = showList.slice(skip, skip + limit)
+
+  const listHtml = displayList.map(item => `
+      <div class="col-lg-3 mt-4">
+      ${renderInventoryCard(item, true)}
+      </div>`).join('')
+  document.querySelector('.inventory-list').innerHTML = listHtml
+  bindInventoryCardActions(availableInventory)
 
   document.querySelector('.inventory-filtered').style.display = allItemsHidden ? 'block' : 'none'
 
@@ -248,10 +248,9 @@ const filterCards = () => {
         const newPage = parseInt(pageLinkEle.textContent)
         console.log('pageLinkEle', newPage)
         pagination.activePage = newPage
-        filterCards()
+        filterCardsAndRender(availableInventory)
       })
     }
-    //  = `Page: ${pagination.activePage} of ${pagination.pages}`
   }
 }
 const updateTotalListingPrice = async () => {
@@ -276,32 +275,8 @@ const updateTotalListingPrice = async () => {
     document.querySelector('.confirm-inventory .price').innerHTML = `<span class="badge text-bg-secondary">${formatToISKString(totalListingFee)}</span>`
   }
 }
-const bindInventoryActions = (availableInventory, cacheExpires, lastModified) => {
-  triggerRefreshTime('.refresh-time-inventory', 'Inventory data', cacheExpires, lastModified)
-
-  document.querySelector('.toggle-show-bricked').addEventListener('click', function () {
-    filterCards()
-  })
-  document.querySelector('.toggle-show-all').addEventListener('click', function () {
-    filterCards()
-  })
-  document.querySelector('.data-search').addEventListener('input', function () {
-    filterCards()
-  })
-  filterCards()
-  document.querySelector('.toggle-select-all').addEventListener('change', function () {
-    const selectAll = this.checked
-    document.querySelectorAll('.inventory-item').forEach(element => {
-      if (element.parentElement.style.display === 'none') return
-      const isListed = element.classList.contains('listed')
-      const isSelected = element.classList.contains('selected')
-      // console.log('e', element, isListed, '-', selectAll, isSelected)
-      if (isListed) return
-      if (selectAll && !isSelected) element.click()
-      if (!selectAll && isSelected) element.click()
-    })
-  })
-  // Bind add and remove inventory
+const bindInventoryCardActions = (availableInventory) => {
+// Bind add and remove inventory
   for (const inventoryItemEle of [...document.querySelectorAll('.inventory-item')]) {
     inventoryItemEle.addEventListener('click', async function (event) {
       if (event.target.classList.contains('no-click-close')) return
@@ -375,6 +350,34 @@ const bindInventoryActions = (availableInventory, cacheExpires, lastModified) =>
       listingPriceEle.value = await validateListingPrice(listingPriceEle.value)
     })
   }
+}
+const bindInventoryActions = (availableInventory, cacheExpires, lastModified) => {
+  triggerRefreshTime('.refresh-time-inventory', 'Inventory data', cacheExpires, lastModified)
+
+  document.querySelector('.toggle-show-bricked').addEventListener('click', function () {
+    filterCardsAndRender(availableInventory)
+  })
+  document.querySelector('.toggle-show-all').addEventListener('click', function () {
+    filterCardsAndRender(availableInventory)
+  })
+  document.querySelector('.data-search').addEventListener('input', function () {
+    filterCardsAndRender(availableInventory)
+  })
+
+  document.querySelector('.toggle-select-all').addEventListener('change', function () {
+    const selectAll = this.checked
+    document.querySelectorAll('.inventory-item').forEach(element => {
+      if (element.parentElement.style.display === 'none') return
+      const isListed = element.classList.contains('listed')
+      const isSelected = element.classList.contains('selected')
+      // console.log('e', element, isListed, '-', selectAll, isSelected)
+      if (isListed) return
+      if (selectAll && !isSelected) element.click()
+      if (!selectAll && isSelected) element.click()
+    })
+  })
+  filterCardsAndRender(availableInventory)
+
   document.querySelector('.confirm-inventory').addEventListener('click', async () => {
     const selectedInventoryToList = [...document.querySelectorAll('.inventory-item.selected[data-item-id]')].map(a => {
       const inventory = availableInventory.find(i => i.itemID === parseInt(a.getAttribute('data-item-id')))

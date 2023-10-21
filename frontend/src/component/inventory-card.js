@@ -237,7 +237,7 @@ export const renderInventoryCard = (item) => {
             <div class="card">
                 <div class="card-body px-0 pb-0">
                     <div class="d-flex flex-row gap-2 align-items-center px-1">
-                        <div class="p-0"><img src="https://images.evetech.net/types/${item.typeID}/icon?size=32"></div>
+                        <div class="p-0"><img class="width-32" src="https://images.evetech.net/types/${item.typeID}/icon?size=32"></div>
                         <div class="p-0">
                             <p class="lead mb-0 type-name">
                                 <b>
@@ -254,12 +254,12 @@ export const renderInventoryCard = (item) => {
 
                     <!--
                     <div class="d-flex flex-row gap-2 align-items-center px-1">
-                        <div class="p-0"><img src="https://images.evetech.net/types/${item.mutatorTypeID}/icon?size=32"></div>
+                        <div class="p-0"><img class="width-32" src="https://images.evetech.net/types/${item.mutatorTypeID}/icon?size=32"></div>
                         <div class="p-0">${item.mutatorTypeName}</div>
                     </div>
                     -->
                     <div class="d-flex flex-row gap-2 align-items-center px-1">
-                        <div class="p-0"><img src="https://images.evetech.net/types/${item.sourceTypeID}/icon?size=32"></div>
+                        <div class="p-0"><img class="width-32" src="https://images.evetech.net/types/${item.sourceTypeID}/icon?size=32"></div>
                         <div class="p-0">${item.sourceTypeName} <span class="badge bg-secondary">${item.mutatorTypeName.split(' ')[0]}</span></div>
                     </div>
 

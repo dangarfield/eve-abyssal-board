@@ -7,12 +7,43 @@ import { inventoryToInventoryCardDTO, dogmaToAttributesRaw } from './dogma-utils
 import naturalSort from 'natural-sort'
 const esi = new Api()
 
+const getInventoryContainerNames = async (locationIDs) => {
+  if (locationIDs.length === 0) return {}
+  // console.log('getInventoryContainerNames', locationIDs)
+  const { characterId, accessToken } = await getCurrentUserAccessToken()
+  const req = await esi.characters.postCharactersCharacterIdAssetsNames(characterId, locationIDs, { token: accessToken })
+  const res = await req
+  const locationNames = res.data.reduce((obj, item) => {
+    obj[item.item_id] = item.name
+    return obj
+  }, {})
+
+  // console.log('res', res)
+  return locationNames
+}
+const getInventoryLocationNames = async (locationIDs) => {
+  if (locationIDs.length === 0) return {}
+  // console.log('getInventoryLocationNames', locationIDs)
+  const { accessToken } = await getCurrentUserAccessToken()
+  const req = await esi.universe.postUniverseNames(locationIDs, { token: accessToken })
+  const res = await req
+  const locationNames = res.data.reduce((obj, item) => {
+    obj[item.id] = item.name
+    return obj
+  }, {})
+
+  // console.log('res', res)
+  return locationNames
+}
 const getDogmaAndDTO = async (inventory) => {
   const batchSize = 100
   const numBatches = Math.ceil(inventory.length / batchSize)
 
   const consolidatedOutput = []
-
+  const containerNames = await getInventoryContainerNames([...new Set(inventory.filter(i => ['AutoFit', 'Unlocked'].includes(i.location_flag)).map(i => i.location_id))])
+  const locationNames = await getInventoryLocationNames([...new Set(inventory.filter(i => ['Hangar', 'Cargo'].includes(i.location_flag)).map(i => i.location_id))])
+  // console.log('containerNames', containerNames)
+  // console.log('locationNames', locationNames)
   for (let i = 0; i < numBatches; i++) {
     const startIdx = i * batchSize
     const endIdx = Math.min((i + 1) * batchSize, inventory.length)
@@ -32,9 +63,23 @@ const getDogmaAndDTO = async (inventory) => {
         status: 'NONE'
       }
 
+      // console.log('inv', i)
       // TODO - Note: that attributesRaw really needs to contain the base-module values as well as the dynamic values so it's searchable in the DB
       // Update - This is set for base-module, just need to implement dynamic values
-      return inventoryToInventoryCardDTO(data)
+      const inv = inventoryToInventoryCardDTO(data)
+      if (i.location_id) {
+        data.location = {
+          location_id: i.location_id,
+          location_flat: i.location_flag,
+          location_type: i.location_type
+        }
+        if (['AutoFit', 'Unlocked'].includes(i.location_flag)) {
+          data.location.container_name = containerNames[i.location_id]
+        } else {
+          data.location.location_name = locationNames[i.location_id]
+        }
+      }
+      return inv
     }))
     sendLoadingStatusEvent('dogma', `Fetched mod attributes ${Math.min(startIdx, inventory.length)} of ${inventory.length}`)
     consolidatedOutput.push(...batchOutput)

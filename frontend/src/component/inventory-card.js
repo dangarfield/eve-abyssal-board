@@ -185,6 +185,18 @@ export const renderInventoryCard = (item) => {
     </div>
   `
     : ''
+  const locationHtml = item.location !== undefined
+    ? `
+        <div class="d-flex flex-row gap-2 align-items-center px-1">
+            <div class="p-0"><span class="d-block width-32"></span></div>
+            <div class="p-0">
+                ${item.location.location_name ? `<span class="badge bg-secondary text-wrap"><i class="bi bi-geo-alt-fill"></i> ${item.location.location_name}</span>` : ''}
+                ${item.location.container_name ? `<span class="badge bg-secondary text-wrap"><i class="bi bi-box"></i> ${item.location.container_name}</span>` : ''}
+            </div>
+        </div>
+        <hr class="my-2"/>
+    `
+    : ''
 
   const contractPriceHtml = item.contract && item.contract.price !== undefined
     ? `
@@ -251,7 +263,7 @@ export const renderInventoryCard = (item) => {
                         </div>
                     </div>
                     <hr class="my-2"/>
-
+                    ${locationHtml}
                     <!--
                     <div class="d-flex flex-row gap-2 align-items-center px-1">
                         <div class="p-0"><img class="width-32" src="https://images.evetech.net/types/${item.mutatorTypeID}/icon?size=32"></div>

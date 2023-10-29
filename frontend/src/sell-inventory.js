@@ -131,7 +131,7 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
     html += `
     <div class="row row-cols-lg-auto g-3 align-items-center flex-row-reverse px-2">
       <div class="col-12">
-        <input class="form-control ms-2 data-search" type="search" placeholder="Search inventory">
+        <input class="form-control ms-2 data-search" type="search" placeholder="Search type & location">
       </div>
       <div class="col-12">
         <select class="form-select form-sort">
@@ -187,6 +187,8 @@ const renderAvailableInventory = (availableInventory, cacheExpires, lastModified
   document.querySelector('.inner-content').innerHTML = html
   for (const item of availableInventory) {
     item.typeNameLower = item.typeName.toLowerCase()
+    const loc = item.location.location_name || item.location.container_name
+    item.locationLower = loc.toLowerCase()
   }
 }
 const pagination = {
@@ -204,8 +206,8 @@ const filterCardsAndRender = (availableInventory) => {
     const isListed = item.status !== 'NONE'
     const isBricked = Math.round(item.qualityScore) < 15
     // Filter based on search query and hide/show based on hideListed
-    // console.log('searchQuery', item.typeName, searchQuery, item.typeNameLower.includes(searchQuery))
-    const shouldHide = (searchQuery && !item.typeNameLower.includes(searchQuery)) || (hideListed && isListed) || (hideBricked && isBricked)
+    // console.log('searchQuery', item.typeName, searchQuery, item.typeNameLower.includes(searchQuery), item.locationLower.includes(searchQuery))
+    const shouldHide = (searchQuery && (!item.typeNameLower.includes(searchQuery) && !item.locationLower.includes(searchQuery))) || (hideListed && isListed) || (hideBricked && isBricked)
     item.shouldShow = !shouldHide
     if (!shouldHide) allItemsHidden = false
   }

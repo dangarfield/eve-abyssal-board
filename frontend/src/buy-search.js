@@ -351,6 +351,8 @@ export const displayTypeSearch = async (typeID) => {
       return -1
     } else if (typeOrder.indexOf(a.type) > typeOrder.indexOf(b.type)) {
       return 1
+    } else if (type.group === 'Cap Batteries') { // CPU usage is displayed in consistently
+      return a.id === 50 ? -1 : b.id === 50 ? 1 : a.name.localeCompare(b.name)
     } else {
       return a.name.localeCompare(b.name)
     }

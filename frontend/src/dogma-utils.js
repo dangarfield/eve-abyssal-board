@@ -89,7 +89,15 @@ export const inventoryToInventoryCardDTO = (data) => {
       attribute.perc = Math.round(100 * (Math.abs(attribute.diff) / attribute.zeroDiff))
     }
   }
-  data.attributes.sort((a, b) => a.name.localeCompare(b.name)) // TODO: There is a weird mechanic here (for Cap Battery, CPU is above Capacitor Bonus etc)
+  switch (abyssalTypeData.group) {
+    case 'Cap Batteries':
+      // CPU usage is displayed in consistently
+      data.attributes.sort((a, b) => a.id === 50 ? -1 : b.id === 50 ? 1 : a.name.localeCompare(b.name))
+      break
+    default:
+      data.attributes.sort((a, b) => a.name.localeCompare(b.name))
+      break
+  }
 
   data.baseAttributes = []
 

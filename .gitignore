@@ -12,3 +12,4 @@ niceadmin
 
 sync-local-contract-inventory-to-prod.js
 *.xlsx
+*example*.json

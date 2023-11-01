@@ -1,5 +1,6 @@
 import { loadData, saveData, clearData, showModalAlert } from './utils'
-import { createSSO } from 'eve-sso-pkce'
+// import { createSSO } from 'eve-sso-pkce'
+import { createSSO } from './sso/eve-sso-pkce.es.js'
 
 const SELLER_SCOPES = 'publicData esi-assets.read_assets.v1 esi-ui.open_window.v1'.split(' ')
 const BUYER_SCOPES = ['esi-ui.open_window.v1']// .split(' ')

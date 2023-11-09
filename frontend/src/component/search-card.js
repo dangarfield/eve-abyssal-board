@@ -9,23 +9,27 @@ export const renderSearchCard = (type, defaultItem) => {
     // TODO - Something wrong with Capacitor Warfare Resistance Bonus slider - Cap Batteries
 
     return `
-        <div class="d-flex flex-row gap-2 align-items-center px-1">
+        <div class="d-flex flex-row gap-2 align-items-center px-1 attribute-holder attr-${attr.id}">
             <div class="p-0"><img src="/icons/${attr.iconID}.png" width="32" height="32"></div>
             <div class="p-0 w-100">
-                <p class="m-0">
-                    ${attr.name}
-                    <!--
-                    <br/>
-                    zero ${attr.allComparisonZero}<br/>
-                    diff ${attr.allDiff}</p>
-                    v ${attr.value}<br/>
-                    g ${attr.allIsGood}<br/>
-                    min ${attr.allMin}<br/>
-                    max ${attr.allMax}<br/>
-                    zeroDiff ${attr.allZeroDiff}<br/>
-                    perc ${attr.allPerc}
-                    -->
-                </p>        
+                <div class="d-flex flex-row gap-2 align-items-center">
+                    <p class="m-0">
+                        ${attr.name}
+                        <!--
+                        <br/>
+                        zero ${attr.allComparisonZero}<br/>
+                        diff ${attr.allDiff}</p>
+                        v ${attr.value}<br/>
+                        g ${attr.allIsGood}<br/>
+                        min ${attr.allMin}<br/>
+                        max ${attr.allMax}<br/>
+                        zeroDiff ${attr.allZeroDiff}<br/>
+                        perc ${attr.allPerc}
+                        -->
+                        
+                    </p>        
+                    <div class="ms-auto form-check form-switch"><input class="form-check-input attribute-active attr-${attr.id}" type="checkbox" role="switch" checked></div>
+                </div>
                           
                 <!--
                 <p class="m-0">

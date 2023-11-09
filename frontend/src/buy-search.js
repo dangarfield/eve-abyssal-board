@@ -123,7 +123,23 @@ const bindSearchInteractions = () => {
     const displayValueEle = document.querySelector(`.search-attr-${attr.id}-display`)
     const rangeEle = document.querySelector(`.search-attr-${attr.id}-range`)
     const rangeDisplayEle = document.querySelector(`.search-attr-${attr.id}-range-display`)
-
+    const attributeActiveEle = document.querySelector(`.attribute-active.attr-${attr.id}`)
+    const attributeHolderEle = document.querySelector(`.attribute-holder.attr-${attr.id}`)
+    attributeActiveEle.addEventListener('change', (e) => {
+      console.log('attributeActiveEle', id, attributeActiveEle.checked)
+      if (attributeActiveEle.checked) {
+        attributeHolderEle.classList.remove('attribute-inactive')
+        searchAttrEle.parentElement.classList.remove('attribute-inactive')
+        searchAttrEle.removeAttribute('disabled')
+        delete attr.disabled
+      } else {
+        attributeHolderEle.classList.add('attribute-inactive')
+        searchAttrEle.parentElement.classList.add('attribute-inactive')
+        searchAttrEle.setAttribute('disabled', 'disabled')
+        attr.disabled = true
+      }
+      triggerSearch()
+    })
     searchAttrEle.addEventListener('change', () => {
       attr.searchValue = parseFloat(searchAttrEle.value)
       triggerSearch()
@@ -284,8 +300,11 @@ const triggerSearch = async () => {
     const rangeValue = (attr.allMax - attr.allMin) / 100 * range
     const min = mid - rangeValue
     const max = mid + rangeValue
-    // console.log('attr', attr.id, '-', mid, range, '=', min, max)
-    query.attributes.push({ id: attr.id, min, max })
+
+    if (!attr.disabled) {
+      // console.log('attr', attr.id, '-', mid, range, '=', min, max, attr.disabled)
+      query.attributes.push({ id: attr.id, min, max })
+    }
   }
 
   let results = filterResults(allResults, query.attributes)

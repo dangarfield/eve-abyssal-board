@@ -7,6 +7,7 @@ import { inventoryToInventoryCardDTO } from './dogma-utils'
 import { getAbyssModuleTypes } from './module-types'
 import { getCurrentUserDetails } from './auth'
 import { openBuyerToSellerDraftEVEMail, openContractInEVEOnline } from './esi-api'
+import { range } from 'mathjs'
 
 let type
 let allResults
@@ -14,7 +15,8 @@ let defaultItem
 
 const moduleTypes = getAbyssModuleTypes()
 
-const renderSearchPlaceholder = () => {
+const DEFAULT_RANGE = 10
+const renderSearchPlaceholder = (showContracts) => {
   const placeholderResultHtml = Array.from({ length: 7 }).map(a => `
     <div class="col-lg-3 item mb-4">
         <div class="card" aria-hidden="true">
@@ -79,7 +81,7 @@ const renderSearchPlaceholder = () => {
         </div>
         <div class="row search-results">
             <div class="col-lg-3 mb-4 search-card-holder">
-                ${renderSearchCard(type, defaultItem)}
+                ${renderSearchCard(type, defaultItem, showContracts)}
             </div>
             ${placeholderResultHtml}
         </div>
@@ -148,7 +150,7 @@ const bindSearchInteractions = () => {
       const value = parseFloat(searchAttrEle.value)
       const displayValue = formatForUnit(calcValueForDisplay(value, attr.unitID), attr.unitID)
       const percentage = (100 * ((value - attr.allMin) / (attr.allMax - attr.allMin))) - attr.range
-      //   console.log('searchAttrEle VALUE', attr.name, attr.id, value, displayValue, percentage)
+      console.log('searchAttrEle VALUE', attr.name, attr.id, value, displayValue, percentage, attr.range)
 
       displayValueEle.innerHTML = displayValue
       if (attr.highIsGood) {
@@ -160,6 +162,7 @@ const bindSearchInteractions = () => {
       }
     })
     const percentage = (100 * ((searchAttrEle.value - attr.allMin) / (attr.allMax - attr.allMin))) - attr.range
+    console.log('searchAttrEle VALUE', attr.name, attr.id, searchAttrEle.value, percentage, attr.range)
     if (attr.highIsGood) {
       rangeEle.style.right = 'inherit'
       rangeEle.style.left = `${percentage}%`
@@ -167,6 +170,7 @@ const bindSearchInteractions = () => {
       rangeEle.style.left = 'inherit'
       rangeEle.style.right = `${percentage}%`
     }
+    rangeEle.style.width = `${attr.range * 2}%`
     rangeEle.style.display = 'block'
 
     const handleInputInteraction = (event) => {
@@ -214,6 +218,24 @@ const bindSearchInteractions = () => {
     searchAttrEle.addEventListener('touchstart', handleInputInteraction)
   }
 }
+const createSimilarLink = (result) => {
+  const params = Object.entries(result.attributesRaw).map(([attrID, value]) => {
+    return `${attrID}=${value.toFixed(4)}_${DEFAULT_RANGE}`
+    /*
+    https://mutaplasmid.space/type/47745/contracts/
+      ?10147=95.0
+      & 30 = 1336.5000155568123
+      & 20 = 528.1776029033662
+      & 6 = 306.43200080871577
+      & 50 = 65.72250079661607
+      & 554 = 335.7079922091961
+      & percent_range = 0.15
+    */
+  })
+  const link = `/buy/category/${type.typeID}?${params.join('&')}&contracts`
+  console.log('createSimilarLink', result, params)
+  return link
+}
 const updateResultsText = (text) => {
   document.querySelector('.results-text').innerHTML = text
 }
@@ -243,10 +265,20 @@ export const bindInventoryCardClickForContact = async (resultCard, results) => {
   console.log('currentUserDetails', currentUserDetails)
   const appConfig = await getAppConfig()
   console.log('getAppConfig', appConfig)
+  const similarLink = createSimilarLink(result)
+  const similarLinkAction = {
+    buttonText: 'View similar',
+    style: 'btn-primary',
+    cb: async () => {
+      console.log('View similar')
+      window.location.assign(similarLink)
+    }
+  }
+  console.log('similarLink', similarLink)
   if (result.status) {
     const discordText = result.discordName ? `<p>This seller is known on the <a href="${appConfig.discordUrl}" target="_blank">Abyssal Trade Discord Board</a> as <code>${result.discordName}</code></p>` : ''
     const inGameText = currentUserDetails ? '<p>Click below to open an EVE mail to communicate with the seller</p>' : '<p>If you login we can help by creating an EVE mail draft with a link to the seller and item</p>'
-    const actions = []
+    const actions = [similarLinkAction]
     if (currentUserDetails) {
       actions.push({
         buttonText: 'Create EVE mail draft',
@@ -268,7 +300,7 @@ export const bindInventoryCardClickForContact = async (resultCard, results) => {
     showModalAlert('Interested?', content, actions)
   } else {
     const content = (currentUserDetails ? '<p>Click below to view this contract in EVE online</p>' : '<p>If you login we can help by opening the contract directly in EVE online</p>') + mutaplasmidSpaceText
-    const actions = []
+    const actions = [similarLinkAction]
     if (currentUserDetails) {
       actions.push({
         buttonText: 'Open contract',
@@ -346,16 +378,50 @@ export const getDefaultItem = (typeID) => {
   if (itemID === null) return null
   return sde.abyssalTypes[typeID].sources[itemID]
 }
+const getFiltersFromURL = () => {
+  const params = new URLSearchParams(window.location.search)
+  console.log('params', params, params.size)
+  if (params.size === 0) return null
+  const paramsObject = {}
+  for (const [attrID, value] of params) {
+    if (value.includes('_')) {
+      const valueSplit = value.split('_')
+      paramsObject[attrID] = { searchValue: parseFloat(valueSplit[0]), range: parseFloat(valueSplit[1]) }
+    } else {
+      paramsObject[attrID] = { searchValue: parseFloat(value) }
+    }
+  }
+  if (params.has('percent_range')) {
+    paramsObject.range = Math.round(parseFloat(params.get('percent_range')) * 100)
+  }
+  if (params.has('contracts')) {
+    paramsObject.contracts = true
+  }
+  console.log('paramsObject', paramsObject)
+  return paramsObject
+}
 export const setComparisonAttributes = () => {
+  const urlFilters = getFiltersFromURL()
+
   for (const attr of type.attributes) {
     attr.range = 20
-    if (defaultItem) {
+    if (urlFilters) {
+      if (urlFilters.range) {
+        attr.range = urlFilters.range
+      }
+      const urlAttr = urlFilters[attr.id]
+      attr.searchValue = urlAttr.searchValue
+      if (urlAttr.range) {
+        attr.range = urlAttr.range
+      }
+    } else if (defaultItem) {
       attr.searchValue = defaultItem.attributes[attr.id]
     } else {
       attr.searchValue = ((attr.allMax - attr.allMin) / 2) + attr.allMin
     }
     console.log('searchValue', attr.name, attr.searchValue, 'min', attr.allMin, 'max', attr.allMax, attr)
   }
+  return urlFilters?.contracts
 }
 export const displayTypeSearch = async (typeID) => {
   type = sde.abyssalTypes[typeID]
@@ -363,7 +429,8 @@ export const displayTypeSearch = async (typeID) => {
   if (type === undefined) window.location.assign('/buy')
   defaultItem = getDefaultItem(parseInt(typeID))
   console.log('defaultItem', defaultItem)
-  setComparisonAttributes()
+  const showContracts = setComparisonAttributes()
+  console.log('showContracts', showContracts)
   type.attributes.sort((a, b) => {
     const typeOrder = ['mutation', 'base-module', 'derived']
     if (typeOrder.indexOf(a.type) < typeOrder.indexOf(b.type)) {
@@ -377,7 +444,7 @@ export const displayTypeSearch = async (typeID) => {
     }
   })
   console.log('sorted types', type.attributes.map(a => a.name))
-  renderSearchPlaceholder()
+  renderSearchPlaceholder(showContracts)
   await getInitialSearch()
   bindSearchInteractions()
   triggerSearch()

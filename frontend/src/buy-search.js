@@ -405,13 +405,18 @@ export const setComparisonAttributes = () => {
   for (const attr of type.attributes) {
     attr.range = 20
     if (urlFilters) {
-      if (urlFilters.range) {
-        attr.range = urlFilters.range
-      }
-      const urlAttr = urlFilters[attr.id]
-      attr.searchValue = urlAttr.searchValue
-      if (urlAttr.range) {
-        attr.range = urlAttr.range
+      if (urlFilters[attr.id]) {
+        if (urlFilters.range) {
+          attr.range = urlFilters.range
+        }
+        const urlAttr = urlFilters[attr.id]
+        attr.searchValue = urlAttr.searchValue
+        if (urlAttr.range) {
+          attr.range = urlAttr.range
+        }
+      } else {
+        attr.searchValue = ((attr.allMax - attr.allMin) / 2) + attr.allMin
+        attr.disabled = true
       }
     } else if (defaultItem) {
       attr.searchValue = defaultItem.attributes[attr.id]

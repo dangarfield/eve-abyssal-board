@@ -5,12 +5,13 @@ export const renderSearchCard = (type, defaultItem, showContracts) => {
   const dogmaHtml = type.attributes.map(attr => {
     const plusMinusValue = ((calcValueForDisplay(attr.allMax, attr.unitID) - calcValueForDisplay(attr.allMin, attr.unitID)) / 100) * attr.range
     const plusMinusDisplayValue = formatForUnit(plusMinusValue, attr.unitID)
-    console.log('plusMinusDisplayValue', plusMinusValue, plusMinusDisplayValue, attr.allMax, attr.allMin, attr.range)
 
+    // console.log('plusMinusDisplayValue', plusMinusValue, plusMinusDisplayValue, attr.allMax, attr.allMin, attr.range)
+    console.log('renderSearchCard attr', attr)
     // TODO - Something wrong with Capacitor Warfare Resistance Bonus slider - Cap Batteries
 
     return `
-        <div class="d-flex flex-row gap-2 align-items-center px-1 attribute-holder attr-${attr.id}">
+        <div class="d-flex flex-row gap-2 align-items-center px-1 attribute-holder attr-${attr.id}${attr.disabled ? ' attribute-inactive' : ''}">
             <div class="p-0"><img src="/icons/${attr.iconID}.png" width="32" height="32"></div>
             <div class="p-0 w-100">
                 <div class="d-flex flex-row gap-2 align-items-center">
@@ -29,7 +30,7 @@ export const renderSearchCard = (type, defaultItem, showContracts) => {
                         -->
                         
                     </p>        
-                    <div class="ms-auto form-check form-switch"><input class="form-check-input attribute-active attr-${attr.id}" type="checkbox" role="switch" checked></div>
+                    <div class="ms-auto form-check form-switch"><input class="form-check-input attribute-active attr-${attr.id}" type="checkbox" role="switch" ${attr.disabled ? '' : ' checked'}></div>
                 </div>
                           
                 <!--
@@ -48,10 +49,10 @@ export const renderSearchCard = (type, defaultItem, showContracts) => {
         </div>
         <div class="row gx-0 mb-0">
             <div class="col-12">
-                <div class="search-attr-holder">
+                <div class="search-attr-holder${attr.disabled ? ' attribute-inactive' : ''}">
                     <span class="bg-track"></span>
                     <span class="bg-selected bg-primary-subtle search-attr-${attr.id}-range" style="display:none;"></span>
-                    <input type="range" class="form-range search-attr${attr.highIsGood ? '' : ' reverse'}" data-search-attr-id="${attr.id}" min="${attr.allMin}" max="${attr.allMax}" step="any" value="${attr.searchValue}">    
+                    <input type="range" class="form-range search-attr${attr.highIsGood ? '' : ' reverse'}" data-search-attr-id="${attr.id}" min="${attr.allMin}" max="${attr.allMax}" step="any" value="${attr.searchValue}"${attr.disabled ? ' disabled' : ''}>    
                 </div>
             </div>
         </div>`

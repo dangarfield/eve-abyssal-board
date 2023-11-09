@@ -7,7 +7,6 @@ import { inventoryToInventoryCardDTO } from './dogma-utils'
 import { getAbyssModuleTypes } from './module-types'
 import { getCurrentUserDetails } from './auth'
 import { openBuyerToSellerDraftEVEMail, openContractInEVEOnline } from './esi-api'
-import { range } from 'mathjs'
 
 let type
 let allResults
@@ -220,7 +219,7 @@ const bindSearchInteractions = () => {
 }
 const createSimilarLink = (result) => {
   const params = Object.entries(result.attributesRaw).map(([attrID, value]) => {
-    return `${attrID}=${value.toFixed(4)}_${DEFAULT_RANGE}`
+    return `${attrID}=${value.toFixed(4)}_${(DEFAULT_RANGE / 100).toFixed(2)}`
     /*
     https://mutaplasmid.space/type/47745/contracts/
       ?10147=95.0
@@ -386,7 +385,7 @@ const getFiltersFromURL = () => {
   for (const [attrID, value] of params) {
     if (value.includes('_')) {
       const valueSplit = value.split('_')
-      paramsObject[attrID] = { searchValue: parseFloat(valueSplit[0]), range: parseFloat(valueSplit[1]) }
+      paramsObject[attrID] = { searchValue: parseFloat(valueSplit[0]), range: Math.round(100 * parseFloat(valueSplit[1])) }
     } else {
       paramsObject[attrID] = { searchValue: parseFloat(value) }
     }

@@ -283,6 +283,12 @@
 .search-attr-holder.attribute-inactive {
     opacity: 0.1;
 }
+.filter-link {
+    opacity: 0;
+}
+.search-card-holder:hover .filter-link {
+    opacity: 1;
+}
 .dogma-value {
     min-width: 75px;
 }

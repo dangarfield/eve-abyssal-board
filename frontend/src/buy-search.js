@@ -117,6 +117,13 @@ const bindSearchInteractions = () => {
   document.querySelector('.show-contracts').addEventListener('change', (event) => {
     triggerSearch()
   })
+  document.querySelector('.filter-link').addEventListener('click', () => {
+    const params = type.attributes.filter(t => !t.disabled).map(t => `${t.id}=${t.searchValue.toFixed(4)}_${(t.range / 100).toFixed(2)}`)
+    const link = `/buy/category/${type.typeID}?${params.join('&')}${document.querySelector('.show-contracts').checked ? '&contracts' : ''}`
+    console.log('filter-link', type, params, link)
+    // window.location.assign(link)
+    window.history.pushState(null, null, link)
+  })
 
   for (const searchAttrEle of [...document.querySelectorAll('.search-attr')]) {
     const id = parseInt(searchAttrEle.getAttribute('data-search-attr-id'))

@@ -14,7 +14,7 @@ export const renderSearchCard = (type, defaultItem, showContracts) => {
         <div class="d-flex flex-row gap-2 align-items-center px-1 attribute-holder attr-${attr.id}${attr.disabled ? ' attribute-inactive' : ''}">
             <div class="p-0"><img src="/icons/${attr.iconID}.png" width="32" height="32"></div>
             <div class="p-0 w-100">
-                <div class="d-flex flex-row gap-2 align-items-center">
+                <div class="d-flex flex-row align-items-center">
                     <p class="m-0">
                         ${attr.name}
                         <!--
@@ -64,7 +64,10 @@ export const renderSearchCard = (type, defaultItem, showContracts) => {
         <div class="d-flex flex-row gap-2 align-items-center px-1">
             <div class="p-0"><img src="https://images.evetech.net/types/${type.typeID}/icon?size=32"></div>
             <div class="p-0">
-                <p class="lead mb-0 type-name"><b>${type.name}</b></p>
+                <div class="d-flex flex-row align-items-center">
+                    <p class="lead mb-0 type-name"><b>${type.name}</b></p>
+                    <button class="btn p-0 border-0 filter-link"><i class="bi bi-link fs-3"></i></button>
+                </div>
                 <span class="badge bg-secondary">${type.group}</span>
                 <span class="badge bg-secondary">${type.category}</span>
             </div>

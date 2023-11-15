@@ -102,6 +102,7 @@ export const inventoryToInventoryCardDTO = (data) => {
   data.baseAttributes = []
 
   data.typeName = abyssalTypeData.name
+  console.log('group', abyssalTypeData)
   data.group = abyssalTypeData.group
   data.category = abyssalTypeData.category
 

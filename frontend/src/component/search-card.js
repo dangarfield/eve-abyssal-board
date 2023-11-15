@@ -1,7 +1,7 @@
 import { calcValueForDisplay, formatForUnit } from '../utils'
 
 export const renderSearchCard = (type, defaultItem, showContracts) => {
-  console.log('search card showContracts', showContracts)
+  console.log('search card showContracts', showContracts, type)
   const dogmaHtml = type.attributes.map(attr => {
     const plusMinusValue = ((calcValueForDisplay(attr.allMax, attr.unitID) - calcValueForDisplay(attr.allMin, attr.unitID)) / 100) * attr.range
     const plusMinusDisplayValue = formatForUnit(plusMinusValue, attr.unitID)

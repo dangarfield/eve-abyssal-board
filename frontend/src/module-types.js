@@ -409,6 +409,11 @@ export const getAbyssModuleTypes = () => {
           categoryName: 'Drone Amp.',
           typeID: 60482,
           defaultItem: 33842 // Federation Navy Drone Damage Amplifier
+        },
+        {
+          categoryName: 'Vorton Tuning System',
+          typeID: 78621,
+          defaultItem: 78741 // Kasiha's Modified Vorton Tuning System
         }
       ]
     },

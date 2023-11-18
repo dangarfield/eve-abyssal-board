@@ -272,7 +272,7 @@
 .form-check-input.attribute-active:checked {
     background-color: #6776f4;
     border-color: #6776f4;
-    opacity: 0;
+    opacity: 0.1;
 }
 .attribute-holder:hover .form-check-input.attribute-active {
     opacity: 1;

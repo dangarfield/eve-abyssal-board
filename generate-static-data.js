@@ -215,7 +215,7 @@ const updateDerivedAttributes = (attributes, typeID) => {
     addAttribute(attributes, 100003, 'derived', 'Armor repair per capacitor', 1002, 1031, true, 'getValue(84) / getValue(6)') // HP/GJ
   }
 
-  if ([49730, 49722, 49726, 49734].includes(typeID)) {
+  if ([49730, 49722, 49726, 49734, 78621].includes(typeID)) {
     addAttribute(attributes, 100004, 'derived', 'DPS Bonus', 1003, 2893, true, '((getValue(64) / getValue(204)) -1)*100') // %
   }
 
